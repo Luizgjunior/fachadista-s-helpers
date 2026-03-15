@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Admin from "./pages/Admin";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import Plans from "./pages/Plans";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import { generateAndSetFavicon } from "@/utils/faviconGenerator";
