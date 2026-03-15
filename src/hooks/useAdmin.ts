@@ -224,22 +224,24 @@ export function useAdmin(profile: Profile | null) {
   const getCreditSummary = useCallback(async () => {
     if (!isAdmin) return { totalConsumed: 0, totalDistributed: 0, avgBalance: 0 };
 
-    // Get totals from transactions
+    // Get transactions joined with profiles to exclude admins
     const { data: txData } = await supabase
       .from("credit_transactions")
-      .select("amount, type");
+      .select("amount, type, profiles!credit_transactions_user_id_fkey(is_admin)");
 
     let totalConsumed = 0;
     let totalDistributed = 0;
-    for (const tx of txData ?? []) {
+    for (const tx of (txData ?? []) as any[]) {
+      if (tx.profiles?.is_admin) continue;
       if (tx.type === "consume") totalConsumed += Math.abs(tx.amount);
       else totalDistributed += Math.abs(tx.amount);
     }
 
-    // Get average balance
+    // Get average balance excluding admins
     const { data: profiles } = await supabase
       .from("profiles")
-      .select("credits");
+      .select("credits")
+      .eq("is_admin", false);
 
     let avgBalance = 0;
     if (profiles && profiles.length > 0) {
