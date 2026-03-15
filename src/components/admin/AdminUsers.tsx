@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Search, Zap, Shield, ChevronLeft, ChevronRight, X, Loader2 } from "lucide-react";
+import { Search, Zap, Shield, ChevronLeft, ChevronRight, X, Loader2, Pencil, Trash2 } from "lucide-react";
 import type { Profile } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
