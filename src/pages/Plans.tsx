@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Sparkles, ShoppingCart, CreditCard, Zap, Check, ChevronDown, ImageIcon } from "lucide-react";
+import { CREDIT_COSTS } from "@/hooks/useCredits";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import AppHeader from "@/components/fachadista/AppHeader";
