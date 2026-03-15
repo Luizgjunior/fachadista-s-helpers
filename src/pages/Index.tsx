@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { History, SlidersHorizontal } from "lucide-react";
-import AppHeader, { LoginModal } from "@/components/fachadista/AppHeader";
+import AppHeader from "@/components/fachadista/AppHeader";
 import ImageUploadZone from "@/components/fachadista/ImageUploadZone";
 import PromptResult from "@/components/fachadista/PromptResult";
 import ControlPanel, { ControlPanelContent } from "@/components/fachadista/ControlPanel";
@@ -9,14 +10,19 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/u
 import { DEFAULT_PARAMS } from "@/constants/defaults";
 import { generateArchitecturalPrompt, generateSamplePreview } from "@/services/geminiService";
 import { type AppMode, type GeneratedPrompt, type PromptParameters } from "@/types/fachadista";
+import { useAuth } from "@/hooks/useAuth";
+import { useCredits } from "@/hooks/useCredits";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 type TabType = 'scene' | 'atmos' | 'entorno';
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { user, profile, signOut, refreshProfile } = useAuth();
+  const { credits, hasCredits, consumeCredit } = useCredits({ profile, refreshProfile });
+
   const [appMode, setAppMode] = useState<AppMode>('generator');
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [user, setUser] = useState<{ email: string } | null>(null);
-  const [emailInput, setEmailInput] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [images, setImages] = useState<string[]>([]);
@@ -76,31 +82,48 @@ const Index = () => {
     return () => window.removeEventListener('paste', handleGlobalPaste);
   }, [appMode, beforeImage, processFile]);
 
+  // Load history from Supabase
   useEffect(() => {
-    const saved = localStorage.getItem('fcd_history');
-    if (saved) setHistory(JSON.parse(saved));
-    const savedUser = localStorage.getItem('fcd_user');
-    if (savedUser) setUser(JSON.parse(savedUser));
-  }, []);
+    if (!user) return;
+    const loadHistory = async () => {
+      const { data, error } = await supabase
+        .from("prompts")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(10);
 
-  const saveToHistory = (item: GeneratedPrompt) => {
-    const newHistory = [item, ...history].slice(0, 10);
-    setHistory(newHistory);
-    localStorage.setItem('fcd_history', JSON.stringify(newHistory));
+      if (!error && data) {
+        setHistory(
+          data.map((p) => ({
+            id: p.id,
+            english: p.prompt_english,
+            portuguese: p.prompt_portuguese ?? "",
+            tags: p.tags ?? [],
+            timestamp: new Date(p.created_at ?? "").getTime(),
+            previewUrl: p.preview_url ?? undefined,
+          }))
+        );
+      }
+    };
+    loadHistory();
+  }, [user]);
+
+  const savePromptToDb = async (item: GeneratedPrompt) => {
+    if (!user) return;
+    await supabase.from("prompts").insert({
+      user_id: user.id,
+      prompt_english: item.english,
+      prompt_portuguese: item.portuguese,
+      tags: item.tags,
+      parameters: params as any,
+      preview_url: item.previewUrl ?? null,
+      credits_used: 1,
+    });
   };
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!emailInput) return;
-    const userData = { email: emailInput };
-    setUser(userData);
-    localStorage.setItem('fcd_user', JSON.stringify(userData));
-    setIsLoginModalOpen(false);
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem('fcd_user');
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/login");
   };
 
   const resetGenerator = () => {
@@ -141,9 +164,7 @@ const Index = () => {
       if (url) {
         const updatedResult = { ...result, previewUrl: url };
         setResult(updatedResult);
-        const newHistory = history.map(h => h.id === result.id ? updatedResult : h);
-        setHistory(newHistory);
-        localStorage.setItem('fcd_history', JSON.stringify(newHistory));
+        setHistory(prev => prev.map(h => h.id === result.id ? updatedResult : h));
       }
     } catch (err) {
       console.error('Erro ao gerar preview:', err);
@@ -154,15 +175,24 @@ const Index = () => {
 
   const handleGenerate = async () => {
     if (images.length === 0) return;
+
+    // Consume credit first
+    const ok = await consumeCredit("Geração de prompt");
+    if (!ok) {
+      toast.error("Créditos insuficientes. Faça upgrade para o plano Pro.");
+      return;
+    }
+
     setLoading(true);
     setDrawerOpen(false);
     try {
       const data = await generateArchitecturalPrompt(images, params);
       setResult(data);
-      saveToHistory(data);
+      setHistory(prev => [data, ...prev].slice(0, 10));
+      await savePromptToDb(data);
     } catch (err) {
       console.error('Erro ao gerar prompt:', err);
-      alert('Erro ao processar imagem. Verifique sua conexão ou tente novamente.');
+      toast.error('Erro ao processar imagem. Verifique sua conexão ou tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -186,21 +216,12 @@ const Index = () => {
       <AppHeader
         appMode={appMode}
         setAppMode={setAppMode}
-        user={user}
-        onLoginClick={() => setIsLoginModalOpen(true)}
+        profile={profile}
         onLogout={handleLogout}
         showResetGenerator={appMode === 'generator' && (images.length > 0 || result !== null)}
         onResetGenerator={resetGenerator}
         showResetComparator={appMode === 'comparator' && (!!beforeImage || !!afterImage)}
         onResetComparator={() => { setBeforeImage(null); setAfterImage(null); }}
-      />
-
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        emailInput={emailInput}
-        setEmailInput={setEmailInput}
-        onSubmit={handleLogin}
       />
 
       {appMode === 'generator' && (
