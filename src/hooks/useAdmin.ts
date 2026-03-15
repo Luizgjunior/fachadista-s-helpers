@@ -25,6 +25,17 @@ export interface CreditTransaction {
   email: string;
 }
 
+export interface CaktoOrder {
+  id: string;
+  user_id: string | null;
+  package_id: string | null;
+  credits_added: number;
+  amount_paid: number | null;
+  customer_email: string | null;
+  status: string;
+  processed_at: string | null;
+}
+
 export interface DailyPromptCount {
   day: string;
   prompts_count: number;
