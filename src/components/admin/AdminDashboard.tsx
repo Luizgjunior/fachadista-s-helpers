@@ -44,6 +44,10 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
     );
   }
 
+  const renderRate = metrics && metrics.total_prompts
+    ? ((metrics.total_renders / metrics.total_prompts) * 100).toFixed(1)
+    : "0.0";
+
   const cards = [
     {
       label: "Total de Usuários",
@@ -76,6 +80,23 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
       icon: Battery,
       color: "text-muted-foreground",
       bg: "bg-muted",
+    },
+    {
+      label: "Total de Renders",
+      value: metrics?.total_renders ?? 0,
+      sub: `${metrics?.renders_30d ?? 0} nos últimos 30 dias`,
+      icon: ImageIcon,
+      color: "text-primary",
+      bg: "bg-brand-light",
+    },
+    {
+      label: "Taxa Prompt→Render",
+      value: `${renderRate}%`,
+      sub: "de prompts viram renders",
+      icon: TrendingUp,
+      color: "text-green-600",
+      bg: "bg-green-50",
+      isString: true,
     },
   ];
 
