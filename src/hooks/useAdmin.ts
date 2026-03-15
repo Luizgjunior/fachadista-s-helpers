@@ -250,6 +250,41 @@ export function useAdmin(profile: Profile | null) {
     return { totalConsumed, totalDistributed, avgBalance };
   }, [isAdmin]);
 
+  const updateUserProfile = useCallback(
+    async (userId: string, data: { full_name?: string; email?: string }) => {
+      if (!isAdmin) return false;
+      const { error } = await supabase
+        .from("profiles")
+        .update({ ...data, updated_at: new Date().toISOString() })
+        .eq("id", userId);
+      if (error) {
+        toast.error("Erro ao atualizar perfil.");
+        return false;
+      }
+      toast.success("Perfil atualizado.");
+      return true;
+    },
+    [isAdmin]
+  );
+
+  const deleteUser = useCallback(
+    async (userId: string) => {
+      if (!isAdmin) return false;
+      // Delete profile (cascades to transactions and prompts via FK)
+      const { error } = await supabase
+        .from("profiles")
+        .delete()
+        .eq("id", userId);
+      if (error) {
+        toast.error("Erro ao excluir usuário.");
+        return false;
+      }
+      toast.success("Usuário excluído.");
+      return true;
+    },
+    [isAdmin]
+  );
+
   return {
     isAdmin,
     getMetrics,
@@ -257,6 +292,8 @@ export function useAdmin(profile: Profile | null) {
     updateUserCredits,
     updateUserPlan,
     toggleAdmin,
+    updateUserProfile,
+    deleteUser,
     getTransactions,
     getDailyPrompts,
     rechargeProUsers,
