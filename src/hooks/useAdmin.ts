@@ -25,6 +25,17 @@ export interface CreditTransaction {
   email: string;
 }
 
+export interface CaktoOrder {
+  id: string;
+  user_id: string | null;
+  package_id: string | null;
+  credits_added: number;
+  amount_paid: number | null;
+  customer_email: string | null;
+  status: string;
+  processed_at: string | null;
+}
+
 export interface DailyPromptCount {
   day: string;
   prompts_count: number;
@@ -291,6 +302,20 @@ export function useAdmin(profile: Profile | null) {
     [isAdmin]
   );
 
+  const getCaktoOrders = useCallback(async (limit = 50): Promise<CaktoOrder[]> => {
+    if (!isAdmin) return [];
+    const { data, error } = await supabase
+      .from("cakto_orders")
+      .select("*")
+      .order("processed_at", { ascending: false })
+      .limit(limit);
+    if (error) {
+      console.error("Error fetching cakto orders:", error);
+      return [];
+    }
+    return (data ?? []) as CaktoOrder[];
+  }, [isAdmin]);
+
   return {
     isAdmin,
     getMetrics,
@@ -304,5 +329,6 @@ export function useAdmin(profile: Profile | null) {
     getDailyPrompts,
     rechargeProUsers,
     getCreditSummary,
+    getCaktoOrders,
   };
 }
