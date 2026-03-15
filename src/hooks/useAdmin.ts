@@ -56,6 +56,7 @@ export function useAdmin(profile: Profile | null) {
       let query = supabase
         .from("profiles")
         .select("*", { count: "exact" })
+        .eq("is_admin", false)
         .order("created_at", { ascending: false });
 
       if (search) {
@@ -149,10 +150,9 @@ export function useAdmin(profile: Profile | null) {
     async (limit = 50): Promise<CreditTransaction[]> => {
       if (!isAdmin) return [];
 
-      // We need to join profiles data. Since supabase-js supports foreign key joins:
       const { data, error } = await supabase
         .from("credit_transactions")
-        .select("*, profiles!credit_transactions_user_id_fkey(full_name, email)")
+        .select("*, profiles!credit_transactions_user_id_fkey(full_name, email, is_admin)")
         .order("created_at", { ascending: false })
         .limit(limit);
 
@@ -162,16 +162,19 @@ export function useAdmin(profile: Profile | null) {
         return [];
       }
 
-      return (data ?? []).map((row: any) => ({
-        id: row.id,
-        user_id: row.user_id,
-        amount: row.amount,
-        type: row.type,
-        description: row.description,
-        created_at: row.created_at,
-        full_name: row.profiles?.full_name ?? null,
-        email: row.profiles?.email ?? "",
-      }));
+      // Exclude admin transactions
+      return (data ?? [])
+        .filter((row: any) => !row.profiles?.is_admin)
+        .map((row: any) => ({
+          id: row.id,
+          user_id: row.user_id,
+          amount: row.amount,
+          type: row.type,
+          description: row.description,
+          created_at: row.created_at,
+          full_name: row.profiles?.full_name ?? null,
+          email: row.profiles?.email ?? "",
+        }));
     },
     [isAdmin]
   );
@@ -184,7 +187,7 @@ export function useAdmin(profile: Profile | null) {
 
     const { data, error } = await supabase
       .from("prompts")
-      .select("created_at")
+      .select("created_at, profiles!prompts_user_id_fkey(is_admin)")
       .gte("created_at", thirtyDaysAgo.toISOString())
       .order("created_at", { ascending: true });
 
@@ -193,9 +196,10 @@ export function useAdmin(profile: Profile | null) {
       return [];
     }
 
-    // Aggregate by day client-side
+    // Aggregate by day, excluding admin prompts
     const counts: Record<string, number> = {};
-    for (const row of data ?? []) {
+    for (const row of (data ?? []) as any[]) {
+      if (row.profiles?.is_admin) continue;
       const day = row.created_at ? row.created_at.slice(0, 10) : "";
       if (day) counts[day] = (counts[day] || 0) + 1;
     }
@@ -223,22 +227,24 @@ export function useAdmin(profile: Profile | null) {
   const getCreditSummary = useCallback(async () => {
     if (!isAdmin) return { totalConsumed: 0, totalDistributed: 0, avgBalance: 0 };
 
-    // Get totals from transactions
+    // Get transactions joined with profiles to exclude admins
     const { data: txData } = await supabase
       .from("credit_transactions")
-      .select("amount, type");
+      .select("amount, type, profiles!credit_transactions_user_id_fkey(is_admin)");
 
     let totalConsumed = 0;
     let totalDistributed = 0;
-    for (const tx of txData ?? []) {
+    for (const tx of (txData ?? []) as any[]) {
+      if (tx.profiles?.is_admin) continue;
       if (tx.type === "consume") totalConsumed += Math.abs(tx.amount);
       else totalDistributed += Math.abs(tx.amount);
     }
 
-    // Get average balance
+    // Get average balance excluding admins
     const { data: profiles } = await supabase
       .from("profiles")
-      .select("credits");
+      .select("credits")
+      .eq("is_admin", false);
 
     let avgBalance = 0;
     if (profiles && profiles.length > 0) {
