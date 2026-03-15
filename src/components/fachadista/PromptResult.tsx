@@ -2,6 +2,7 @@ import { Copy, Check, Zap, Sparkles, Eye, RefreshCw, Download } from "lucide-rea
 import { GeneratedPrompt } from "@/types/fachadista";
 import { Progress } from "@/components/ui/progress";
 import { useState, useEffect } from "react";
+import { CREDIT_COSTS } from "@/hooks/useCredits";
 
 interface PromptResultProps {
   result: GeneratedPrompt;
