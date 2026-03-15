@@ -19,8 +19,14 @@ interface CreditPackage {
   price_brl: number;
   is_popular: boolean;
   is_active: boolean;
-  features: string[] | null;
+  features: unknown;
 }
+
+const getFeatures = (features: unknown): string[] => {
+  if (!features) return [];
+  if (Array.isArray(features)) return features as string[];
+  return [];
+};
 
 const FAQ_ITEMS = [
   {
