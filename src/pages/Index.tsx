@@ -176,8 +176,8 @@ const Index = () => {
       setHistory(prev => [data, ...prev].slice(0, 10));
       await savePromptToDb(data);
     } catch (err) {
-      console.error('Erro ao gerar prompt:', err);
-      toast.error('Erro ao processar imagem. Verifique sua conexão ou tente novamente.');
+      console.error('Erro completo:', err);
+      toast.error(err?.message || 'Erro desconhecido. Veja o console.');
     } finally {
       setLoading(false);
     }
