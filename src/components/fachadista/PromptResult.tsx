@@ -116,7 +116,7 @@ const PromptResult = ({
                     Gerar Render IA
                   </button>
                   {!isAdmin && (
-                    <p className="text-[9px] font-bold text-muted-foreground/50">Consome 3 créditos</p>
+                    <p className="text-[9px] font-bold text-muted-foreground/50">Consome {CREDIT_COSTS.IMAGE} créditos</p>
                   )}
                 </div>
               )}

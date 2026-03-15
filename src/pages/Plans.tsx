@@ -156,7 +156,7 @@ const Plans = () => {
 
                   <div className="flex items-center gap-3 bg-field-bg border border-border rounded-xl px-3 py-2 text-[10px] font-bold text-muted-foreground mb-6">
                     <Zap className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                    <span>{Math.floor(pkg.credits / 1)} prompts ou {Math.floor(pkg.credits / 3)} renders IA</span>
+                    <span>{Math.floor(pkg.credits / CREDIT_COSTS.PROMPT)} prompts ou {Math.floor(pkg.credits / CREDIT_COSTS.IMAGE)} renders IA</span>
                   </div>
 
                   <div className="border-t border-border my-6" />

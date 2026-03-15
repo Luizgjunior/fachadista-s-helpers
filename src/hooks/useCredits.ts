@@ -8,49 +8,17 @@ interface UseCreditsOptions {
   refreshProfile: () => Promise<void>;
 }
 
+export const CREDIT_COSTS = {
+  PROMPT: 3,
+  IMAGE: 5,
+} as const;
+
 export function useCredits({ profile, refreshProfile }: UseCreditsOptions) {
   const isAdmin = profile?.is_admin === true;
   const credits = profile?.credits ?? 0;
   const hasCredits = isAdmin || credits > 0;
-
-  const consumeCredit = useCallback(
-    async (description?: string) => {
-      if (!profile) {
-        toast.error("Faça login para gerar prompts.");
-        return false;
-      }
-
-      // Admins have unlimited credits
-      if (profile.is_admin) {
-        return true;
-      }
-
-      if (!hasCredits) {
-        toast.error("Seus créditos acabaram. Faça upgrade do plano.");
-        return false;
-      }
-
-      const { data, error } = await supabase.rpc("consume_credit", {
-        p_user_id: profile.id,
-        p_description: description ?? "Geração de prompt",
-      });
-
-      if (error) {
-        console.error("Error consuming credit:", error);
-        toast.error("Erro ao consumir crédito.");
-        return false;
-      }
-
-      if (data === false) {
-        toast.error("Seus créditos acabaram.");
-        return false;
-      }
-
-      await refreshProfile();
-      return true;
-    },
-    [profile, hasCredits, refreshProfile]
-  );
+  const hasCreditsForPrompt = isAdmin || credits >= CREDIT_COSTS.PROMPT;
+  const hasCreditsForImage = isAdmin || credits >= CREDIT_COSTS.IMAGE;
 
   const consumeCredits = useCallback(
     async (amount: number, description?: string) => {
@@ -58,9 +26,10 @@ export function useCredits({ profile, refreshProfile }: UseCreditsOptions) {
         toast.error("Faça login para continuar.");
         return false;
       }
-      if (profile.is_admin) return true;
 
-      if ((profile.credits ?? 0) < amount) {
+      if (isAdmin) return true;
+
+      if (credits < amount) {
         toast.error(`Créditos insuficientes. Necessário: ${amount}`);
         return false;
       }
@@ -71,16 +40,40 @@ export function useCredits({ profile, refreshProfile }: UseCreditsOptions) {
         p_description: description ?? `Consumo de ${amount} créditos`,
       });
 
-      if (error || data === false) {
+      if (error) {
+        console.error("Error consuming credits:", error);
         toast.error("Erro ao consumir créditos.");
+        return false;
+      }
+
+      if (data === false) {
+        toast.error("Créditos insuficientes.");
         return false;
       }
 
       await refreshProfile();
       return true;
     },
-    [profile, refreshProfile]
+    [profile, isAdmin, credits, refreshProfile]
   );
 
-  return { credits, hasCredits, consumeCredit, consumeCredits };
+  const consumePromptCredits = useCallback(
+    () => consumeCredits(CREDIT_COSTS.PROMPT, "Geração de prompt"),
+    [consumeCredits]
+  );
+
+  const consumeImageCredits = useCallback(
+    () => consumeCredits(CREDIT_COSTS.IMAGE, "Geração de render IA"),
+    [consumeCredits]
+  );
+
+  return {
+    credits,
+    hasCredits,
+    hasCreditsForPrompt,
+    hasCreditsForImage,
+    consumeCredits,
+    consumePromptCredits,
+    consumeImageCredits,
+  };
 }

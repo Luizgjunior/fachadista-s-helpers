@@ -120,7 +120,7 @@ const Index = () => {
       tags: item.tags,
       parameters: params as any,
       preview_url: item.previewUrl ?? null,
-      credits_used: 1,
+      credits_used: 3,
     });
   };
 

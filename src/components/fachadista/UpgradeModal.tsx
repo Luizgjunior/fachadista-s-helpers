@@ -37,7 +37,7 @@ const UpgradeModal = ({ open, onClose }: UpgradeModalProps) => {
               <span className="bg-secondary text-muted-foreground text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full">Atual</span>
               <h3 className="text-lg font-black uppercase tracking-tight text-foreground">Free</h3>
               <ul className="space-y-2 text-xs font-bold text-muted-foreground">
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-muted-foreground/50" /> 10 créditos iniciais</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-muted-foreground/50" /> 10 créditos iniciais (3 prompts ou 2 renders)</li>
                 <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-muted-foreground/50" /> Histórico de 10 prompts</li>
               </ul>
             </div>
