@@ -186,13 +186,8 @@ const Index = () => {
   const generatePreview = async () => {
     if (!result || previewLoading) return;
 
-    if (!profile?.is_admin && (profile?.credits ?? 0) < 3) {
-      setUpgradeOpen(true);
-      return;
-    }
-
     if (!profile?.is_admin) {
-      const ok = await consumeCredits(3, "Geração de render IA");
+      const ok = await consumeImageCredits();
       if (!ok) {
         setUpgradeOpen(true);
         return;
