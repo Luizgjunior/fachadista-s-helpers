@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { TrendingDown, Gift, BarChart3, RefreshCw, Loader2, X } from "lucide-react";
-import type { CreditTransaction } from "@/hooks/useAdmin";
+import { TrendingDown, Gift, BarChart3, RefreshCw, Loader2, X, ShoppingBag } from "lucide-react";
+import type { CreditTransaction, CaktoOrder } from "@/hooks/useAdmin";
 
 function Skeleton({ className = "" }: { className?: string }) {
   return <div className={`bg-muted animate-pulse rounded-2xl ${className}`} />;
@@ -11,6 +11,7 @@ interface AdminCreditsProps {
     getCreditSummary: () => Promise<{ totalConsumed: number; totalDistributed: number; avgBalance: number }>;
     getTransactions: (limit?: number) => Promise<CreditTransaction[]>;
     rechargeProUsers: () => Promise<number>;
+    getCaktoOrders: (limit?: number) => Promise<CaktoOrder[]>;
   };
 }
 
