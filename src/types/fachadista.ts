@@ -49,6 +49,8 @@ export interface PromptParameters {
   blurReference: boolean;
 }
 
+export type AppMode = 'generator' | 'comparator';
+
 export interface GeneratedPrompt {
   id: string;
   english: string;
