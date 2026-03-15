@@ -33,6 +33,7 @@ const Index = () => {
   const [result, setResult] = useState<GeneratedPrompt | null>(null);
   const [history, setHistory] = useState<GeneratedPrompt[]>([]);
   const [copied, setCopied] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('scene');
 
