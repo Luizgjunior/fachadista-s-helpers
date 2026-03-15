@@ -448,6 +448,20 @@ export default function AdminUsers({ admin, currentProfile }: AdminUsersProps) {
                         >
                           <Shield className="w-3.5 h-3.5" />
                         </button>
+                        <button
+                          onClick={() => setEditModal(u)}
+                          className="p-1.5 rounded-lg border bg-field-bg border-field-border text-muted-foreground hover:text-blue-600 hover:border-blue-400 transition-all"
+                          title="Editar"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteUser(u)}
+                          className="p-1.5 rounded-lg border bg-field-bg border-field-border text-muted-foreground hover:text-destructive hover:border-destructive/50 transition-all"
+                          title="Excluir"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </td>
                   </tr>
