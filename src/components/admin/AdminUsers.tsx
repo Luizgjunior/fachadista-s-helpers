@@ -13,6 +13,8 @@ interface AdminUsersProps {
     updateUserCredits: (userId: string, currentCredits: number, delta: number, reason: string) => Promise<boolean>;
     updateUserPlan: (userId: string, planId: string) => Promise<boolean>;
     toggleAdmin: (userId: string, makeAdmin: boolean) => Promise<boolean>;
+    updateUserProfile: (userId: string, data: { full_name?: string; email?: string }) => Promise<boolean>;
+    deleteUser: (userId: string) => Promise<boolean>;
   };
   currentProfile: Profile | null;
 }
