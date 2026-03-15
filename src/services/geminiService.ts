@@ -105,9 +105,12 @@ export const generateArchitecturalPrompt = async (
     }
   );
 
+  console.log('Status da resposta:', response.status);
+
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData?.error?.message || `Erro na API Gemini: ${response.status}`);
+    const errorBody = await response.json().catch(() => ({}));
+    console.error('Erro da API Gemini:', JSON.stringify(errorBody));
+    throw new Error(errorBody?.error?.message || `Erro ${response.status}: ${response.statusText}`);
   }
 
   const result = await response.json();
