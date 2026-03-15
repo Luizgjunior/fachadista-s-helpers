@@ -1,4 +1,5 @@
 import { Camera, Wind, Map, Building, Layout, Palette, Focus, Sun, Globe, Lightbulb, Footprints, Users, Car, Zap } from "lucide-react";
+import { CREDIT_COSTS } from "@/hooks/useCredits";
 import SelectField from "./SelectField";
 import SliderField from "./SliderField";
 import ToggleSwitch from "./ToggleSwitch";
@@ -162,6 +163,9 @@ export const ControlPanelContent = ({ activeTab, setActiveTab, params, setParams
       )}
       {loading ? 'PROCESSANDO...' : 'GERAR PROMPT'}
     </button>
+    <p className="text-[9px] font-bold text-muted-foreground/50 text-center mt-2 uppercase tracking-widest">
+      Consome {CREDIT_COSTS.PROMPT} créditos por geração
+    </p>
   </div>
 );
 

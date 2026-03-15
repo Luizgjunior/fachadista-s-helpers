@@ -2,6 +2,7 @@ import { Copy, Check, Zap, Sparkles, Eye, RefreshCw, Download } from "lucide-rea
 import { GeneratedPrompt } from "@/types/fachadista";
 import { Progress } from "@/components/ui/progress";
 import { useState, useEffect } from "react";
+import { CREDIT_COSTS } from "@/hooks/useCredits";
 
 interface PromptResultProps {
   result: GeneratedPrompt;
@@ -23,7 +24,7 @@ const PromptResult = ({
   isAdmin,
 }: PromptResultProps) => {
   const [fakeProgress, setFakeProgress] = useState(0);
-  const canGenerate = isAdmin || userCredits >= 3;
+  const canGenerate = isAdmin || userCredits >= CREDIT_COSTS.IMAGE;
 
   useEffect(() => {
     if (!previewLoading) {
@@ -99,7 +100,7 @@ const PromptResult = ({
                   <p className="text-sm md:text-base font-black text-muted-foreground uppercase tracking-wide">Render com IA</p>
                   <p className="text-[10px] md:text-xs font-bold text-muted-foreground/60">Gere uma visualização fotorrealista do seu projeto</p>
                   <span className="bg-primary/10 text-primary text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
-                    3 créditos
+                    {CREDIT_COSTS.IMAGE} créditos
                   </span>
                   <button
                     onClick={onGeneratePreview}
@@ -109,13 +110,13 @@ const PromptResult = ({
                         ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95'
                         : 'bg-muted text-muted-foreground cursor-not-allowed'
                     }`}
-                    title={!canGenerate ? 'Créditos insuficientes (necessário: 3)' : undefined}
+                    title={!canGenerate ? `Créditos insuficientes (necessário: ${CREDIT_COSTS.IMAGE})` : undefined}
                   >
                     <Sparkles className="w-4 h-4" />
                     Gerar Render IA
                   </button>
                   {!isAdmin && (
-                    <p className="text-[9px] font-bold text-muted-foreground/50">Consome 3 créditos</p>
+                    <p className="text-[9px] font-bold text-muted-foreground/50">Consome {CREDIT_COSTS.IMAGE} créditos</p>
                   )}
                 </div>
               )}

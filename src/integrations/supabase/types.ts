@@ -277,6 +277,10 @@ export type Database = {
         Args: { p_description?: string; p_user_id: string }
         Returns: boolean
       }
+      consume_credits_bulk: {
+        Args: { p_amount: number; p_description?: string; p_user_id: string }
+        Returns: boolean
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       recharge_pro_users: { Args: never; Returns: number }
       toggle_admin: {

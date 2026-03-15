@@ -22,7 +22,7 @@ type TabType = 'scene' | 'atmos' | 'entorno';
 const Index = () => {
   const navigate = useNavigate();
   const { user, profile, signOut, refreshProfile } = useAuth();
-  const { credits, hasCredits, consumeCredit, consumeCredits } = useCredits({ profile, refreshProfile });
+  const { credits, hasCreditsForPrompt, hasCreditsForImage, consumePromptCredits, consumeImageCredits } = useCredits({ profile, refreshProfile });
 
   const [appMode, setAppMode] = useState<AppMode>('generator');
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -120,7 +120,7 @@ const Index = () => {
       tags: item.tags,
       parameters: params as any,
       preview_url: item.previewUrl ?? null,
-      credits_used: 1,
+      credits_used: 3,
     });
   };
 
@@ -162,8 +162,7 @@ const Index = () => {
   const handleGenerate = async () => {
     if (images.length === 0) return;
 
-    // Consume credit first
-    const ok = await consumeCredit("Geração de prompt");
+    const ok = await consumePromptCredits();
     if (!ok) {
       setUpgradeOpen(true);
       return;
@@ -187,13 +186,8 @@ const Index = () => {
   const generatePreview = async () => {
     if (!result || previewLoading) return;
 
-    if (!profile?.is_admin && (profile?.credits ?? 0) < 3) {
-      setUpgradeOpen(true);
-      return;
-    }
-
     if (!profile?.is_admin) {
-      const ok = await consumeCredits(3, "Geração de render IA");
+      const ok = await consumeImageCredits();
       if (!ok) {
         setUpgradeOpen(true);
         return;
