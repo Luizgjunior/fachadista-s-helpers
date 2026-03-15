@@ -263,8 +263,10 @@ export type Database = {
           new_users_30d: number | null
           pro_users: number | null
           prompts_30d: number | null
+          renders_30d: number | null
           total_credits_consumed: number | null
           total_prompts: number | null
+          total_renders: number | null
           total_users: number | null
         }
         Relationships: []

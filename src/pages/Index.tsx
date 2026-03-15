@@ -10,7 +10,7 @@ import ComparatorView from "@/components/fachadista/ComparatorView";
 import UpgradeModal from "@/components/fachadista/UpgradeModal";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { DEFAULT_PARAMS } from "@/constants/defaults";
-import { generateArchitecturalPrompt } from "@/services/geminiService";
+import { generateArchitecturalPrompt, generateSamplePreview } from "@/services/geminiService";
 import { type AppMode, type GeneratedPrompt, type PromptParameters } from "@/types/fachadista";
 import { useAuth } from "@/hooks/useAuth";
 import { useCredits } from "@/hooks/useCredits";
@@ -22,7 +22,7 @@ type TabType = 'scene' | 'atmos' | 'entorno';
 const Index = () => {
   const navigate = useNavigate();
   const { user, profile, signOut, refreshProfile } = useAuth();
-  const { credits, hasCredits, consumeCredit } = useCredits({ profile, refreshProfile });
+  const { credits, hasCredits, consumeCredit, consumeCredits } = useCredits({ profile, refreshProfile });
 
   const [appMode, setAppMode] = useState<AppMode>('generator');
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -33,6 +33,7 @@ const Index = () => {
   const [result, setResult] = useState<GeneratedPrompt | null>(null);
   const [history, setHistory] = useState<GeneratedPrompt[]>([]);
   const [copied, setCopied] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('scene');
 
@@ -183,6 +184,50 @@ const Index = () => {
     }
   };
 
+  const generatePreview = async () => {
+    if (!result || previewLoading) return;
+
+    if (!profile?.is_admin && (profile?.credits ?? 0) < 3) {
+      setUpgradeOpen(true);
+      return;
+    }
+
+    if (!profile?.is_admin) {
+      const ok = await consumeCredits(3, "Geração de render IA");
+      if (!ok) {
+        setUpgradeOpen(true);
+        return;
+      }
+    }
+
+    setPreviewLoading(true);
+    try {
+      const url = await generateSamplePreview(result.english, params.socialFormat);
+      if (url) {
+        const updatedResult = { ...result, previewUrl: url };
+        setResult(updatedResult);
+        setHistory(prev => prev.map(h => h.id === result.id ? updatedResult : h));
+
+        if (user) {
+          await supabase
+            .from('prompts')
+            .update({ preview_url: url })
+            .eq('id', result.id);
+        }
+        toast.success("Render gerado com sucesso! 🎨");
+      }
+    } catch (err: any) {
+      console.error('Erro ao gerar render:', err);
+      toast.error(
+        err?.message?.includes('API Key')
+          ? 'API Key não configurada. Contate o suporte.'
+          : 'Erro ao gerar imagem. Tente novamente.'
+      );
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
+
   const controlPanelProps = {
     activeTab,
     setActiveTab,
@@ -258,6 +303,10 @@ const Index = () => {
                   result={result}
                   copied={copied}
                   onCopy={copyToClipboard}
+                  previewLoading={previewLoading}
+                  onGeneratePreview={generatePreview}
+                  userCredits={credits}
+                  isAdmin={profile?.is_admin ?? false}
                 />
               )}
             </div>

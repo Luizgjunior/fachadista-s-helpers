@@ -52,5 +52,35 @@ export function useCredits({ profile, refreshProfile }: UseCreditsOptions) {
     [profile, hasCredits, refreshProfile]
   );
 
-  return { credits, hasCredits, consumeCredit };
+  const consumeCredits = useCallback(
+    async (amount: number, description?: string) => {
+      if (!profile) {
+        toast.error("Faça login para continuar.");
+        return false;
+      }
+      if (profile.is_admin) return true;
+
+      if ((profile.credits ?? 0) < amount) {
+        toast.error(`Créditos insuficientes. Necessário: ${amount}`);
+        return false;
+      }
+
+      const { data, error } = await supabase.rpc("consume_credits_bulk" as any, {
+        p_user_id: profile.id,
+        p_amount: amount,
+        p_description: description ?? `Consumo de ${amount} créditos`,
+      });
+
+      if (error || data === false) {
+        toast.error("Erro ao consumir créditos.");
+        return false;
+      }
+
+      await refreshProfile();
+      return true;
+    },
+    [profile, refreshProfile]
+  );
+
+  return { credits, hasCredits, consumeCredit, consumeCredits };
 }
