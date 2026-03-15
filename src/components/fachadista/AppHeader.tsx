@@ -36,11 +36,17 @@ const AppHeader = ({
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Credits */}
+          {/* Credits or Admin badge */}
           {profile && (
-            <span className="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1 bg-brand-light px-2.5 py-1.5 rounded-lg">
-              ⚡ {profile.credits}
-            </span>
+            profile.is_admin ? (
+              <span className="text-[10px] font-black text-primary uppercase tracking-widest bg-brand-light border border-primary/20 px-2.5 py-1.5 rounded-lg">
+                Admin
+              </span>
+            ) : (
+              <span className="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1 bg-brand-light px-2.5 py-1.5 rounded-lg">
+                ⚡ {profile.credits}
+              </span>
+            )
           )}
 
           {showResetGenerator && (
