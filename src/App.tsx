@@ -9,6 +9,8 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import { useEffect } from "react";
+import { generateAndSetFavicon } from "@/utils/faviconGenerator";
 
 const queryClient = new QueryClient();
 
