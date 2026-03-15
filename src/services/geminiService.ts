@@ -67,6 +67,9 @@ export const generateArchitecturalPrompt = async (
     throw new Error("API Key do Gemini não configurada. Adicione VITE_GEMINI_API_KEY nas variáveis de ambiente.");
   }
 
+  console.log('API Key presente:', !!apiKey, 'Primeiros chars:', apiKey.slice(0, 8));
+  console.log('Imagens recebidas:', imagesData.length);
+
   const imageParts = imagesData.map(img => ({
     inline_data: {
       mime_type: "image/jpeg",
