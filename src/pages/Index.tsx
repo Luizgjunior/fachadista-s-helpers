@@ -6,9 +6,10 @@ import ImageUploadZone from "@/components/fachadista/ImageUploadZone";
 import PromptResult from "@/components/fachadista/PromptResult";
 import ControlPanel, { ControlPanelContent } from "@/components/fachadista/ControlPanel";
 import ComparatorView from "@/components/fachadista/ComparatorView";
+import UpgradeModal from "@/components/fachadista/UpgradeModal";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { DEFAULT_PARAMS } from "@/constants/defaults";
-import { generateArchitecturalPrompt, generateSamplePreview } from "@/services/geminiService";
+import { generateArchitecturalPrompt } from "@/services/geminiService";
 import { type AppMode, type GeneratedPrompt, type PromptParameters } from "@/types/fachadista";
 import { useAuth } from "@/hooks/useAuth";
 import { useCredits } from "@/hooks/useCredits";
@@ -24,10 +25,10 @@ const Index = () => {
 
   const [appMode, setAppMode] = useState<AppMode>('generator');
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [previewLoading, setPreviewLoading] = useState(false);
   const [result, setResult] = useState<GeneratedPrompt | null>(null);
   const [history, setHistory] = useState<GeneratedPrompt[]>([]);
   const [copied, setCopied] = useState(false);
@@ -156,30 +157,13 @@ const Index = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const generatePreview = async () => {
-    if (!result || previewLoading) return;
-    setPreviewLoading(true);
-    try {
-      const url = await generateSamplePreview(result.english, params.socialFormat);
-      if (url) {
-        const updatedResult = { ...result, previewUrl: url };
-        setResult(updatedResult);
-        setHistory(prev => prev.map(h => h.id === result.id ? updatedResult : h));
-      }
-    } catch (err) {
-      console.error('Erro ao gerar preview:', err);
-    } finally {
-      setPreviewLoading(false);
-    }
-  };
-
   const handleGenerate = async () => {
     if (images.length === 0) return;
 
     // Consume credit first
     const ok = await consumeCredit("Geração de prompt");
     if (!ok) {
-      toast.error("Créditos insuficientes. Faça upgrade para o plano Pro.");
+      setUpgradeOpen(true);
       return;
     }
 
@@ -222,7 +206,10 @@ const Index = () => {
         onResetGenerator={resetGenerator}
         showResetComparator={appMode === 'comparator' && (!!beforeImage || !!afterImage)}
         onResetComparator={() => { setBeforeImage(null); setAfterImage(null); }}
+        onUpgradeClick={() => setUpgradeOpen(true)}
       />
+
+      <UpgradeModal open={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
 
       {appMode === 'generator' && (
         <>
@@ -270,8 +257,6 @@ const Index = () => {
                   result={result}
                   copied={copied}
                   onCopy={copyToClipboard}
-                  previewLoading={previewLoading}
-                  onGeneratePreview={generatePreview}
                 />
               )}
             </div>
