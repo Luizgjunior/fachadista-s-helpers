@@ -216,6 +216,7 @@ export default function AdminUsers({ admin, currentProfile }: AdminUsersProps) {
   const [planFilter, setPlanFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [creditModal, setCreditModal] = useState<Profile | null>(null);
+  const [editModal, setEditModal] = useState<Profile | null>(null);
   const [confirmAction, setConfirmAction] = useState<{
     title: string;
     message: string;
