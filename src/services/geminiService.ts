@@ -1,14 +1,5 @@
 import { PromptParameters, GeneratedPrompt } from "@/types/fachadista";
-
-const API_URL = "https://generativelanguage.googleapis.com/v1beta/models";
-
-const getApiKey = (): string => {
-  const key = import.meta.env.VITE_GEMINI_API_KEY || "";
-  if (!key) {
-    console.warn("VITE_GEMINI_API_KEY não configurada. O serviço Gemini não funcionará.");
-  }
-  return key;
-};
+import { supabase } from "@/integrations/supabase/client";
 
 const formatParam = (label: string, value: string | number | boolean): string => {
   if (value === 'Nenhuma das opção') return '';
@@ -62,123 +53,55 @@ export const generateArchitecturalPrompt = async (
   imagesData: string[],
   params: PromptParameters
 ): Promise<GeneratedPrompt> => {
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    throw new Error("API Key do Gemini não configurada. Adicione VITE_GEMINI_API_KEY nas variáveis de ambiente.");
-  }
+  console.log('Chamando edge function generate-prompt com', imagesData.length, 'imagens');
 
-  console.log('API Key presente:', !!apiKey, 'Primeiros chars:', apiKey.slice(0, 8));
-  console.log('Imagens recebidas:', imagesData.length);
-
-  const imageParts = imagesData.map(img => ({
-    inline_data: {
-      mime_type: "image/jpeg",
-      data: img.split(',')[1],
+  const { data, error } = await supabase.functions.invoke('generate-prompt', {
+    body: {
+      images: imagesData,
+      promptText: buildPromptText(params),
     },
-  }));
+  });
 
-  const response = await fetch(
-    `${API_URL}/gemini-2.0-flash:generateContent?key=${apiKey}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{
-          parts: [
-            ...imageParts,
-            { text: buildPromptText(params) },
-          ],
-        }],
-        generationConfig: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: "OBJECT",
-            properties: {
-              english: { type: "STRING" },
-              portuguese: { type: "STRING" },
-              tags: { type: "ARRAY", items: { type: "STRING" } }
-            },
-            required: ["english", "portuguese", "tags"]
-          }
-        }
-      }),
-    }
-  );
-
-  console.log('Status da resposta:', response.status);
-
-  if (!response.ok) {
-    const errorBody = await response.json().catch(() => ({}));
-    console.error('Erro da API Gemini:', JSON.stringify(errorBody));
-    throw new Error(errorBody?.error?.message || `Erro ${response.status}: ${response.statusText}`);
+  if (error) {
+    console.error('Erro na edge function:', error);
+    throw new Error(error.message || 'Erro ao gerar prompt.');
   }
 
-  const result = await response.json();
-  const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-  const data = JSON.parse(text);
+  if (data?.error) {
+    throw new Error(data.error);
+  }
 
   return {
-    ...data,
+    english: data.english || '',
+    portuguese: data.portuguese || '',
+    tags: data.tags || [],
     id: Math.random().toString(36).substr(2, 9),
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
 };
 
 export const generateSamplePreview = async (
   prompt: string,
-  aspectRatio: string
+  _aspectRatio: string
 ): Promise<string> => {
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    throw new Error("API Key do Gemini não configurada.");
+  console.log('Chamando edge function generate-render');
+
+  const { data, error } = await supabase.functions.invoke('generate-render', {
+    body: { prompt },
+  });
+
+  if (error) {
+    console.error('Erro na edge function:', error);
+    throw new Error(error.message || 'Erro ao gerar render.');
   }
 
-  const ratioMap: Record<string, string> = {
-    'Instagram / TikTok (9:16)': '9:16',
-    'Instagram Portrait (4:5)': '3:4',
-    'Post / Feed (1:1)': '1:1',
-    'YouTube / TV (16:9)': '16:9',
-    'Fotografia (3:2)': '4:3',
-    'Cinematográfico (2.35:1)': '16:9',
-    'Vertical Clássico (2:3)': '3:4',
-    'Nenhuma das opção': '1:1',
-  };
-
-  const selectedRatio = ratioMap[aspectRatio] || '1:1';
-
-  const enhancedPrompt = `${prompt}, architectural photography, photorealistic, ultra detailed, professional visualization, 8K resolution, shot on RED camera`;
-
-  const response = await fetch(
-    `${API_URL}/gemini-2.0-flash-preview-image-generation:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: enhancedPrompt }]
-        }],
-        generationConfig: {
-          responseModalities: ['IMAGE', 'TEXT'],
-          imageGenerationConfig: {
-            numberOfImages: 1,
-            aspectRatio: selectedRatio,
-          }
-        }
-      })
-    }
-  );
-
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err?.error?.message || `Erro na API Gemini: ${response.status}`);
+  if (data?.error) {
+    throw new Error(data.error);
   }
 
-  const result = await response.json();
-  for (const part of result?.candidates?.[0]?.content?.parts ?? []) {
-    if (part.inlineData?.data) {
-      return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-    }
+  if (!data?.imageUrl) {
+    throw new Error('Nenhuma imagem foi gerada. Tente novamente.');
   }
 
-  throw new Error("Nenhuma imagem foi gerada. Tente novamente.");
+  return data.imageUrl;
 };
