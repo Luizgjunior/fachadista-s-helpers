@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Sparkles, ShoppingCart, CreditCard, Zap, Check, ChevronDown } from "lucide-react";
+import { ArrowLeft, Sparkles, ShoppingCart, CreditCard, Zap, Check, ChevronDown, ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import AppHeader from "@/components/fachadista/AppHeader";
