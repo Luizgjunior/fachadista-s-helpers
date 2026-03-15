@@ -282,9 +282,20 @@ const Login = () => {
           </div>
         </div>
 
-        <p className="text-center mt-6 text-[9px] font-bold text-muted-foreground/50 uppercase tracking-[0.3em]">
-          © {new Date().getFullYear()} FCD VIEWPROMPT
-        </p>
+        <div className="text-center mt-6 space-y-2">
+          <p className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-[0.3em]">
+            © {new Date().getFullYear()} FCD VIEWPROMPT
+          </p>
+          <div className="flex items-center justify-center gap-2">
+            <Link to="/terms" className="text-[9px] font-bold text-muted-foreground/40 hover:text-muted-foreground uppercase tracking-widest transition-colors">
+              Termos
+            </Link>
+            <span className="text-[9px] text-muted-foreground/30">•</span>
+            <Link to="/privacy" className="text-[9px] font-bold text-muted-foreground/40 hover:text-muted-foreground uppercase tracking-widest transition-colors">
+              Privacidade
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
