@@ -1,14 +1,8 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+Allow: /terms
+Allow: /privacy
+Disallow: /admin
+Disallow: /login
+
+Sitemap: https://fcdviewprompt.com.br/sitemap.xml
