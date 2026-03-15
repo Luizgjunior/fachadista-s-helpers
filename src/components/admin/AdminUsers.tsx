@@ -509,6 +509,15 @@ export default function AdminUsers({ admin, currentProfile }: AdminUsersProps) {
         />
       )}
 
+      {/* Edit Modal */}
+      {editModal && (
+        <EditModal
+          user={editModal}
+          onClose={() => setEditModal(null)}
+          onConfirm={handleEditConfirm}
+        />
+      )}
+
       {/* Confirm Dialog */}
       {confirmAction && (
         <ConfirmDialog
