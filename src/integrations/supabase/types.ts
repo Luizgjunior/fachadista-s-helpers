@@ -192,6 +192,11 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      recharge_pro_users: { Args: never; Returns: number }
+      toggle_admin: {
+        Args: { make_admin: boolean; target_user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
