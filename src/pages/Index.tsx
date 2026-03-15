@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import LegalFooter from "@/components/shared/LegalFooter";
 import { useNavigate } from "react-router-dom";
 import { History, SlidersHorizontal } from "lucide-react";
 import AppHeader from "@/components/fachadista/AppHeader";
@@ -302,10 +303,7 @@ const Index = () => {
         />
       )}
 
-      <footer className="p-6 md:p-16 text-center border-t border-border bg-surface-muted/50 mt-auto">
-        <p className="text-[10px] md:text-[11px] font-black text-muted-foreground uppercase tracking-[0.4em] md:tracking-[0.6em] mb-3 md:mb-4">FCD VIEWPROMPT</p>
-        <p className="text-[9px] md:text-[10px] font-bold text-muted-foreground/50 uppercase tracking-[0.2em] md:tracking-[0.3em]">© {new Date().getFullYear()} ARCHVIZ INTELLIGENCE LAB • HIGH END RENDERING TOOLS</p>
-      </footer>
+      <LegalFooter />
 
       <input type="file" ref={fileInputRef} className="hidden" accept="image/png, image/jpeg, image/webp" multiple onChange={(e) => handleFileUpload(e, 'main')} />
       <input type="file" ref={beforeInputRef} className="hidden" accept="image/png, image/jpeg, image/webp" onChange={(e) => handleFileUpload(e, 'before')} />
