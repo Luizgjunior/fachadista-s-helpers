@@ -1,15 +1,13 @@
-import { Copy, Check, Zap, Eye, RefreshCw } from "lucide-react";
+import { Copy, Check, Zap, Sparkles } from "lucide-react";
 import { GeneratedPrompt } from "@/types/fachadista";
 
 interface PromptResultProps {
   result: GeneratedPrompt;
   copied: boolean;
   onCopy: (text: string) => void;
-  previewLoading: boolean;
-  onGeneratePreview: () => void;
 }
 
-const PromptResult = ({ result, copied, onCopy, previewLoading, onGeneratePreview }: PromptResultProps) => (
+const PromptResult = ({ result, copied, onCopy }: PromptResultProps) => (
   <div className="space-y-6 md:space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
     <div className="glass-panel rounded-3xl md:rounded-[40px] p-5 md:p-12 space-y-6 md:space-y-10 shadow-2xl shadow-muted/30">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-border pb-6 md:pb-10">
@@ -53,29 +51,18 @@ const PromptResult = ({ result, copied, onCopy, previewLoading, onGeneratePrevie
 
         <div className="space-y-4 md:space-y-8">
           <span className="text-[10px] md:text-[11px] font-black text-muted-foreground uppercase tracking-[0.3em] block mb-3 md:mb-4">Preview de Amostra (IA)</span>
-          <div className="relative aspect-square bg-secondary rounded-2xl md:rounded-[32px] border border-border overflow-hidden group shadow-xl">
+          <div className="relative aspect-square bg-secondary rounded-2xl md:rounded-[32px] border border-border overflow-hidden shadow-xl">
             {result.previewUrl ? (
               <img src={result.previewUrl} className="w-full h-full object-cover" alt="Preview IA" />
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center p-6 md:p-10 text-center">
-                <Eye className="w-8 h-8 md:w-10 md:h-10 text-muted-foreground/50 mb-4 md:mb-6" />
-                <p className="text-[10px] md:text-sm font-bold text-muted-foreground uppercase leading-relaxed tracking-wide">Gere uma prévia visual para testar a fidelidade do prompt</p>
+              <div className="w-full h-full flex flex-col items-center justify-center p-6 md:p-10 text-center gap-4">
+                <Sparkles className="w-10 h-10 text-primary/30" />
+                <p className="text-sm md:text-base font-black text-muted-foreground uppercase tracking-wide">Preview em breve</p>
+                <p className="text-[10px] md:text-xs font-bold text-muted-foreground/60">Funcionalidade disponível no plano Pro</p>
+                <span className="bg-primary/10 text-primary text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
+                  Coming Soon
+                </span>
               </div>
-            )}
-
-            {previewLoading && (
-              <div className="absolute inset-0 bg-surface/70 backdrop-blur-md flex items-center justify-center">
-                <RefreshCw className="w-8 h-8 md:w-10 md:h-10 animate-spin text-primary" />
-              </div>
-            )}
-
-            {!result.previewUrl && !previewLoading && (
-              <button
-                onClick={onGeneratePreview}
-                className="absolute inset-0 flex items-center justify-center bg-foreground/5 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <span className="bg-foreground text-background px-6 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest shadow-2xl">Gerar Preview Visual</span>
-              </button>
             )}
           </div>
         </div>
