@@ -100,7 +100,7 @@ const PromptResult = ({
                   <p className="text-sm md:text-base font-black text-muted-foreground uppercase tracking-wide">Render com IA</p>
                   <p className="text-[10px] md:text-xs font-bold text-muted-foreground/60">Gere uma visualização fotorrealista do seu projeto</p>
                   <span className="bg-primary/10 text-primary text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
-                    3 créditos
+                    {CREDIT_COSTS.IMAGE} créditos
                   </span>
                   <button
                     onClick={onGeneratePreview}
