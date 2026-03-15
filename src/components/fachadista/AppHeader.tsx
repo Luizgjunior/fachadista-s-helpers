@@ -1,5 +1,5 @@
 import {
-  Sparkles, Sun, RotateCcw, RefreshCw, Zap, ArrowRightLeft, LogOut, Shield
+  Sparkles, Sun, RotateCcw, RefreshCw, Zap, ArrowRightLeft, LogOut, Shield, ShoppingCart
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { type AppMode } from "@/types/fachadista";
@@ -41,7 +41,9 @@ const AppHeader = ({
 }: AppHeaderProps) => {
   const navigate = useNavigate();
 
-  const showUpgradeButton = !profile?.is_admin && profile && profile.credits === 0 && onUpgradeClick;
+  const isRegularUser = profile && !profile.is_admin;
+  const showBuyButton = isRegularUser && profile.credits <= 5 && profile.credits > 0;
+  const showUpgradeButton = isRegularUser && profile.credits === 0 && onUpgradeClick;
 
   return (
     <header className="sticky top-0 z-50 glass-panel border-b border-border px-4 py-3 md:px-10 md:py-6">
@@ -62,17 +64,28 @@ const AppHeader = ({
               <span className="bg-primary/10 text-primary border border-primary/20 text-[9px] font-black uppercase tracking-widest px-3 py-2 rounded-xl">
                 Admin Global
               </span>
+            ) : profile.credits === 0 ? (
+              <button
+                onClick={() => navigate('/plans')}
+                className="flex items-center gap-1.5 bg-primary text-primary-foreground text-[9px] font-black uppercase tracking-widest px-3 py-2 rounded-xl shadow-lg shadow-primary/20"
+              >
+                <ShoppingCart className="w-3.5 h-3.5" /> Comprar
+              </button>
             ) : (
-              <div className="bg-brand-light px-2.5 py-1.5 rounded-lg">
-                <CreditBar credits={profile.credits} planId={profile.plan_id} />
+              <div className="flex items-center gap-2">
+                <div className="bg-brand-light px-2.5 py-1.5 rounded-lg">
+                  <CreditBar credits={profile.credits} planId={profile.plan_id} />
+                </div>
+                {showBuyButton && (
+                  <button
+                    onClick={() => navigate('/plans')}
+                    className="bg-primary/10 text-primary border border-primary/20 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl"
+                  >
+                    ⚡ Comprar
+                  </button>
+                )}
               </div>
             )
-          )}
-
-          {showUpgradeButton && (
-            <button onClick={onUpgradeClick} className="p-2.5 rounded-xl bg-primary/10 text-primary">
-              <Zap className="w-4 h-4" />
-            </button>
           )}
 
           {showResetGenerator && (
@@ -179,20 +192,28 @@ const AppHeader = ({
                 <span className="bg-primary/10 text-primary border border-primary/20 text-[9px] font-black uppercase tracking-widest px-3 py-2 rounded-xl">
                   Admin Global
                 </span>
+              ) : profile.credits === 0 ? (
+                <button
+                  onClick={() => navigate('/plans')}
+                  className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-primary-foreground bg-primary px-4 py-2.5 rounded-xl shadow-lg shadow-primary/20 hover:opacity-90 transition-all"
+                >
+                  <ShoppingCart className="w-4 h-4" /> Comprar Créditos
+                </button>
               ) : (
-                <div className="bg-brand-light px-3 py-2 rounded-xl min-w-[100px]">
-                  <CreditBar credits={profile.credits} planId={profile.plan_id} />
+                <div className="flex items-center gap-3">
+                  <div className="bg-brand-light px-3 py-2 rounded-xl min-w-[100px]">
+                    <CreditBar credits={profile.credits} planId={profile.plan_id} />
+                  </div>
+                  {showBuyButton && (
+                    <button
+                      onClick={() => navigate('/plans')}
+                      className="flex items-center gap-1.5 bg-primary/10 text-primary border border-primary/20 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl hover:bg-primary/20 transition-all"
+                    >
+                      ⚡ Comprar
+                    </button>
+                  )}
                 </div>
               )
-            )}
-
-            {showUpgradeButton && (
-              <button
-                onClick={onUpgradeClick}
-                className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-4 py-2.5 rounded-xl shadow-sm hover:bg-primary/20 transition-all"
-              >
-                <Zap className="w-4 h-4" /> Upgrade
-              </button>
             )}
 
             {profile?.is_admin && (

@@ -26,6 +26,14 @@ function AppRoutes() {
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route
+        path="/plans"
+        element={
+          <ProtectedRoute user={user} loading={loading}>
+            <Plans />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/"
         element={
           <ProtectedRoute user={user} loading={loading}>
