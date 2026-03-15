@@ -187,7 +187,7 @@ export function useAdmin(profile: Profile | null) {
 
     const { data, error } = await supabase
       .from("prompts")
-      .select("created_at")
+      .select("created_at, profiles!prompts_user_id_fkey(is_admin)")
       .gte("created_at", thirtyDaysAgo.toISOString())
       .order("created_at", { ascending: true });
 
@@ -196,9 +196,10 @@ export function useAdmin(profile: Profile | null) {
       return [];
     }
 
-    // Aggregate by day client-side
+    // Aggregate by day, excluding admin prompts
     const counts: Record<string, number> = {};
-    for (const row of data ?? []) {
+    for (const row of (data ?? []) as any[]) {
+      if (row.profiles?.is_admin) continue;
       const day = row.created_at ? row.created_at.slice(0, 10) : "";
       if (day) counts[day] = (counts[day] || 0) + 1;
     }
