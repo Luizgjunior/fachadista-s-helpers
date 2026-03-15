@@ -10,7 +10,7 @@ import ComparatorView from "@/components/fachadista/ComparatorView";
 import UpgradeModal from "@/components/fachadista/UpgradeModal";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { DEFAULT_PARAMS } from "@/constants/defaults";
-import { generateArchitecturalPrompt } from "@/services/geminiService";
+import { generateArchitecturalPrompt, generateSamplePreview } from "@/services/geminiService";
 import { type AppMode, type GeneratedPrompt, type PromptParameters } from "@/types/fachadista";
 import { useAuth } from "@/hooks/useAuth";
 import { useCredits } from "@/hooks/useCredits";
