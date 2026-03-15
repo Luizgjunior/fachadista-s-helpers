@@ -302,6 +302,20 @@ export function useAdmin(profile: Profile | null) {
     [isAdmin]
   );
 
+  const getCaktoOrders = useCallback(async (limit = 50): Promise<CaktoOrder[]> => {
+    if (!isAdmin) return [];
+    const { data, error } = await supabase
+      .from("cakto_orders")
+      .select("*")
+      .order("processed_at", { ascending: false })
+      .limit(limit);
+    if (error) {
+      console.error("Error fetching cakto orders:", error);
+      return [];
+    }
+    return (data ?? []) as CaktoOrder[];
+  }, [isAdmin]);
+
   return {
     isAdmin,
     getMetrics,
@@ -315,5 +329,6 @@ export function useAdmin(profile: Profile | null) {
     getDailyPrompts,
     rechargeProUsers,
     getCreditSummary,
+    getCaktoOrders,
   };
 }
