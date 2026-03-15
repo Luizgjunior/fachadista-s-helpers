@@ -110,7 +110,7 @@ const PromptResult = ({
                         ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95'
                         : 'bg-muted text-muted-foreground cursor-not-allowed'
                     }`}
-                    title={!canGenerate ? 'Créditos insuficientes (necessário: 3)' : undefined}
+                    title={!canGenerate ? `Créditos insuficientes (necessário: ${CREDIT_COSTS.IMAGE})` : undefined}
                   >
                     <Sparkles className="w-4 h-4" />
                     Gerar Render IA
