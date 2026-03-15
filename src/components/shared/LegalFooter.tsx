@@ -9,12 +9,19 @@ export default function LegalFooter() {
       <p className="text-[9px] md:text-[10px] font-bold text-muted-foreground/50 uppercase tracking-[0.2em] md:tracking-[0.3em] mb-3">
         © {new Date().getFullYear()} ARCHVIZ INTELLIGENCE LAB
       </p>
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex items-center justify-center gap-2 flex-wrap">
         <Link
           to="/terms"
           className="text-[9px] font-bold text-muted-foreground/40 hover:text-muted-foreground uppercase tracking-widest transition-colors"
         >
           Termos de Uso
+        </Link>
+        <span className="text-[9px] text-muted-foreground/30">•</span>
+        <Link
+          to="/plans"
+          className="text-[9px] font-bold text-muted-foreground/40 hover:text-muted-foreground uppercase tracking-widest transition-colors"
+        >
+          Planos
         </Link>
         <span className="text-[9px] text-muted-foreground/30">•</span>
         <Link

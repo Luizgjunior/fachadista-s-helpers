@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Admin from "./pages/Admin";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import Plans from "./pages/Plans";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import { generateAndSetFavicon } from "@/utils/faviconGenerator";
@@ -24,6 +25,14 @@ function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<Privacy />} />
+      <Route
+        path="/plans"
+        element={
+          <ProtectedRoute user={user} loading={loading}>
+            <Plans />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/"
         element={
