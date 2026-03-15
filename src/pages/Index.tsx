@@ -184,6 +184,50 @@ const Index = () => {
     }
   };
 
+  const generatePreview = async () => {
+    if (!result || previewLoading) return;
+
+    if (!profile?.is_admin && (profile?.credits ?? 0) < 3) {
+      setUpgradeOpen(true);
+      return;
+    }
+
+    if (!profile?.is_admin) {
+      const ok = await consumeCredits(3, "Geração de render IA");
+      if (!ok) {
+        setUpgradeOpen(true);
+        return;
+      }
+    }
+
+    setPreviewLoading(true);
+    try {
+      const url = await generateSamplePreview(result.english, params.socialFormat);
+      if (url) {
+        const updatedResult = { ...result, previewUrl: url };
+        setResult(updatedResult);
+        setHistory(prev => prev.map(h => h.id === result.id ? updatedResult : h));
+
+        if (user) {
+          await supabase
+            .from('prompts')
+            .update({ preview_url: url })
+            .eq('id', result.id);
+        }
+        toast.success("Render gerado com sucesso! 🎨");
+      }
+    } catch (err: any) {
+      console.error('Erro ao gerar render:', err);
+      toast.error(
+        err?.message?.includes('API Key')
+          ? 'API Key não configurada. Contate o suporte.'
+          : 'Erro ao gerar imagem. Tente novamente.'
+      );
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
+
   const controlPanelProps = {
     activeTab,
     setActiveTab,
