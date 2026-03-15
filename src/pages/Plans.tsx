@@ -156,7 +156,7 @@ const Plans = () => {
                   <div className="border-t border-border my-6" />
 
                   <ul className="space-y-3 mb-8">
-                    {(pkg.features as string[] | null)?.map((feat, i) => (
+                    {getFeatures(pkg.features).map((feat, i) => (
                       <li key={i} className="flex items-start gap-2.5">
                         <Check className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                         <span className="text-sm text-foreground">{feat}</span>
