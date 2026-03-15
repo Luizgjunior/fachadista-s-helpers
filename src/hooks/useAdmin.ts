@@ -56,6 +56,7 @@ export function useAdmin(profile: Profile | null) {
       let query = supabase
         .from("profiles")
         .select("*", { count: "exact" })
+        .eq("is_admin", false)
         .order("created_at", { ascending: false });
 
       if (search) {
