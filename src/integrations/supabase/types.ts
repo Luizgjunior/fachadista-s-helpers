@@ -14,13 +14,184 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      credit_transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          description: string | null
+          id: string
+          reference_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plans: {
+        Row: {
+          created_at: string | null
+          credits_per_month: number
+          features: Json | null
+          id: string
+          name: string
+          price_brl: number
+        }
+        Insert: {
+          created_at?: string | null
+          credits_per_month: number
+          features?: Json | null
+          id: string
+          name: string
+          price_brl: number
+        }
+        Update: {
+          created_at?: string | null
+          credits_per_month?: number
+          features?: Json | null
+          id?: string
+          name?: string
+          price_brl?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          credits: number
+          email: string
+          full_name: string | null
+          id: string
+          is_admin: boolean
+          plan_id: string | null
+          total_prompts_generated: number
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          credits?: number
+          email: string
+          full_name?: string | null
+          id: string
+          is_admin?: boolean
+          plan_id?: string | null
+          total_prompts_generated?: number
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          credits?: number
+          email?: string
+          full_name?: string | null
+          id?: string
+          is_admin?: boolean
+          plan_id?: string | null
+          total_prompts_generated?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prompts: {
+        Row: {
+          created_at: string | null
+          credits_used: number
+          id: string
+          parameters: Json | null
+          preview_url: string | null
+          prompt_english: string
+          prompt_portuguese: string | null
+          tags: string[] | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          credits_used?: number
+          id?: string
+          parameters?: Json | null
+          preview_url?: string | null
+          prompt_english: string
+          prompt_portuguese?: string | null
+          tags?: string[] | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          credits_used?: number
+          id?: string
+          parameters?: Json | null
+          preview_url?: string | null
+          prompt_english?: string
+          prompt_portuguese?: string | null
+          tags?: string[] | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      admin_metrics: {
+        Row: {
+          credits_consumed_30d: number | null
+          free_users: number | null
+          new_users_30d: number | null
+          pro_users: number | null
+          prompts_30d: number | null
+          total_credits_consumed: number | null
+          total_prompts: number | null
+          total_users: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      consume_credit: {
+        Args: { p_description?: string; p_user_id: string }
+        Returns: boolean
+      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
