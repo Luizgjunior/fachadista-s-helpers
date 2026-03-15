@@ -25,6 +25,7 @@ const TYPE_STYLES: Record<string, { label: string; className: string }> = {
 export default function AdminCredits({ admin }: AdminCreditsProps) {
   const [summary, setSummary] = useState({ totalConsumed: 0, totalDistributed: 0, avgBalance: 0 });
   const [transactions, setTransactions] = useState<CreditTransaction[]>([]);
+  const [caktoOrders, setCaktoOrders] = useState<CaktoOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [showRechargeConfirm, setShowRechargeConfirm] = useState(false);
   const [recharging, setRecharging] = useState(false);
@@ -32,9 +33,14 @@ export default function AdminCredits({ admin }: AdminCreditsProps) {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const [s, t] = await Promise.all([admin.getCreditSummary(), admin.getTransactions(50)]);
+      const [s, t, o] = await Promise.all([
+        admin.getCreditSummary(),
+        admin.getTransactions(50),
+        admin.getCaktoOrders(50),
+      ]);
       setSummary(s);
       setTransactions(t);
+      setCaktoOrders(o);
       setLoading(false);
     };
     load();
