@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 import { toast } from "sonner";
@@ -20,6 +20,7 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const mountedRef = useRef(true);
 
   const fetchProfile = useCallback(async (userId: string) => {
     const { data, error } = await supabase
@@ -35,31 +36,54 @@ export function useAuth() {
     return data as Profile;
   }, []);
 
-  const handleSession = useCallback(async (session: Session | null) => {
-    if (session?.user) {
-      setUser(session.user);
-      const p = await fetchProfile(session.user.id);
-      setProfile(p);
-    } else {
-      setUser(null);
-      setProfile(null);
-    }
-    setLoading(false);
-  }, [fetchProfile]);
-
   useEffect(() => {
+    mountedRef.current = true;
+
+    // 1. Set up listener FIRST (fire-and-forget — no await inside callback)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        await handleSession(session);
+      (_event, session) => {
+        if (!mountedRef.current) return;
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+
+        if (currentUser) {
+          // Fire-and-forget: don't await inside the callback to avoid deadlock
+          fetchProfile(currentUser.id).then((p) => {
+            if (mountedRef.current) {
+              setProfile(p);
+              setLoading(false);
+            }
+          });
+        } else {
+          setProfile(null);
+          setLoading(false);
+        }
       }
     );
 
+    // 2. Restore session from storage
     supabase.auth.getSession().then(({ data: { session } }) => {
-      handleSession(session);
+      if (!mountedRef.current) return;
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+
+      if (currentUser) {
+        fetchProfile(currentUser.id).then((p) => {
+          if (mountedRef.current) {
+            setProfile(p);
+            setLoading(false);
+          }
+        });
+      } else {
+        setLoading(false);
+      }
     });
 
-    return () => subscription.unsubscribe();
-  }, [handleSession]);
+    return () => {
+      mountedRef.current = false;
+      subscription.unsubscribe();
+    };
+  }, [fetchProfile]);
 
   const signInWithEmail = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
