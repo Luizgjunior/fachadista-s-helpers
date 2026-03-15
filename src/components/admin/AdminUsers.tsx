@@ -105,6 +105,72 @@ function CreditModal({
   );
 }
 
+// Edit modal
+function EditModal({
+  user,
+  onClose,
+  onConfirm,
+}: {
+  user: Profile;
+  onClose: () => void;
+  onConfirm: (data: { full_name?: string; email?: string }) => Promise<void>;
+}) {
+  const [fullName, setFullName] = useState(user.full_name ?? "");
+  const [email, setEmail] = useState(user.email);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    await onConfirm({ full_name: fullName, email });
+    setSubmitting(false);
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200">
+      <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-sm bg-surface rounded-3xl border border-border shadow-2xl p-6 space-y-5 animate-in zoom-in-95 duration-200">
+        <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
+          <X className="w-5 h-5" />
+        </button>
+
+        <div>
+          <h3 className="text-sm font-black uppercase tracking-wider text-foreground">Editar Usuário</h3>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Nome Completo</label>
+          <input
+            type="text"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            className="w-full bg-field-bg border border-field-border rounded-xl px-4 py-3 text-sm focus:border-field-focus focus:ring-4 focus:ring-primary/10 outline-none"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">E-mail</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full bg-field-bg border border-field-border rounded-xl px-4 py-3 text-sm focus:border-field-focus focus:ring-4 focus:ring-primary/10 outline-none"
+          />
+        </div>
+
+        <button
+          onClick={handleSubmit}
+          disabled={submitting}
+          className="w-full py-3.5 bg-primary text-primary-foreground rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-lg shadow-primary/20 hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+          Salvar
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // Confirm dialog
 function ConfirmDialog({
   title,
