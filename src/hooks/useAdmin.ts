@@ -150,10 +150,9 @@ export function useAdmin(profile: Profile | null) {
     async (limit = 50): Promise<CreditTransaction[]> => {
       if (!isAdmin) return [];
 
-      // We need to join profiles data. Since supabase-js supports foreign key joins:
       const { data, error } = await supabase
         .from("credit_transactions")
-        .select("*, profiles!credit_transactions_user_id_fkey(full_name, email)")
+        .select("*, profiles!credit_transactions_user_id_fkey(full_name, email, is_admin)")
         .order("created_at", { ascending: false })
         .limit(limit);
 
@@ -163,16 +162,19 @@ export function useAdmin(profile: Profile | null) {
         return [];
       }
 
-      return (data ?? []).map((row: any) => ({
-        id: row.id,
-        user_id: row.user_id,
-        amount: row.amount,
-        type: row.type,
-        description: row.description,
-        created_at: row.created_at,
-        full_name: row.profiles?.full_name ?? null,
-        email: row.profiles?.email ?? "",
-      }));
+      // Exclude admin transactions
+      return (data ?? [])
+        .filter((row: any) => !row.profiles?.is_admin)
+        .map((row: any) => ({
+          id: row.id,
+          user_id: row.user_id,
+          amount: row.amount,
+          type: row.type,
+          description: row.description,
+          created_at: row.created_at,
+          full_name: row.profiles?.full_name ?? null,
+          email: row.profiles?.email ?? "",
+        }));
     },
     [isAdmin]
   );
