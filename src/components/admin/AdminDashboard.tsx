@@ -103,8 +103,8 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
   return (
     <div className="space-y-8 md:space-y-12">
       {/* Metric cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
-        {cards.map(({ label, value, sub, icon: Icon, color, bg }) => (
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
+        {cards.map(({ label, value, sub, icon: Icon, color, bg, isString }: any) => (
           <div
             key={label}
             className="bg-surface rounded-2xl md:rounded-3xl border border-border p-4 md:p-6 shadow-sm"
@@ -113,7 +113,7 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
               <Icon className={`w-5 h-5 ${color}`} />
             </div>
             <div className="text-2xl md:text-3xl font-black text-foreground tracking-tight">
-              {value.toLocaleString("pt-BR")}
+              {isString ? value : (typeof value === 'number' ? value.toLocaleString("pt-BR") : value)}
             </div>
             <div className="text-[9px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-1">
               {label}
