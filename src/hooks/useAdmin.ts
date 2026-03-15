@@ -10,6 +10,8 @@ export interface AdminMetrics {
   free_users: number;
   total_prompts: number;
   prompts_30d: number;
+  total_renders: number;
+  renders_30d: number;
   total_credits_consumed: number;
   credits_consumed_30d: number;
 }

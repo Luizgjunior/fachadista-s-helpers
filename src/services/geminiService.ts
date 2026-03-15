@@ -118,6 +118,61 @@ export const generateArchitecturalPrompt = async (
   };
 };
 
-export const generateSamplePreview = async (_prompt: string, _aspectRatio: string): Promise<string> => {
-  throw new Error("Preview visual indisponível nesta versão.");
+export const generateSamplePreview = async (
+  prompt: string,
+  aspectRatio: string
+): Promise<string> => {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    throw new Error("API Key do Gemini não configurada.");
+  }
+
+  const ratioMap: Record<string, string> = {
+    'Instagram / TikTok (9:16)': '9:16',
+    'Instagram Portrait (4:5)': '3:4',
+    'Post / Feed (1:1)': '1:1',
+    'YouTube / TV (16:9)': '16:9',
+    'Fotografia (3:2)': '4:3',
+    'Cinematográfico (2.35:1)': '16:9',
+    'Vertical Clássico (2:3)': '3:4',
+    'Nenhuma das opção': '1:1',
+  };
+
+  const selectedRatio = ratioMap[aspectRatio] || '1:1';
+
+  const enhancedPrompt = `${prompt}, architectural photography, photorealistic, ultra detailed, professional visualization, 8K resolution, shot on RED camera`;
+
+  const response = await fetch(
+    `${API_URL}/gemini-2.0-flash-preview-image-generation:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: enhancedPrompt }]
+        }],
+        generationConfig: {
+          responseModalities: ['IMAGE', 'TEXT'],
+          imageGenerationConfig: {
+            numberOfImages: 1,
+            aspectRatio: selectedRatio,
+          }
+        }
+      })
+    }
+  );
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `Erro na API Gemini: ${response.status}`);
+  }
+
+  const result = await response.json();
+  for (const part of result?.candidates?.[0]?.content?.parts ?? []) {
+    if (part.inlineData?.data) {
+      return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+    }
+  }
+
+  throw new Error("Nenhuma imagem foi gerada. Tente novamente.");
 };
