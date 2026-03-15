@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import LegalFooter from "@/components/shared/LegalFooter";
 import { useNavigate } from "react-router-dom";
 import { History, SlidersHorizontal } from "lucide-react";
 import AppHeader from "@/components/fachadista/AppHeader";
