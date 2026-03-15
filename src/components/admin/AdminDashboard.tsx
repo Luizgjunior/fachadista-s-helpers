@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Users, Zap, Sparkles, Battery } from "lucide-react";
+import { Users, Zap, Sparkles, Battery, ImageIcon, TrendingUp } from "lucide-react";
 import type { AdminMetrics } from "@/hooks/useAdmin";
 
 function Skeleton({ className = "" }: { className?: string }) {
