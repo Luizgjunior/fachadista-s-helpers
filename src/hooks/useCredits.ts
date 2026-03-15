@@ -9,14 +9,20 @@ interface UseCreditsOptions {
 }
 
 export function useCredits({ profile, refreshProfile }: UseCreditsOptions) {
+  const isAdmin = profile?.is_admin === true;
   const credits = profile?.credits ?? 0;
-  const hasCredits = credits > 0;
+  const hasCredits = isAdmin || credits > 0;
 
   const consumeCredit = useCallback(
     async (description?: string) => {
       if (!profile) {
         toast.error("Faça login para gerar prompts.");
         return false;
+      }
+
+      // Admins have unlimited credits
+      if (profile.is_admin) {
+        return true;
       }
 
       if (!hasCredits) {
