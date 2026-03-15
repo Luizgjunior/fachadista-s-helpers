@@ -212,11 +212,7 @@ const Index = () => {
       }
     } catch (err: any) {
       console.error('Erro ao gerar render:', err);
-      toast.error(
-        err?.message?.includes('API Key')
-          ? 'API Key não configurada. Contate o suporte.'
-          : 'Erro ao gerar imagem. Tente novamente.'
-      );
+      toast.error(err?.message || 'Erro ao gerar imagem. Tente novamente.');
     } finally {
       setPreviewLoading(false);
     }
