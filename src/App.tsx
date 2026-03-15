@@ -8,6 +8,8 @@ import { ProtectedRoute, AdminRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import { generateAndSetFavicon } from "@/utils/faviconGenerator";
@@ -20,6 +22,8 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/privacy" element={<Privacy />} />
       <Route
         path="/"
         element={
