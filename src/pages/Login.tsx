@@ -214,9 +214,30 @@ const Login = () => {
                 </button>
               )}
 
+              {mode === "signup" && !forgotMode && (
+                <label className="flex items-start gap-2.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={acceptedTerms}
+                    onChange={(e) => setAcceptedTerms(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 rounded border-field-border accent-primary"
+                  />
+                  <span className="text-[10px] font-bold text-muted-foreground leading-relaxed">
+                    Li e aceito os{" "}
+                    <Link to="/terms" className="text-primary hover:underline" target="_blank">
+                      Termos de Uso
+                    </Link>{" "}
+                    e a{" "}
+                    <Link to="/privacy" className="text-primary hover:underline" target="_blank">
+                      Política de Privacidade
+                    </Link>
+                  </span>
+                </label>
+              )}
+
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || (mode === "signup" && !forgotMode && !acceptedTerms)}
                 className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:opacity-90 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
