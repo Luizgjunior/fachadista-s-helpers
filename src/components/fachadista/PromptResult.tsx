@@ -24,7 +24,7 @@ const PromptResult = ({
   isAdmin,
 }: PromptResultProps) => {
   const [fakeProgress, setFakeProgress] = useState(0);
-  const canGenerate = isAdmin || userCredits >= 3;
+  const canGenerate = isAdmin || userCredits >= CREDIT_COSTS.IMAGE;
 
   useEffect(() => {
     if (!previewLoading) {
