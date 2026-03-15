@@ -14,6 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
+      cakto_orders: {
+        Row: {
+          amount_paid: number | null
+          credits_added: number
+          customer_email: string | null
+          id: string
+          package_id: string | null
+          processed_at: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_paid?: number | null
+          credits_added: number
+          customer_email?: string | null
+          id: string
+          package_id?: string | null
+          processed_at?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_paid?: number | null
+          credits_added?: number
+          customer_email?: string | null
+          id?: string
+          package_id?: string | null
+          processed_at?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cakto_orders_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "credit_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cakto_orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      credit_packages: {
+        Row: {
+          cakto_checkout_url: string | null
+          created_at: string | null
+          credits: number
+          id: string
+          is_active: boolean
+          name: string
+          price_brl: number
+        }
+        Insert: {
+          cakto_checkout_url?: string | null
+          created_at?: string | null
+          credits: number
+          id: string
+          is_active?: boolean
+          name: string
+          price_brl: number
+        }
+        Update: {
+          cakto_checkout_url?: string | null
+          created_at?: string | null
+          credits?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          price_brl?: number
+        }
+        Relationships: []
+      }
       credit_transactions: {
         Row: {
           amount: number
