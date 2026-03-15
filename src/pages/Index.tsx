@@ -162,8 +162,7 @@ const Index = () => {
   const handleGenerate = async () => {
     if (images.length === 0) return;
 
-    // Consume credit first
-    const ok = await consumeCredit("Geração de prompt");
+    const ok = await consumePromptCredits();
     if (!ok) {
       setUpgradeOpen(true);
       return;
