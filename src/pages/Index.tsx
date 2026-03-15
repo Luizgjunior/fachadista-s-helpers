@@ -259,6 +259,10 @@ const Index = () => {
                   result={result}
                   copied={copied}
                   onCopy={copyToClipboard}
+                  previewLoading={previewLoading}
+                  onGeneratePreview={generatePreview}
+                  userCredits={credits}
+                  isAdmin={profile?.is_admin ?? false}
                 />
               )}
             </div>
