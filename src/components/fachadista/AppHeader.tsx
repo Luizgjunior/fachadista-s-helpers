@@ -14,13 +14,34 @@ interface AppHeaderProps {
   onResetGenerator: () => void;
   showResetComparator: boolean;
   onResetComparator: () => void;
+  onUpgradeClick?: () => void;
 }
+
+const CreditBar = ({ credits, planId }: { credits: number; planId: string | null }) => {
+  const max = planId === 'pro' ? 200 : 10;
+  const pct = Math.min(credits / max, 1);
+  const barColor = pct > 0.5 ? 'bg-green-500' : pct >= 0.2 ? 'bg-yellow-500' : 'bg-red-500';
+
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <span className="text-[10px] md:text-[11px] font-black text-primary uppercase tracking-wider flex items-center gap-1.5">
+        ⚡ {credits} créditos
+      </span>
+      <div className="w-full h-1 bg-secondary rounded-full overflow-hidden">
+        <div className={`h-full ${barColor} rounded-full transition-all`} style={{ width: `${pct * 100}%` }} />
+      </div>
+    </div>
+  );
+};
 
 const AppHeader = ({
   appMode, setAppMode, profile, onLogout,
-  showResetGenerator, onResetGenerator, showResetComparator, onResetComparator
+  showResetGenerator, onResetGenerator, showResetComparator, onResetComparator,
+  onUpgradeClick
 }: AppHeaderProps) => {
   const navigate = useNavigate();
+
+  const showUpgradeButton = !profile?.is_admin && profile && profile.credits === 0 && onUpgradeClick;
 
   return (
     <header className="sticky top-0 z-50 glass-panel border-b border-border px-4 py-3 md:px-10 md:py-6">
@@ -36,17 +57,22 @@ const AppHeader = ({
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Credits or Admin badge */}
           {profile && (
             profile.is_admin ? (
-              <span className="text-[10px] font-black text-primary uppercase tracking-widest bg-brand-light border border-primary/20 px-2.5 py-1.5 rounded-lg">
-                Admin
+              <span className="bg-primary/10 text-primary border border-primary/20 text-[9px] font-black uppercase tracking-widest px-3 py-2 rounded-xl">
+                Admin Global
               </span>
             ) : (
-              <span className="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1 bg-brand-light px-2.5 py-1.5 rounded-lg">
-                ⚡ {profile.credits}
-              </span>
+              <div className="bg-brand-light px-2.5 py-1.5 rounded-lg">
+                <CreditBar credits={profile.credits} planId={profile.plan_id} />
+              </div>
             )
+          )}
+
+          {showUpgradeButton && (
+            <button onClick={onUpgradeClick} className="p-2.5 rounded-xl bg-primary/10 text-primary">
+              <Zap className="w-4 h-4" />
+            </button>
           )}
 
           {showResetGenerator && (
@@ -150,14 +176,23 @@ const AppHeader = ({
 
             {profile && (
               profile.is_admin ? (
-                <span className="text-[11px] font-black text-primary uppercase tracking-widest bg-brand-light border border-primary/20 px-3 py-2 rounded-xl">
+                <span className="bg-primary/10 text-primary border border-primary/20 text-[9px] font-black uppercase tracking-widest px-3 py-2 rounded-xl">
                   Admin Global
                 </span>
               ) : (
-                <span className="text-[11px] font-black text-primary uppercase tracking-wider flex items-center gap-1.5 bg-brand-light px-3 py-2 rounded-xl">
-                  ⚡ {profile.credits} créditos
-                </span>
+                <div className="bg-brand-light px-3 py-2 rounded-xl min-w-[100px]">
+                  <CreditBar credits={profile.credits} planId={profile.plan_id} />
+                </div>
               )
+            )}
+
+            {showUpgradeButton && (
+              <button
+                onClick={onUpgradeClick}
+                className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-4 py-2.5 rounded-xl shadow-sm hover:bg-primary/20 transition-all"
+              >
+                <Zap className="w-4 h-4" /> Upgrade
+              </button>
             )}
 
             {profile?.is_admin && (

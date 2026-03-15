@@ -118,33 +118,6 @@ export const generateArchitecturalPrompt = async (
   };
 };
 
-export const generateSamplePreview = async (prompt: string, _aspectRatio: string): Promise<string> => {
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    throw new Error("API Key do Gemini não configurada.");
-  }
-
-  const response = await fetch(
-    `${API_URL}/gemini-2.0-flash:generateContent?key=${apiKey}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: `Generate a detailed description of this architectural visualization: ${prompt}` }],
-        }],
-      }),
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error("Falha ao gerar preview");
-  }
-
-  const result = await response.json();
-  const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error("Falha ao gerar preview");
-
-  // Return a placeholder since image generation requires different API
-  return "";
+export const generateSamplePreview = async (_prompt: string, _aspectRatio: string): Promise<string> => {
+  throw new Error("Preview visual indisponível nesta versão.");
 };
