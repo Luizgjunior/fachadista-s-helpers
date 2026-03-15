@@ -281,6 +281,28 @@ export default function AdminUsers({ admin, currentProfile }: AdminUsersProps) {
     });
   };
 
+  const handleEditConfirm = async (data: { full_name?: string; email?: string }) => {
+    if (!editModal) return;
+    await admin.updateUserProfile(editModal.id, data);
+    await loadUsers();
+  };
+
+  const handleDeleteUser = (user: Profile) => {
+    if (user.id === currentProfile?.id) {
+      toast.error("Você não pode excluir sua própria conta.");
+      return;
+    }
+    setConfirmAction({
+      title: "Excluir Usuário",
+      message: `Tem certeza que deseja excluir ${user.full_name ?? user.email}? Esta ação é irreversível.`,
+      action: async () => {
+        await admin.deleteUser(user.id);
+        await loadUsers();
+        setConfirmAction(null);
+      },
+    });
+  };
+
   const totalPages = Math.ceil(count / LIMIT);
   const formatDate = (d: string | null) => {
     if (!d) return "—";
