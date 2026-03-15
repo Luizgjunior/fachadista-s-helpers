@@ -67,8 +67,10 @@ export type Database = {
           cakto_checkout_url: string | null
           created_at: string | null
           credits: number
+          features: Json | null
           id: string
           is_active: boolean
+          is_popular: boolean
           name: string
           price_brl: number
         }
@@ -76,8 +78,10 @@ export type Database = {
           cakto_checkout_url?: string | null
           created_at?: string | null
           credits: number
+          features?: Json | null
           id: string
           is_active?: boolean
+          is_popular?: boolean
           name: string
           price_brl: number
         }
@@ -85,8 +89,10 @@ export type Database = {
           cakto_checkout_url?: string | null
           created_at?: string | null
           credits?: number
+          features?: Json | null
           id?: string
           is_active?: boolean
+          is_popular?: boolean
           name?: string
           price_brl?: number
         }
