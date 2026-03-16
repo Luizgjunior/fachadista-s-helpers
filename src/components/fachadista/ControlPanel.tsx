@@ -81,7 +81,9 @@ export const ControlPanelContent = ({ activeTab, setActiveTab, params, setParams
                 <span className="text-[9px] md:text-[11px] font-medium text-muted-foreground uppercase tracking-tight">Backlit / Halo</span>
               </div>
             </div>
-            <ToggleSwitch enabled={params.illuminatedSignage} onToggle={() => setParams(p => ({ ...p, illuminatedSignage: !p.illuminatedSignage }))} />
+            <div className={`relative w-11 h-6 md:w-12 md:h-6 rounded-full transition-all duration-300 flex-shrink-0 ${params.illuminatedSignage ? 'bg-toggle-on' : 'bg-toggle-off'}`}>
+              <div className={`absolute top-1 w-4 h-4 bg-surface rounded-full transition-all duration-300 shadow-sm ${params.illuminatedSignage ? 'left-6 md:left-7' : 'left-1'}`} />
+            </div>
           </div>
         </div>
       )}
@@ -104,7 +106,9 @@ export const ControlPanelContent = ({ activeTab, setActiveTab, params, setParams
                   <span className="text-[9px] md:text-[11px] font-medium text-muted-foreground uppercase">Presença no entorno</span>
                 </div>
               </div>
-              <ToggleSwitch enabled={params.sidewalkEnabled} onToggle={() => setParams(p => ({ ...p, sidewalkEnabled: !p.sidewalkEnabled }))} />
+              <div className={`relative w-11 h-6 md:w-12 md:h-6 rounded-full transition-all duration-300 flex-shrink-0 ${params.sidewalkEnabled ? 'bg-toggle-on' : 'bg-toggle-off'}`}>
+                <div className={`absolute top-1 w-4 h-4 bg-surface rounded-full transition-all duration-300 shadow-sm ${params.sidewalkEnabled ? 'left-6 md:left-7' : 'left-1'}`} />
+              </div>
             </div>
 
             <SelectField icon={Palette} label="Tipo de Calçada" value={params.sidewalkType}
