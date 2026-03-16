@@ -27,7 +27,8 @@ const mobileLoadingMessages = [
   "Estruturando o prompt...",
   "Otimizando para Midjourney...",
 ];
-  const Index = () => {
+const Index = () => {
+  const navigate = useNavigate();
   const { user, profile, signOut, refreshProfile } = useAuth();
   const { credits, hasCreditsForPrompt, hasCreditsForImage, consumePromptCredits, consumeImageCredits } = useCredits({ profile, refreshProfile });
 
