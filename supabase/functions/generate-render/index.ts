@@ -7,135 +7,110 @@ const corsHeaders = {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-const IMAGE_SYSTEM_PROMPT = `You are an ultra-realistic architectural photography AI. Generate images that are completely indistinguishable from professional architectural photography.
-Requirements:
-- Photorealistic quality, NOT a 3D render look
-- Magazine-quality architectural photography (Dezeen, Archdaily)
-- Correct perspective, natural lighting physics
-- Real material textures at maximum detail
-- Natural human figures in candid poses
-- Environment-appropriate vegetation and vehicles
-- 8K resolution quality, sharp focus throughout`;
+const ASPECT_RATIO_MAP: Record<string, string> = {
+  "9:16": "9:16",
+  "3:4": "3:4",
+  "1:1": "1:1",
+  "16:9": "16:9",
+  "4:3": "4:3",
+};
 
-async function callWithRetry(apiKey: string, prompt: string, maxRetries = 3): Promise<Response> {
-  const models = [
-    "google/gemini-3.1-flash-image-preview",
-    "google/gemini-3-flash-image-preview",
-    "google/gemini-2.5-flash-image",
-  ];
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
 
-  for (const model of models) {
+  try {
+    const GEMINI_API_KEY = Deno.env.get("VITE_GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) throw new Error("VITE_GEMINI_API_KEY não configurada.");
+
+    const { prompt, aspectRatio } = await req.json();
+    if (!prompt) throw new Error("Prompt não fornecido.");
+
+    const ratio = ASPECT_RATIO_MAP[aspectRatio] || "16:9";
+
+    const maxRetries = 3;
     for (let attempt = 0; attempt < maxRetries; attempt++) {
-      console.log(`Trying model: ${model}, attempt ${attempt + 1}`);
+      console.log(`Gerando imagem, tentativa ${attempt + 1}/${maxRetries}`);
 
-      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: "system", content: IMAGE_SYSTEM_PROMPT },
-            { role: "user", content: prompt },
-          ],
-          modalities: ["image", "text"],
-        }),
-      });
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: prompt }],
+              },
+            ],
+            generationConfig: {
+              responseModalities: ["IMAGE", "TEXT"],
+              imageGenerationConfig: {
+                numberOfImages: 1,
+                aspectRatio: ratio,
+              },
+            },
+          }),
+        }
+      );
 
       if (response.status === 429 && attempt < maxRetries - 1) {
-        const delay = Math.pow(2, attempt + 1) * 1500;
-        console.log(`Rate limited. Retrying in ${delay}ms`);
+        const delay = Math.pow(2, attempt + 1) * 2000;
+        console.log(`Rate limit 429. Aguardando ${delay}ms`);
         await sleep(delay);
         continue;
       }
 
-      if (response.status === 404 || response.status === 400) {
-        console.log(`Model ${model} not available, trying next`);
-        break;
+      if (!response.ok) {
+        const statusCode = response.status;
+        const errorText = await response.text();
+        console.error("Gemini Image API error:", statusCode, errorText);
+
+        if (statusCode === 429) {
+          return new Response(
+            JSON.stringify({ error: "Limite de requisições. Tente em alguns segundos." }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        if (statusCode === 403) {
+          return new Response(
+            JSON.stringify({ error: "API Key sem permissão para geração de imagens." }),
+            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        throw new Error(`Erro Gemini Image API: ${statusCode} - ${errorText}`);
       }
 
-      return response;
-    }
-  }
+      const data = await response.json();
+      console.log("Response candidates:", data.candidates?.length);
 
-  throw new Error("Todos os modelos falharam após múltiplas tentativas.");
-}
-
-function extractImageUrl(data: any): string | null {
-  const img1 = data?.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-  if (img1) return img1;
-
-  const content = data?.choices?.[0]?.message?.content;
-  if (Array.isArray(content)) {
-    for (const part of content) {
-      if ((part.type === "image_url" || part.type === "image") && part.image_url?.url) {
-        return part.image_url.url;
+      for (const candidate of data.candidates || []) {
+        for (const part of candidate.content?.parts || []) {
+          if (part.inlineData?.data) {
+            const mimeType = part.inlineData.mimeType || "image/png";
+            const imageUrl = `data:${mimeType};base64,${part.inlineData.data}`;
+            console.log("Imagem gerada com sucesso, mime:", mimeType);
+            return new Response(
+              JSON.stringify({ imageUrl }),
+              { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+        }
       }
-    }
-  }
 
-  if (typeof content === "string" && content.startsWith("data:image")) {
-    return content;
-  }
-
-  const img4 = data?.choices?.[0]?.message?.image_url?.url;
-  if (img4) return img4;
-
-  console.log("Full response structure:", JSON.stringify(data, null, 2));
-  return null;
-}
-
-serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-
-  try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
-
-    const { prompt } = await req.json();
-    if (!prompt) throw new Error("Prompt não fornecido.");
-
-    const response = await callWithRetry(LOVABLE_API_KEY, prompt);
-
-    if (!response.ok) {
-      const statusCode = response.status;
-      const errorText = await response.text();
-      console.error("AI Gateway error:", statusCode, errorText);
-
-      if (statusCode === 429) {
-        return new Response(JSON.stringify({ error: "Limite de requisições. Tente novamente em alguns segundos." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (statusCode === 402) {
-        return new Response(JSON.stringify({ error: "Créditos da plataforma esgotados. Contate o suporte." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      throw new Error(`Erro no gateway IA: ${statusCode} - ${errorText}`);
+      throw new Error("Nenhuma imagem retornada na resposta.");
     }
 
-    const data = await response.json();
-    console.log("Model used:", data?.model || "unknown");
+    throw new Error("Limite de tentativas excedido. Tente novamente.");
 
-    const imageUrl = extractImageUrl(data);
-    console.log("Image URL length:", imageUrl?.length || 0);
-    console.log("Image URL prefix:", imageUrl?.substring(0, 50));
-
-    if (!imageUrl) {
-      throw new Error("Nenhuma imagem retornada. Tente novamente.");
-    }
-
-    return new Response(JSON.stringify({ imageUrl }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
   } catch (e) {
     console.error("generate-render error:", e);
     const msg = e instanceof Error ? e.message : "Erro desconhecido";
     return new Response(JSON.stringify({ error: msg }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
