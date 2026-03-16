@@ -34,60 +34,62 @@ const ComparatorView = ({
   }, []);
 
   return (
-    <main className="flex-1 max-w-[1600px] mx-auto w-full p-4 md:p-10 flex flex-col gap-6 md:gap-10 animate-in fade-in duration-500">
-      <div className="text-center space-y-2 md:space-y-3">
-        <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tighter text-foreground">Comparador de Render</h2>
-        <p className="text-[10px] md:text-sm font-bold text-muted-foreground uppercase tracking-widest">Visualize a evolução do seu projeto</p>
+    <main className="flex-1 max-w-[1600px] mx-auto w-full px-4 py-4 md:px-8 lg:px-12 md:py-8 flex flex-col gap-5 md:gap-10 animate-in fade-in duration-500">
+      <div className="text-center space-y-1.5 md:space-y-3">
+        <h2 className="text-xl md:text-4xl font-black uppercase tracking-tighter text-foreground">Comparador de Render</h2>
+        <p className="text-[9px] md:text-sm font-bold text-muted-foreground uppercase tracking-widest">Visualize a evolução do seu projeto</p>
       </div>
 
       {!beforeImage || !afterImage ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-10 max-w-5xl mx-auto w-full">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-10 max-w-5xl mx-auto w-full">
+          {/* Before card */}
           <div
             onClick={() => beforeInputRef.current?.click()}
-            className="bg-surface border border-border rounded-3xl md:rounded-[45px] p-8 md:p-12 flex flex-col items-center justify-center aspect-[4/3] cursor-pointer hover:bg-surface-hover hover:border-primary/30 transition-all group relative overflow-hidden shadow-xl shadow-muted/30"
+            className="bg-surface border border-border rounded-2xl md:rounded-[45px] p-6 md:p-12 flex flex-col items-center justify-center aspect-[4/3] cursor-pointer hover:border-primary/30 transition-all group relative overflow-hidden shadow-lg md:shadow-xl shadow-muted/20 md:shadow-muted/30"
           >
             {beforeImage ? (
               <>
                 <img src={beforeImage} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-30 transition-opacity" alt="Antes" />
-                <div className="z-10 bg-surface/90 px-5 py-2.5 md:px-6 md:py-3 rounded-xl md:rounded-2xl backdrop-blur-md border border-border shadow-xl">
-                  <Check className="w-8 h-8 md:w-10 md:h-10 text-green-500" />
+                <div className="z-10 bg-surface/90 px-4 py-2 md:px-6 md:py-3 rounded-xl md:rounded-2xl backdrop-blur-md border border-border shadow-xl">
+                  <Check className="w-7 h-7 md:w-10 md:h-10 text-green-500" />
                 </div>
-                <p className="z-10 mt-4 md:mt-6 font-black uppercase tracking-[0.2em] text-foreground text-xs md:text-sm">Sketch / Base OK</p>
+                <p className="z-10 mt-3 md:mt-6 font-black uppercase tracking-[0.2em] text-foreground text-xs">Sketch / Base OK</p>
               </>
             ) : (
               <>
-                <div className="bg-secondary p-6 md:p-8 rounded-full mb-6 md:mb-8 group-hover:scale-110 transition-transform shadow-md border border-border">
-                  <ImageIcon className="w-8 h-8 md:w-10 md:h-10 text-muted-foreground/50 group-hover:text-primary transition-colors" />
+                <div className="bg-secondary p-5 md:p-8 rounded-full mb-4 md:mb-8 group-hover:scale-110 transition-transform shadow-md border border-border">
+                  <ImageIcon className="w-7 h-7 md:w-10 md:h-10 text-muted-foreground/50 group-hover:text-primary transition-colors" />
                 </div>
-                <h3 className="text-base md:text-xl font-black uppercase text-foreground mb-2 md:mb-3">Snapshot Antes</h3>
-                <p className="text-[10px] md:text-xs uppercase tracking-widest text-muted-foreground text-center leading-relaxed mb-3 md:mb-4">Arraste seu rascunho ou snapshot inicial</p>
-                <div className="bg-secondary/80 px-3 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl text-[9px] md:text-[10px] font-black text-muted-foreground uppercase tracking-widest border border-border/50">
+                <h3 className="text-sm md:text-xl font-black uppercase text-foreground mb-1.5 md:mb-3">Snapshot Antes</h3>
+                <p className="text-[9px] md:text-xs uppercase tracking-widest text-muted-foreground text-center leading-relaxed mb-2 md:mb-4">Arraste seu rascunho ou snapshot</p>
+                <div className="bg-secondary/80 px-3 py-1.5 rounded-lg text-[9px] font-black text-muted-foreground uppercase tracking-widest border border-border/50">
                   Ou Ctrl+V
                 </div>
               </>
             )}
           </div>
 
+          {/* After card */}
           <div
             onClick={() => afterInputRef.current?.click()}
-            className="bg-surface border border-border rounded-3xl md:rounded-[45px] p-8 md:p-12 flex flex-col items-center justify-center aspect-[4/3] cursor-pointer hover:bg-surface-hover hover:border-primary/30 transition-all group relative overflow-hidden shadow-xl shadow-muted/30"
+            className="bg-surface border border-border rounded-2xl md:rounded-[45px] p-6 md:p-12 flex flex-col items-center justify-center aspect-[4/3] cursor-pointer hover:border-primary/30 transition-all group relative overflow-hidden shadow-lg md:shadow-xl shadow-muted/20 md:shadow-muted/30"
           >
             {afterImage ? (
               <>
                 <img src={afterImage} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-30 transition-opacity" alt="Depois" />
-                <div className="z-10 bg-surface/90 px-5 py-2.5 md:px-6 md:py-3 rounded-xl md:rounded-2xl backdrop-blur-md border border-border shadow-xl">
-                  <Check className="w-8 h-8 md:w-10 md:h-10 text-green-500" />
+                <div className="z-10 bg-surface/90 px-4 py-2 md:px-6 md:py-3 rounded-xl md:rounded-2xl backdrop-blur-md border border-border shadow-xl">
+                  <Check className="w-7 h-7 md:w-10 md:h-10 text-green-500" />
                 </div>
-                <p className="z-10 mt-4 md:mt-6 font-black uppercase tracking-[0.2em] text-foreground text-xs md:text-sm">Render Final OK</p>
+                <p className="z-10 mt-3 md:mt-6 font-black uppercase tracking-[0.2em] text-foreground text-xs">Render Final OK</p>
               </>
             ) : (
               <>
-                <div className="bg-secondary p-6 md:p-8 rounded-full mb-6 md:mb-8 group-hover:scale-110 transition-transform shadow-md border border-border">
-                  <Sparkles className="w-8 h-8 md:w-10 md:h-10 text-muted-foreground/50 group-hover:text-primary transition-colors" />
+                <div className="bg-secondary p-5 md:p-8 rounded-full mb-4 md:mb-8 group-hover:scale-110 transition-transform shadow-md border border-border">
+                  <Sparkles className="w-7 h-7 md:w-10 md:h-10 text-muted-foreground/50 group-hover:text-primary transition-colors" />
                 </div>
-                <h3 className="text-base md:text-xl font-black uppercase text-foreground mb-2 md:mb-3">Render Depois</h3>
-                <p className="text-[10px] md:text-xs uppercase tracking-widest text-muted-foreground text-center leading-relaxed mb-3 md:mb-4">Arraste sua visualização final fotorrealista</p>
-                <div className="bg-secondary/80 px-3 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl text-[9px] md:text-[10px] font-black text-muted-foreground uppercase tracking-widest border border-border/50">
+                <h3 className="text-sm md:text-xl font-black uppercase text-foreground mb-1.5 md:mb-3">Render Depois</h3>
+                <p className="text-[9px] md:text-xs uppercase tracking-widest text-muted-foreground text-center leading-relaxed mb-2 md:mb-4">Sua visualização final fotorrealista</p>
+                <div className="bg-secondary/80 px-3 py-1.5 rounded-lg text-[9px] font-black text-muted-foreground uppercase tracking-widest border border-border/50">
                   Ou Ctrl+V
                 </div>
               </>
@@ -95,19 +97,19 @@ const ComparatorView = ({
           </div>
         </div>
       ) : (
-        <div className="w-full max-w-6xl mx-auto space-y-6 md:space-y-8 animate-in zoom-in-95 duration-500">
-          <div className="flex justify-between items-center px-2 md:px-8">
-            <div className="bg-surface px-4 py-2 md:px-6 md:py-3 rounded-xl md:rounded-2xl border border-border shadow-sm">
-              <span className="text-[10px] md:text-sm font-black uppercase tracking-[0.15em] md:tracking-[0.2em] text-foreground">PROJETO BASE</span>
+        <div className="w-full max-w-6xl mx-auto space-y-5 md:space-y-8 animate-in zoom-in-95 duration-500">
+          <div className="flex justify-between items-center px-1 md:px-8">
+            <div className="bg-surface px-3 py-1.5 md:px-6 md:py-3 rounded-lg md:rounded-2xl border border-border shadow-sm">
+              <span className="text-[9px] md:text-sm font-black uppercase tracking-[0.15em] text-foreground">PROJETO BASE</span>
             </div>
-            <div className="bg-primary px-4 py-2 md:px-6 md:py-3 rounded-xl md:rounded-2xl border border-primary shadow-sm">
-              <span className="text-[10px] md:text-sm font-black uppercase tracking-[0.15em] md:tracking-[0.2em] text-primary-foreground">RESULTADO FINAL</span>
+            <div className="bg-primary px-3 py-1.5 md:px-6 md:py-3 rounded-lg md:rounded-2xl border border-primary shadow-sm">
+              <span className="text-[9px] md:text-sm font-black uppercase tracking-[0.15em] text-primary-foreground">RESULTADO FINAL</span>
             </div>
           </div>
 
           <div
             ref={containerRef}
-            className="relative w-full aspect-[4/3] md:aspect-video rounded-3xl md:rounded-[55px] overflow-hidden cursor-ew-resize border border-border shadow-[0_20px_40px_-10px_rgba(0,0,0,0.12)] md:shadow-[0_35px_60px_-15px_rgba(0,0,0,0.15)] select-none bg-secondary"
+            className="relative w-full aspect-[3/2] md:aspect-video rounded-2xl md:rounded-[55px] overflow-hidden cursor-ew-resize border border-border shadow-xl md:shadow-2xl select-none bg-secondary"
             onMouseMove={handleSliderMove}
             onTouchMove={handleSliderMove}
             onClick={handleSliderMove}
@@ -137,13 +139,13 @@ const ComparatorView = ({
             </div>
           </div>
 
-          <div className="flex justify-center flex-col items-center gap-3 md:gap-4">
-            <p className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] md:tracking-[0.3em] animate-pulse">Deslize para comparar</p>
+          <div className="flex justify-center flex-col items-center gap-3">
+            <p className="text-[9px] md:text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] animate-pulse">Deslize para comparar</p>
             <button
               onClick={() => { setBeforeImage(null); setAfterImage(null); }}
-              className="bg-surface hover:bg-surface-hover border border-border px-6 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] md:tracking-[0.2em] transition-all shadow-sm"
+              className="bg-surface hover:bg-surface-hover border border-border px-5 py-2.5 md:px-8 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-all shadow-sm"
             >
-              Fazer novo Comparativo
+              Novo Comparativo
             </button>
           </div>
         </div>
