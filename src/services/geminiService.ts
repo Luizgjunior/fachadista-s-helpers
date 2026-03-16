@@ -192,6 +192,12 @@ export const generateSamplePreview = async (
         continue;
       }
       console.error('Erro na edge function:', error);
+      if (error.message?.includes('Nenhuma imagem')) {
+        throw new Error('O modelo de IA não retornou uma imagem. Tente novamente ou use um prompt diferente.');
+      }
+      if (error.message?.includes('429') || error.message?.includes('Limite')) {
+        throw new Error('Muitas requisições simultâneas. Aguarde 10 segundos e tente novamente.');
+      }
       throw new Error(error.message || 'Erro ao gerar render.');
     }
 

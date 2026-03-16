@@ -109,6 +109,49 @@ Always respond with valid JSON containing exactly three fields:
 
 Do NOT include any text outside the JSON object.`;
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+async function callPromptWithRetry(apiKey: string, contentParts: any[], maxRetries = 3): Promise<Response> {
+  const models = ["google/gemini-2.5-pro", "google/gemini-2.5-flash"];
+
+  for (const model of models) {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      console.log(`generate-prompt: model=${model}, attempt=${attempt + 1}`);
+
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: ARCHVIZ_SYSTEM_PROMPT },
+            { role: "user", content: contentParts },
+          ],
+        }),
+      });
+
+      if (response.status === 429 && attempt < maxRetries - 1) {
+        const delay = Math.pow(2, attempt + 1) * 1500;
+        console.log(`Rate limited. Retrying in ${delay}ms`);
+        await sleep(delay);
+        continue;
+      }
+
+      if (response.status === 404 || response.status === 400) {
+        console.log(`Model ${model} not available, trying next`);
+        break;
+      }
+
+      return response;
+    }
+  }
+
+  throw new Error("Todos os modelos falharam após múltiplas tentativas.");
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -123,46 +166,26 @@ serve(async (req) => {
     }
 
     const contentParts: any[] = [];
-
     for (const img of images) {
       const base64Data = img.split(",")[1];
       if (base64Data) {
-        contentParts.push({
-          type: "image_url",
-          image_url: { url: img },
-        });
+        contentParts.push({ type: "image_url", image_url: { url: img } });
       }
     }
-
     contentParts.push({ type: "text", text: promptText });
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: ARCHVIZ_SYSTEM_PROMPT },
-          { role: "user", content: contentParts },
-        ],
-      }),
-    });
+    const response = await callPromptWithRetry(LOVABLE_API_KEY, contentParts);
 
     if (!response.ok) {
       const statusCode = response.status;
       if (statusCode === 429) {
         return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns segundos." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (statusCode === 402) {
         return new Response(JSON.stringify({ error: "Créditos da plataforma esgotados. Contate o suporte." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const errorText = await response.text();
@@ -171,6 +194,7 @@ serve(async (req) => {
     }
 
     const data = await response.json();
+    console.log("Prompt model used:", data?.model || "unknown");
     const content = data.choices?.[0]?.message?.content;
 
     if (!content) {
@@ -201,8 +225,7 @@ serve(async (req) => {
     console.error("generate-prompt error:", e);
     const msg = e instanceof Error ? e.message : "Erro desconhecido";
     return new Response(JSON.stringify({ error: msg }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
