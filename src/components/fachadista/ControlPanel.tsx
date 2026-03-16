@@ -151,6 +151,43 @@ export const ControlPanelContent = ({ activeTab, setActiveTab, params, setParams
   </div>
 );
 
+const DesktopGenerateButton = ({ images, loading, onGenerate }: { images: string[]; loading: boolean; onGenerate: () => void }) => {
+  const [msgIndex, setMsgIndex] = useState(0);
+
+  useEffect(() => {
+    if (!loading) { setMsgIndex(0); return; }
+    setMsgIndex(0);
+    const interval = setInterval(() => {
+      setMsgIndex((i) => (i + 1) % promptLoadingMessages.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [loading]);
+
+  return (
+    <div className="hidden md:block">
+      <button
+        onClick={onGenerate}
+        disabled={images.length === 0 || loading}
+        className={`w-full py-6 rounded-[32px] font-black text-base uppercase tracking-[0.4em] transition-all shadow-xl active:scale-95 flex items-center justify-center gap-5 mt-8 ${
+          images.length === 0
+            ? 'bg-secondary text-muted-foreground/50 opacity-50'
+            : 'bg-primary text-primary-foreground hover:opacity-90 shadow-primary/30'
+        }`}
+      >
+        {loading ? (
+          <span className="w-6 h-6 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+        ) : (
+          <span className="text-primary-foreground">✦</span>
+        )}
+        {loading ? promptLoadingMessages[msgIndex] : 'GERAR PROMPT'}
+      </button>
+      <p className="text-[9px] font-bold text-muted-foreground/50 text-center mt-2 uppercase tracking-widest">
+        Consome {CREDIT_COSTS.PROMPT} créditos por geração
+      </p>
+    </div>
+  );
+};
+
 interface ControlPanelProps {
   activeTab: TabType;
   setActiveTab: (tab: TabType) => void;
