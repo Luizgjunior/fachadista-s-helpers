@@ -5,6 +5,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const MODELS = ["gemini-2.5-pro", "gemini-2.5-flash"] as const;
+
 const ARCHVIZ_SYSTEM_PROMPT = `You are the world's leading Architectural Visualization Director and Computational Photography Expert. Your renders are published in Dezeen, Archdaily, Wallpaper*, Architectural Digest, and Phaidon. Your work is consistently mistaken for real photography.
 
 YOUR CORE MISSION:
@@ -41,6 +45,91 @@ UNIVERSAL PHOTOREALISM RULES:
 
 Do NOT include any text outside the JSON object.`;
 
+const extractRetryDelayMs = (errorText: string, attempt: number) => {
+  const match = errorText.match(/retry in\s+(\d+(?:\.\d+)?)s/i) || errorText.match(/"retryDelay":\s*"(\d+)s"/i);
+  if (match) {
+    const seconds = Number(match[1]);
+    if (!Number.isNaN(seconds)) {
+      return Math.ceil(seconds * 1000);
+    }
+  }
+
+  return Math.pow(2, attempt + 1) * 1500;
+};
+
+async function callGeminiWithFallback(apiKey: string, parts: any[]) {
+  let lastStatus = 500;
+  let lastErrorText = "";
+
+  for (const model of MODELS) {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      console.log(`generate-prompt trying model=${model} attempt=${attempt + 1}`);
+      await sleep(250);
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            system_instruction: {
+              parts: [{ text: ARCHVIZ_SYSTEM_PROMPT }],
+            },
+            contents: [
+              {
+                role: "user",
+                parts,
+              },
+            ],
+            generationConfig: {
+              responseMimeType: "application/json",
+              responseSchema: {
+                type: "OBJECT",
+                properties: {
+                  english: { type: "STRING" },
+                  portuguese: { type: "STRING" },
+                  tags: {
+                    type: "ARRAY",
+                    items: { type: "STRING" },
+                  },
+                },
+                required: ["english", "portuguese", "tags"],
+              },
+            },
+          }),
+        }
+      );
+
+      if (response.ok) {
+        console.log(`generate-prompt success model=${model}`);
+        return response;
+      }
+
+      const errorText = await response.text();
+      lastStatus = response.status;
+      lastErrorText = errorText;
+      console.error(`Gemini API error model=${model} status=${response.status}:`, errorText);
+
+      if ((response.status === 400 || response.status === 404) && model !== MODELS[MODELS.length - 1]) {
+        break;
+      }
+
+      if (response.status === 429 && attempt < 2) {
+        const delay = extractRetryDelayMs(errorText, attempt);
+        console.log(`generate-prompt rate limited model=${model}, retrying in ${delay}ms`);
+        await sleep(delay);
+        continue;
+      }
+
+      if (response.status !== 429) {
+        break;
+      }
+    }
+  }
+
+  return new Response(lastErrorText || "Erro Gemini API", { status: lastStatus });
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -73,58 +162,27 @@ serve(async (req) => {
 
     parts.push({ text: promptText });
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: ARCHVIZ_SYSTEM_PROMPT }],
-          },
-          contents: [
-            {
-              role: "user",
-              parts,
-            },
-          ],
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: "OBJECT",
-              properties: {
-                english: { type: "STRING" },
-                portuguese: { type: "STRING" },
-                tags: {
-                  type: "ARRAY",
-                  items: { type: "STRING" },
-                },
-              },
-              required: ["english", "portuguese", "tags"],
-            },
-          },
-        }),
-      }
-    );
+    const response = await callGeminiWithFallback(GEMINI_API_KEY, parts);
 
     if (!response.ok) {
       const statusCode = response.status;
       const errorText = await response.text();
-      console.error("Gemini API error:", statusCode, errorText);
 
       if (statusCode === 429) {
         return new Response(
-          JSON.stringify({ error: "Limite de requisições atingido. Tente em alguns segundos." }),
+          JSON.stringify({ error: "A chave do Google AI atingiu o limite de uso/quota. Aguarde um pouco ou troque para uma chave com billing ativo." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+
       if (statusCode === 403) {
         return new Response(
-          JSON.stringify({ error: "API Key inválida ou sem permissão." }),
+          JSON.stringify({ error: "API Key inválida ou sem permissão para o modelo selecionado." }),
           { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      throw new Error(`Erro Gemini API: ${statusCode}`);
+
+      throw new Error(`Erro Gemini API: ${statusCode} - ${errorText}`);
     }
 
     const data = await response.json();
@@ -149,7 +207,6 @@ serve(async (req) => {
     return new Response(JSON.stringify(parsed), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-
   } catch (e) {
     console.error("generate-prompt error:", e);
     const msg = e instanceof Error ? e.message : "Erro desconhecido";
