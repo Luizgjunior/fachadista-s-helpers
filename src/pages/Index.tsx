@@ -95,6 +95,15 @@ const Index = () => {
   }, [appMode, beforeImage, processFile]);
 
   useEffect(() => {
+    if (!loading) { setMobileMsgIndex(0); return; }
+    setMobileMsgIndex(0);
+    const interval = setInterval(() => {
+      setMobileMsgIndex((i) => (i + 1) % mobileLoadingMessages.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [loading]);
+
+  useEffect(() => {
     if (!user) return;
     const loadHistory = async () => {
       const { data, error } = await supabase
