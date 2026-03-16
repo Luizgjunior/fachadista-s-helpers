@@ -345,7 +345,7 @@ const Index = () => {
                 ) : (
                   <span>✦</span>
                 )}
-                {loading ? 'Gerando...' : 'Gerar'}
+                {loading ? mobileLoadingMessages[mobileMsgIndex] : 'Gerar'}
               </button>
             </div>
             <p className="text-[8px] font-bold text-muted-foreground/40 text-center pb-2 uppercase tracking-widest">
