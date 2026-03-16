@@ -7,46 +7,46 @@ const formatParam = (label: string, value: string | number | boolean): string =>
 };
 
 const buildPromptText = (params: PromptParameters): string => {
-  return `Você é um Diretor de Fotografia e Especialista em ArchViz de nível mundial (estilo Mir.no, The Boundary). 
-Sua missão é converter os snapshots anexados em um prompt mestre para Midjourney v6.1 que produza uma imagem INDISTINGUÍVEL de uma fotografia real.
-Se houver múltiplas imagens, use-as como referências complementares de estilo, geometria e materiais.
+  return `Analyze the attached architectural snapshot(s) and generate the MASTER PROMPT.
 
-REGRAS DE OURO PARA O FOTORREALISMO:
-1. NÃO use palavras genéricas como "hiper-realista". Use especificações técnicas de câmera: "Shot on 35mm lens", "f/8 aperture", "ISO 100", "RAW photography style".
-2. FÍSICA DE LUZ: Descreva como a luz interage com as superfícies. "Soft global illumination", "ray-traced reflections", "natural light bouncing off surfaces", "subtle lens flare".
-3. TEXTURAS TANGÍVEIS: Descreva micro-detalhes. "Visible concrete pores", "grainy stone textures", "oxidized metal", "weathered wood grain", "highly detailed glass reflections".
-4. VEGETAÇÃO: Deve ser orgânica e diversa. "Lush photorealistic foliage", "scanned 3D plants", "natural leaf translucency".
-5. SERES HUMANOS (CRÍTICO): Evite o "uncanny valley". Descreva pessoas em poses naturais, levemente desfocadas ou em movimento (motion blur) para realismo.
-6. SOMBRAS: "Contact shadows", "soft ambient occlusion", "sharp shadows for sunny days", "diffuse shadows for overcast".
+PROJECT SPECS:
+${formatParam('Type', params.projectType)}
+${formatParam('Format/Ratio', params.socialFormat)}
+${formatParam('Render Style', params.visualStyle)}
+${formatParam('Camera Angle', params.cameraAngle)}
+${params.blurReference ? '⚠ BLUR MODE: Use reference only for massing/composition. Ignore surface details.' : '✓ Use all visual information from reference.'}
 
-DADOS DA CENA:
-${formatParam('Tipo de Projeto', params.projectType)}
-${formatParam('Formato', params.socialFormat)}
-${formatParam('Estética Visual', params.visualStyle)}
-${formatParam('Ângulo de Câmera', params.cameraAngle)}
+ATMOSPHERE:
+${formatParam('Time of Day', params.lighting)}
+${formatParam('Weather', params.weather)}
+${params.illuminatedSignage ? 'SIGNAGE: Warm LED backlit, halo glow, realistic falloff, neon flicker' : 'SIGNAGE: No artificial lighting'}
 
-${params.blurReference ? "- REFERÊNCIA DESFOCADA: Use as imagens apenas para composição, volumes e layout geral." : ""}
+ENVIRONMENT:
+${formatParam('Context', params.environmentType)}
+SIDEWALK: ${params.sidewalkEnabled && params.sidewalkType !== 'Nenhuma das opção' ? `${params.sidewalkType} — show imperfections, gum stains, edge erosion, wet patches` : 'Integrate naturally with terrain'}
+PEOPLE: ${params.peopleCount} figures — candid, diverse, motion-natural
+VEHICLES: ${params.carCount} cars — luxury/modern, reflective metallic paint, realistic parking angles
+EXTRA DETAILS: ${params.environmentDetails || 'None'}
 
-ATMOSFERA:
-${formatParam('Iluminação', params.lighting)}
-${formatParam('Clima', params.weather)}
-- Letreiro Iluminado: ${params.illuminatedSignage ? "Warm LED backlit signage, halo effect, subtle glow on surrounding textures" : "No artificial signage lighting"}
+OUTPUT FORMAT (strict JSON):
+{
+  "english": "[MASTER PROMPT — minimum 200 words, maximum technical density, camera specs first, then architecture, then environment, then post-processing params]",
+  "portuguese": "[Technical analysis: explain WHY this prompt will produce photorealistic results — mention specific techniques used]",
+  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"]
+}
 
-ENTORNO:
-${formatParam('Tipo de Ambiente', params.environmentType)}
-- Calçada: ${params.sidewalkEnabled && params.sidewalkType !== 'Nenhuma das opção' ? `Hyper-detailed ${params.sidewalkType} pavement with realistic imperfections.` : "Direct integration with terrain."}
-- População: ${params.peopleCount} pessoas.
-- Veículos: ${params.carCount} carros de luxo ou modernos, pintura reflexiva metálica realista.
-- Detalhes: ${params.environmentDetails}
+CRITICAL: The english prompt must be so technically precise that a professional ArchViz artist would recognize it as expert work. Include specific f-stop, focal length, ISO, color temperature, and render engine references.`;
+};
 
-Gere um JSON estritamente com:
-1. 'english': Prompt técnico mestre completo.
-2. 'portuguese': Uma breve análise técnica.
-3. 'tags': 5 tags técnicas (ex: RayTracing, RAW, 8k, ArchDaily, Photorealistic).
-
-IMPORTANTE: 
-- Se for "Projeto de Interiores", foque em iluminação interna, design de mobiliário, texturas de tecidos.
-- Se for "Planta Arquitetônica" ou "Detalhamento", foque em estética "Clean Blueprint", "Professional Draftsmanship".`;
+const ASPECT_RATIO_MAP: Record<string, string> = {
+  'Instagram / TikTok (9:16)': '9:16',
+  'Instagram Portrait (4:5)': '3:4',
+  'Post / Feed (1:1)': '1:1',
+  'YouTube / TV (16:9)': '16:9',
+  'Fotografia (3:2)': '4:3',
+  'Cinematográfico (2.35:1)': '16:9',
+  'Vertical Clássico (2:3)': '3:4',
+  'Nenhuma das opção': '16:9',
 };
 
 export const generateArchitecturalPrompt = async (
@@ -82,12 +82,14 @@ export const generateArchitecturalPrompt = async (
 
 export const generateSamplePreview = async (
   prompt: string,
-  _aspectRatio: string
+  socialFormat: string
 ): Promise<string> => {
   console.log('Chamando edge function generate-render');
 
+  const aspectRatio = ASPECT_RATIO_MAP[socialFormat] || '16:9';
+
   const { data, error } = await supabase.functions.invoke('generate-render', {
-    body: { prompt },
+    body: { prompt, aspectRatio },
   });
 
   if (error) {

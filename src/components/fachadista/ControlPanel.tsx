@@ -1,4 +1,5 @@
 import { Camera, Wind, Map, Building, Layout, Palette, Focus, Sun, Globe, Lightbulb, Footprints, Users, Car, Zap } from "lucide-react";
+import { useState, useEffect } from "react";
 import { CREDIT_COSTS } from "@/hooks/useCredits";
 import SelectField from "./SelectField";
 import SliderField from "./SliderField";
@@ -6,6 +7,14 @@ import ToggleSwitch from "./ToggleSwitch";
 import { PromptParameters, ProjectType, CameraAngle, SidewalkType } from "@/types/fachadista";
 
 type TabType = 'scene' | 'atmos' | 'entorno';
+
+const promptLoadingMessages = [
+  "Analisando o projeto...",
+  "Identificando materiais...",
+  "Calculando iluminação ideal...",
+  "Estruturando o prompt...",
+  "Otimizando para Midjourney...",
+];
 
 interface ControlPanelContentProps {
   activeTab: TabType;
@@ -138,6 +147,23 @@ export const ControlPanelContent = ({ activeTab, setActiveTab, params, setParams
     </div>
 
     {/* Generate button — only in desktop panel, mobile has its own bottom bar */}
+    <DesktopGenerateButton images={images} loading={loading} onGenerate={onGenerate} />
+  </div>
+);
+
+const DesktopGenerateButton = ({ images, loading, onGenerate }: { images: string[]; loading: boolean; onGenerate: () => void }) => {
+  const [msgIndex, setMsgIndex] = useState(0);
+
+  useEffect(() => {
+    if (!loading) { setMsgIndex(0); return; }
+    setMsgIndex(0);
+    const interval = setInterval(() => {
+      setMsgIndex((i) => (i + 1) % promptLoadingMessages.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [loading]);
+
+  return (
     <div className="hidden md:block">
       <button
         onClick={onGenerate}
@@ -153,14 +179,14 @@ export const ControlPanelContent = ({ activeTab, setActiveTab, params, setParams
         ) : (
           <span className="text-primary-foreground">✦</span>
         )}
-        {loading ? 'PROCESSANDO...' : 'GERAR PROMPT'}
+        {loading ? promptLoadingMessages[msgIndex] : 'GERAR PROMPT'}
       </button>
       <p className="text-[9px] font-bold text-muted-foreground/50 text-center mt-2 uppercase tracking-widest">
         Consome {CREDIT_COSTS.PROMPT} créditos por geração
       </p>
     </div>
-  </div>
-);
+  );
+};
 
 interface ControlPanelProps {
   activeTab: TabType;

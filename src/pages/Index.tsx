@@ -20,6 +20,13 @@ import { toast } from "sonner";
 
 type TabType = 'scene' | 'atmos' | 'entorno';
 
+const mobileLoadingMessages = [
+  "Analisando o projeto...",
+  "Identificando materiais...",
+  "Calculando iluminação ideal...",
+  "Estruturando o prompt...",
+  "Otimizando para Midjourney...",
+];
 const Index = () => {
   const navigate = useNavigate();
   const { user, profile, signOut, refreshProfile } = useAuth();
@@ -37,6 +44,7 @@ const Index = () => {
   const [previewLoading, setPreviewLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('scene');
+  const [mobileMsgIndex, setMobileMsgIndex] = useState(0);
 
   const [beforeImage, setBeforeImage] = useState<string | null>(null);
   const [afterImage, setAfterImage] = useState<string | null>(null);
@@ -85,6 +93,15 @@ const Index = () => {
     window.addEventListener('paste', handleGlobalPaste);
     return () => window.removeEventListener('paste', handleGlobalPaste);
   }, [appMode, beforeImage, processFile]);
+
+  useEffect(() => {
+    if (!loading) { setMobileMsgIndex(0); return; }
+    setMobileMsgIndex(0);
+    const interval = setInterval(() => {
+      setMobileMsgIndex((i) => (i + 1) % mobileLoadingMessages.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [loading]);
 
   useEffect(() => {
     if (!user) return;
@@ -328,7 +345,7 @@ const Index = () => {
                 ) : (
                   <span>✦</span>
                 )}
-                {loading ? 'Gerando...' : 'Gerar'}
+                {loading ? mobileLoadingMessages[mobileMsgIndex] : 'Gerar'}
               </button>
             </div>
             <p className="text-[8px] font-bold text-muted-foreground/40 text-center pb-2 uppercase tracking-widest">

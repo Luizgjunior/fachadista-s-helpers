@@ -4,6 +4,16 @@ import { Progress } from "@/components/ui/progress";
 import { useState, useEffect } from "react";
 import { CREDIT_COSTS } from "@/hooks/useCredits";
 
+const loadingMessages = [
+  "Analisando composição arquitetônica...",
+  "Calculando física de luz...",
+  "Renderizando materiais...",
+  "Aplicando profundidade de campo...",
+  "Adicionando elementos de entorno...",
+  "Finalizando fotorrealismo...",
+  "Quase pronto...",
+];
+
 interface PromptResultProps {
   result: GeneratedPrompt;
   copied: boolean;
@@ -18,15 +28,20 @@ const PromptResult = ({
   result, copied, onCopy, previewLoading, onGeneratePreview, userCredits, isAdmin,
 }: PromptResultProps) => {
   const [fakeProgress, setFakeProgress] = useState(0);
+  const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
   const canGenerate = isAdmin || userCredits >= CREDIT_COSTS.IMAGE;
 
   useEffect(() => {
-    if (!previewLoading) { setFakeProgress(0); return; }
+    if (!previewLoading) { setFakeProgress(0); setLoadingMsgIndex(0); return; }
     setFakeProgress(0);
-    const interval = setInterval(() => {
+    setLoadingMsgIndex(0);
+    const progressInterval = setInterval(() => {
       setFakeProgress((p) => (p >= 95 ? 95 : p + Math.random() * 8));
     }, 500);
-    return () => clearInterval(interval);
+    const msgInterval = setInterval(() => {
+      setLoadingMsgIndex((i) => (i + 1) % loadingMessages.length);
+    }, 3000);
+    return () => { clearInterval(progressInterval); clearInterval(msgInterval); };
   }, [previewLoading]);
 
   const handleDownload = () => {
@@ -64,7 +79,7 @@ const PromptResult = ({
           </button>
         </div>
 
-        {/* Content: stacked on mobile, side-by-side on desktop */}
+        {/* Content */}
         <div className="flex flex-col md:grid md:grid-cols-2 gap-5 md:gap-10">
           {/* Prompt text */}
           <div className="space-y-4 md:space-y-8">
@@ -114,7 +129,9 @@ const PromptResult = ({
               {previewLoading && (
                 <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center gap-4">
                   <RefreshCw className="w-7 h-7 md:w-8 md:h-8 text-primary animate-spin" />
-                  <p className="text-[10px] md:text-xs font-black uppercase tracking-widest text-primary animate-pulse">Gerando render...</p>
+                  <p className="text-[10px] md:text-xs font-black uppercase tracking-widest text-primary animate-pulse min-h-[1.5em]">
+                    {loadingMessages[loadingMsgIndex]}
+                  </p>
                   <div className="w-3/4">
                     <Progress value={fakeProgress} className="h-1" />
                   </div>
