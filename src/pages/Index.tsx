@@ -44,6 +44,7 @@ const Index = () => {
   const [previewLoading, setPreviewLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('scene');
+  const [mobileMsgIndex, setMobileMsgIndex] = useState(0);
 
   const [beforeImage, setBeforeImage] = useState<string | null>(null);
   const [afterImage, setAfterImage] = useState<string | null>(null);
