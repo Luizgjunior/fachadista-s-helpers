@@ -20,7 +20,13 @@ import { toast } from "sonner";
 
 type TabType = 'scene' | 'atmos' | 'entorno';
 
-const Index = () => {
+const mobileLoadingMessages = [
+  "Analisando o projeto...",
+  "Identificando materiais...",
+  "Calculando iluminação ideal...",
+  "Estruturando o prompt...",
+  "Otimizando para Midjourney...",
+];
   const navigate = useNavigate();
   const { user, profile, signOut, refreshProfile } = useAuth();
   const { credits, hasCreditsForPrompt, hasCreditsForImage, consumePromptCredits, consumeImageCredits } = useCredits({ profile, refreshProfile });
