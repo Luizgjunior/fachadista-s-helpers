@@ -12,28 +12,11 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const { prompt, aspectRatio } = await req.json();
+    const { prompt } = await req.json();
 
     if (!prompt) {
       throw new Error("Prompt não fornecido.");
     }
-
-    const enrichedPrompt = `ARCHITECTURAL PHOTOGRAPHY MASTERPIECE.
-
-${prompt}
-
-MANDATORY RENDER QUALITY PARAMETERS:
-- Shot on Phase One IQ4 150MP medium format camera
-- Schneider Kreuznach 35mm LS lens, f/8, ISO 50
-- Perfect exposure, no clipping in highlights or shadows
-- Color grade: slight warm shift (+15 temperature), +10 clarity, -5 highlights recovery
-- Lens correction: remove distortion, keep natural perspective
-- Output: editorial architectural photography quality
-- Style references: Dezeen, Architectural Digest, Wallpaper Magazine photography
-- NOT a 3D render — looks like a real photograph taken on location by a professional architectural photographer
-- Ultra sharp focus on building facade, natural depth of field for environment
-- No watermarks, no text overlays, no artificial looking elements
-- Aspect ratio: ${aspectRatio || '16:9'}`.trim();
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -42,11 +25,11 @@ MANDATORY RENDER QUALITY PARAMETERS:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-pro-image-preview",
+        model: "google/gemini-3.1-flash-image-preview",
         messages: [
           {
             role: "user",
-            content: enrichedPrompt,
+            content: prompt,
           },
         ],
         modalities: ["image", "text"],

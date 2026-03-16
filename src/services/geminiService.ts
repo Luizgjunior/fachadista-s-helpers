@@ -30,8 +30,8 @@ EXTRA DETAILS: ${params.environmentDetails || 'None'}
 
 OUTPUT FORMAT (strict JSON):
 {
-  "english": "[MASTER PROMPT — minimum 200 words, maximum technical density, camera specs first, then architecture, then environment, then post-processing params]",
-  "portuguese": "[Technical analysis: explain WHY this prompt will produce photorealistic results — mention specific techniques used]",
+  "english": "[MASTER PROMPT — minimum 300 words, maximum technical density, camera specs first, then architecture, then environment, then post-processing params]",
+  "portuguese": "[Technical analysis in Portuguese: 150 words minimum, explain WHY this prompt will produce photorealistic results — mention specific techniques used]",
   "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"]
 }
 
@@ -47,6 +47,93 @@ const ASPECT_RATIO_MAP: Record<string, string> = {
   'Cinematográfico (2.35:1)': '16:9',
   'Vertical Clássico (2:3)': '3:4',
   'Nenhuma das opção': '16:9',
+};
+
+const buildImagePrompt = (prompt: string, params: PromptParameters): string => {
+  const lightingMap: Record<string, string> = {
+    'Manhã': 'morning golden hour, sun at 15° elevation from east, warm 3200K raking light, long soft shadows, morning mist possibility',
+    'Tarde': 'high noon sun, 70° elevation, cool 5500K direct light, short hard shadows directly below elements, maximum material exposure',
+    'Fim de Tarde': 'late afternoon magic hour, sun at 20° elevation from west, ultra-warm 2700K golden cast, long dramatic shadows, atmospheric aerosol glow',
+    'Noturno': 'architectural night photography, multi-source artificial lighting, warm 3000K facade wash, cool 4000K street lighting, dark deep-blue sky, light spill pools on pavement',
+    'Nenhuma das opção': 'natural optimal daylight',
+  };
+
+  const weatherMap: Record<string, string> = {
+    'Dia de Sol': 'clear sky, solar disc visible, hard shadow umbra, maximum material saturation, specular highlights on glass and metal',
+    'Nublado': 'uniform overcast, featureless gray-white sky, zero shadow contrast, flat even illumination, muted color palette',
+    'Chuvoso': 'active rainfall, wet reflective all surfaces, puddles with ripple rings, gray low-contrast sky, people with umbrellas',
+    'Pós-Chuva': 'post-rain clarity, wet mirror reflections on pavement, dramatic cumulonimbus breaking, shafts of sunlight, rainbow possibility, maximum material color saturation',
+    'Nenhuma das opção': 'optimal weather conditions',
+  };
+
+  const environmentMap: Record<string, string> = {
+    'Urbano / Metrópole': 'dense metropolitan context, high-rise neighbors, glass tower reflections, urban street furniture, traffic infrastructure, mixed-use ground floor, city ambient light',
+    'Residencial / Subúrbio': 'low-density residential street, mature neighborhood trees, domestic human activity, garden planting overflow to sidewalk, parked family vehicles',
+    'Vegetação / Floresta': 'forest edge location, mature tree canopy framing, dappled light through leaves, organic ground cover, biophilic integration, wildlife ambient presence',
+    'Litoral / Marítimo': 'coastal waterfront setting, sea horizon visible, salt air atmospheric haze, marine-grade materials, boat infrastructure background, bleached nautical color palette',
+    'Montanhoso / Alpino': 'mountain terrain setting, altitude atmospheric clarity, rock formations integration, conifer forest framing, snow-cap peaks in background, alpine material vernacular',
+    'Industrial / Galpão': 'industrial precinct context, warehouse neighbors, heavy vehicle infrastructure, utilitarian urban furniture, rail or port elements',
+    'Centro Histórico': 'historic city center, heritage facade neighbors, cobblestone street surface, period street furniture, cultural tourism activity',
+    'Desértico / Árido': 'arid desert landscape, bleached white sky horizon, heat shimmer at ground level, sand drift at building base, sparse succulent vegetation, terracotta color palette',
+    'Nenhuma das opção': 'contextually appropriate environment',
+  };
+
+  const sidewalkDesc = params.sidewalkEnabled && params.sidewalkType !== 'Nenhuma das opção'
+    ? `${params.sidewalkType} sidewalk pavement with realistic wear: joint line staining, edge chipping, surface micro-texture, utility cover integration`
+    : 'natural ground plane integration';
+
+  const lighting = lightingMap[params.lighting] || lightingMap['Tarde'];
+  const weather = weatherMap[params.weather] || weatherMap['Dia de Sol'];
+  const environment = environmentMap[params.environmentType] || environmentMap['Urbano / Metrópole'];
+
+  return `ULTRA-REALISTIC ARCHITECTURAL PHOTOGRAPHY, 8K, 300DPI.
+
+MASTER PROMPT:
+${prompt}
+
+════════ PHOTOGRAPHY SYSTEM ════════
+Phase One IQ4 150MP medium format camera body.
+Rodenstock HR Digaron-S 32mm f/4 lens (architecture standard).
+Settings: f/11, ISO 50, 1/125s. Tripod-mounted carbon fiber.
+Perspective correction: zero keystoning, parallel verticals enforced.
+Post-processing: Phase One Capture One Pro, zero noise at ISO 50, maximum dynamic range retention.
+
+════════ LIGHTING ════════
+${lighting}
+
+════════ WEATHER & SKY ════════
+${weather}
+
+════════ ENVIRONMENT CONTEXT ════════
+${environment}
+
+SIDEWALK/GROUND: ${sidewalkDesc}
+
+HUMAN FIGURES: ${params.peopleCount} people — candid street photography style, natural poses, motion blur on walking figures, real clothing fabric microdetail, diverse age and ethnicity, correct 1.75m scale reference
+
+VEHICLES: ${params.carCount} contemporary vehicles — clear-coat metallic paint, tire sidewall deformation, windshield building reflections, realistic parking angles
+
+════════ MATERIAL QUALITY ════════
+Every material rendered with:
+- Surface micro-texture at 8K resolution
+- Correct reflectance response to specified lighting
+- Aging and weathering appropriate to building age
+- Material joint and transition details
+- Subsurface scattering on translucent materials
+
+════════ TECHNICAL RENDER PARAMS ════════
+8K ultra-high resolution: 7680×4320 pixels
+Path-tracing global illumination, ray-traced reflections
+Temporal anti-aliasing, zero edge aliasing
+16-bit HDR color space, sRGB output
+Atmospheric perspective: detail falloff at 200m depth
+
+QUALITY REFERENCE: Dezeen magazine photography, Archdaily editorial, Wallpaper* architectural images, Architectural Digest professional photography.
+
+ABSOLUTE NEGATIVE PROMPT:
+no CGI look, no 3D render artifacts, no plastic surfaces, no artificial HDR processing, no oversaturated colors, no lens flare abuse, no watermarks, no text overlays, no uncanny valley humans, no floating objects, no incorrect shadows, no perspective distortion.
+
+FINAL REQUIREMENT: The output must be completely indistinguishable from a photograph taken on location by a world-class architectural photographer.`.trim();
 };
 
 export const generateArchitecturalPrompt = async (
@@ -82,14 +169,15 @@ export const generateArchitecturalPrompt = async (
 
 export const generateSamplePreview = async (
   prompt: string,
-  socialFormat: string
+  socialFormat: string,
+  params: PromptParameters
 ): Promise<string> => {
-  console.log('Chamando edge function generate-render');
+  console.log('Chamando edge function generate-render com Nano Banana 2');
 
-  const aspectRatio = ASPECT_RATIO_MAP[socialFormat] || '16:9';
+  const enrichedPrompt = buildImagePrompt(prompt, params);
 
   const { data, error } = await supabase.functions.invoke('generate-render', {
-    body: { prompt, aspectRatio },
+    body: { prompt: enrichedPrompt },
   });
 
   if (error) {
