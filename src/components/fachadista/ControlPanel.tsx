@@ -68,8 +68,7 @@ export const ControlPanelContent = ({ activeTab, setActiveTab, params, setParams
           <SelectField icon={Globe} label="Clima / Sky" value={params.weather}
             options={['Dia de Sol', 'Nublado', 'Chuvoso', 'Pós-Chuva', 'Nenhuma das opção']}
             onChange={(v) => setParams(p => ({ ...p, weather: v as any }))} />
-          <div
-            onClick={() => setParams(p => ({ ...p, illuminatedSignage: !p.illuminatedSignage }))}
+          <label
             className="flex items-center justify-between p-4 md:p-6 bg-field-bg border border-field-border rounded-xl md:rounded-[28px] group hover:border-primary/30 transition-all cursor-pointer select-none"
           >
             <div className="flex items-center gap-3 md:gap-5">
@@ -82,7 +81,7 @@ export const ControlPanelContent = ({ activeTab, setActiveTab, params, setParams
               </div>
             </div>
             <ToggleSwitch enabled={params.illuminatedSignage} onToggle={() => setParams(p => ({ ...p, illuminatedSignage: !p.illuminatedSignage }))} />
-          </div>
+          </label>
         </div>
       )}
 
