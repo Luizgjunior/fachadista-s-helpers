@@ -14,6 +14,7 @@ import { generateArchitecturalPrompt, generateSamplePreview } from "@/services/g
 import { type AppMode, type GeneratedPrompt, type PromptParameters } from "@/types/fachadista";
 import { useAuth } from "@/hooks/useAuth";
 import { useCredits } from "@/hooks/useCredits";
+import { CREDIT_COSTS } from "@/hooks/useCredits";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -85,7 +86,6 @@ const Index = () => {
     return () => window.removeEventListener('paste', handleGlobalPaste);
   }, [appMode, beforeImage, processFile]);
 
-  // Load history from Supabase
   useEffect(() => {
     if (!user) return;
     const loadHistory = async () => {
@@ -175,7 +175,7 @@ const Index = () => {
       setResult(data);
       setHistory(prev => [data, ...prev].slice(0, 10));
       await savePromptToDb(data);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Erro completo:', err);
       toast.error(err?.message || 'Erro desconhecido. Veja o console.');
     } finally {
@@ -230,6 +230,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden">
+      {/* Background blurs */}
       <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[150px] pointer-events-none" />
       <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-glow/5 blur-[150px] pointer-events-none" />
 
@@ -249,33 +250,31 @@ const Index = () => {
 
       {appMode === 'generator' && (
         <>
-          <main className="flex-1 max-w-[1600px] mx-auto w-full p-4 md:p-10 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-12 pb-24 lg:pb-10 animate-in fade-in duration-500">
+          <main className="flex-1 max-w-[1600px] mx-auto w-full px-4 py-4 md:px-8 lg:px-12 md:py-8 grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 lg:gap-12 pb-24 lg:pb-10 animate-in fade-in duration-500">
             {/* History sidebar — desktop only */}
-            <div className="hidden xl:block lg:col-span-1 space-y-4">
-              <div className="flex flex-col items-center gap-6">
-                <History className="w-6 h-6 text-muted-foreground/50" />
-                <div className="flex flex-col gap-4">
-                  {history.map(item => (
-                    <button
-                      key={item.id}
-                      onClick={() => setResult(item)}
-                      className={`w-14 h-14 rounded-2xl border transition-all overflow-hidden bg-surface shadow-sm ${
-                        result?.id === item.id
-                          ? 'border-primary scale-110 shadow-xl shadow-primary/10'
-                          : 'border-border opacity-60 hover:opacity-100 hover:border-muted-foreground'
-                      }`}
-                    >
-                      <div className="w-full h-full bg-field-bg flex items-center justify-center text-[11px] font-bold text-muted-foreground">
-                        #{item.id.slice(0, 3)}
-                      </div>
-                    </button>
-                  ))}
-                </div>
+            <div className="hidden xl:flex lg:col-span-1 flex-col items-center gap-6 pt-2">
+              <History className="w-5 h-5 text-muted-foreground/50" />
+              <div className="flex flex-col gap-3">
+                {history.map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => setResult(item)}
+                    className={`w-12 h-12 rounded-xl border transition-all overflow-hidden bg-surface shadow-sm ${
+                      result?.id === item.id
+                        ? 'border-primary scale-110 shadow-lg shadow-primary/10'
+                        : 'border-border opacity-60 hover:opacity-100 hover:border-muted-foreground'
+                    }`}
+                  >
+                    <div className="w-full h-full bg-field-bg flex items-center justify-center text-[10px] font-bold text-muted-foreground">
+                      #{item.id.slice(0, 3)}
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Main content */}
-            <div className="lg:col-span-11 xl:col-span-7 space-y-8 md:space-y-12">
+            {/* Main content area */}
+            <div className="lg:col-span-11 xl:col-span-7 space-y-5 md:space-y-10">
               <ImageUploadZone
                 images={images}
                 setImages={setImages}
@@ -305,22 +304,43 @@ const Index = () => {
             <ControlPanel {...controlPanelProps} />
           </main>
 
-          {/* Mobile fixed bottom bar */}
-          <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden p-3 bg-background/80 backdrop-blur-xl border-t border-border safe-area-bottom">
-            <button
-              onClick={() => setDrawerOpen(true)}
-              className="w-full py-4 rounded-2xl font-black text-sm uppercase tracking-[0.2em] bg-primary text-primary-foreground shadow-xl shadow-primary/20 flex items-center justify-center gap-3 active:scale-95 transition-all"
-            >
-              <SlidersHorizontal className="w-4 h-4" />
-              Configurações
-            </button>
+          {/* ═══ MOBILE BOTTOM BAR ═══ */}
+          <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-background/90 backdrop-blur-xl border-t border-border safe-area-bottom">
+            <div className="flex gap-2 p-3">
+              <button
+                onClick={() => setDrawerOpen(true)}
+                className="flex-1 py-3.5 rounded-xl font-black text-[11px] uppercase tracking-widest bg-surface border border-border text-foreground flex items-center justify-center gap-2 active:scale-95 transition-all shadow-sm"
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+                Configurar
+              </button>
+              <button
+                onClick={handleGenerate}
+                disabled={images.length === 0 || loading}
+                className={`flex-1 py-3.5 rounded-xl font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg ${
+                  images.length === 0 || loading
+                    ? 'bg-secondary text-muted-foreground/50'
+                    : 'bg-primary text-primary-foreground shadow-primary/20'
+                }`}
+              >
+                {loading ? (
+                  <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                ) : (
+                  <span>✦</span>
+                )}
+                {loading ? 'Gerando...' : 'Gerar'}
+              </button>
+            </div>
+            <p className="text-[8px] font-bold text-muted-foreground/40 text-center pb-2 uppercase tracking-widest">
+              {CREDIT_COSTS.PROMPT} créditos por geração
+            </p>
           </div>
 
           {/* Mobile drawer */}
           <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
             <DrawerContent className="max-h-[85vh]">
-              <DrawerHeader className="pb-2">
-                <DrawerTitle className="text-base font-black uppercase tracking-widest text-center">Configurações</DrawerTitle>
+              <DrawerHeader className="pb-1">
+                <DrawerTitle className="text-sm font-black uppercase tracking-widest text-center">Configurações</DrawerTitle>
               </DrawerHeader>
               <div className="px-4 pb-6 overflow-y-auto">
                 <ControlPanelContent {...controlPanelProps} />
