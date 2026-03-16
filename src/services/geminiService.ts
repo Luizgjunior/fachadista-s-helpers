@@ -172,14 +172,15 @@ export const generateSamplePreview = async (
   socialFormat: string,
   params: PromptParameters
 ): Promise<string> => {
-  console.log('Chamando edge function generate-render com Nano Banana 2');
+  console.log('Chamando edge function generate-render via Google Gemini API');
 
   const enrichedPrompt = buildImagePrompt(prompt, params);
+  const aspectRatio = ASPECT_RATIO_MAP[socialFormat] || '16:9';
 
   const maxRetries = 3;
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     const { data, error } = await supabase.functions.invoke('generate-render', {
-      body: { prompt: enrichedPrompt },
+      body: { prompt: enrichedPrompt, aspectRatio },
     });
 
     if (error) {
