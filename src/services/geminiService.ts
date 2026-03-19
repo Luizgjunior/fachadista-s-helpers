@@ -289,7 +289,7 @@ export const generateSamplePreview = async (
   const maxRetries = 3;
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     const { data, error } = await supabase.functions.invoke('generate-render', {
-      body: { prompt: enrichedPrompt, aspectRatio },
+      body: { prompt: enrichedPrompt, aspectRatio, referenceImage },
     });
 
     if (error) {
