@@ -7,70 +7,57 @@ const corsHeaders = {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-const ASPECT_RATIO_MAP: Record<string, { width: number; height: number }> = {
-  "9:16": { width: 768, height: 1344 },
-  "3:4": { width: 768, height: 1024 },
-  "1:1": { width: 1024, height: 1024 },
-  "16:9": { width: 1344, height: 768 },
-  "4:3": { width: 1024, height: 768 },
-};
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const FAL_KEY = Deno.env.get("FAL_KEY");
-    if (!FAL_KEY) throw new Error("FAL_KEY não configurada.");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY não configurada.");
 
-    const { prompt, aspectRatio, referenceImage } = await req.json();
+    const { prompt, referenceImage } = await req.json();
     if (!prompt) throw new Error("Prompt não fornecido.");
 
-    const size = ASPECT_RATIO_MAP[aspectRatio] || ASPECT_RATIO_MAP["16:9"];
+    // Build user content with optional reference image
+    const userContent: any[] = [];
 
-    // Decide: image-to-image (with reference) or text-to-image (without)
-    const hasReference = !!referenceImage;
-    const endpoint = hasReference
-      ? "https://fal.run/fal-ai/flux/dev/image-to-image"
-      : "https://fal.run/fal-ai/flux/schnell";
-
-    const body: Record<string, any> = {
-      prompt,
-      num_images: 1,
-      enable_safety_checker: false,
-    };
-
-    if (hasReference) {
-      // image-to-image: send reference image + strength
-      body.image_url = referenceImage; // base64 data URI or URL
-      body.strength = 0.75; // balance between reference fidelity and prompt creativity
-      body.num_inference_steps = 35;
-      body.guidance_scale = 7.5;
-      body.image_size = { width: size.width, height: size.height };
+    if (referenceImage) {
+      userContent.push({
+        type: "image_url",
+        image_url: { url: referenceImage },
+      });
+      userContent.push({
+        type: "text",
+        text: `Using the attached reference image as the architectural base, generate an enhanced photorealistic render. Maintain the structure, proportions, and layout from the reference while applying the following specifications:\n\n${prompt}`,
+      });
     } else {
-      // text-to-image: use preset size names
-      const sizePresetMap: Record<string, string> = {
-        "9:16": "portrait_16_9",
-        "3:4": "portrait_4_3",
-        "1:1": "square_hd",
-        "16:9": "landscape_16_9",
-        "4:3": "landscape_4_3",
-      };
-      body.image_size = sizePresetMap[aspectRatio] || "landscape_16_9";
+      userContent.push({
+        type: "text",
+        text: `Generate an ultra-photorealistic architectural image:\n\n${prompt}`,
+      });
     }
 
     const maxRetries = 3;
     for (let attempt = 0; attempt < maxRetries; attempt++) {
-      console.log(`Gerando imagem via fal.ai (${hasReference ? 'img2img' : 'txt2img'}), tentativa ${attempt + 1}/${maxRetries}`);
+      console.log(`Gerando imagem via Nano Banana 2, tentativa ${attempt + 1}/${maxRetries}`);
 
-      const response = await fetch(endpoint, {
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: {
-          Authorization: `Key ${FAL_KEY}`,
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          model: "google/gemini-3.1-flash-image-preview",
+          modalities: ["image", "text"],
+          messages: [
+            {
+              role: "user",
+              content: userContent,
+            },
+          ],
+        }),
       });
 
       if (response.status === 429 && attempt < maxRetries - 1) {
@@ -83,7 +70,7 @@ serve(async (req) => {
       if (!response.ok) {
         const statusCode = response.status;
         const errorText = await response.text();
-        console.error("fal.ai API error:", statusCode, errorText);
+        console.error("AI Gateway error:", statusCode, errorText);
 
         if (statusCode === 429) {
           return new Response(
@@ -91,28 +78,38 @@ serve(async (req) => {
             { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
-        if (statusCode === 401 || statusCode === 403) {
+        if (statusCode === 402) {
           return new Response(
-            JSON.stringify({ error: "FAL_KEY inválida ou sem permissão." }),
-            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            JSON.stringify({ error: "Créditos esgotados. Adicione créditos em Settings > Workspace > Usage." }),
+            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
-        throw new Error(`Erro fal.ai API: ${statusCode} - ${errorText}`);
+        throw new Error(`AI Gateway error: ${statusCode} - ${errorText}`);
       }
 
       const data = await response.json();
-      console.log("fal.ai response images:", data.images?.length);
+      const message = data.choices?.[0]?.message;
 
-      const imageUrl = data.images?.[0]?.url;
-      if (!imageUrl) {
-        throw new Error("Nenhuma imagem retornada na resposta.");
+      // Extract image from message.images array (Nano Banana format)
+      const images = message?.images;
+      if (images && images.length > 0) {
+        const imageUrl = images[0]?.image_url?.url;
+        if (imageUrl) {
+          console.log("Imagem gerada com sucesso via Nano Banana 2");
+          return new Response(
+            JSON.stringify({ imageUrl }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
       }
 
-      console.log("Imagem gerada com sucesso via fal.ai");
-      return new Response(
-        JSON.stringify({ imageUrl }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      console.log("Nenhuma imagem na resposta, tentando novamente...");
+      if (attempt < maxRetries - 1) {
+        await sleep(1500);
+        continue;
+      }
+
+      throw new Error("O modelo não retornou uma imagem. Tente novamente.");
     }
 
     throw new Error("Limite de tentativas excedido. Tente novamente.");
