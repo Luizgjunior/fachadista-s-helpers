@@ -19,7 +19,7 @@ serve(async (req) => {
     const { prompt, referenceImage } = await req.json();
     if (!prompt) throw new Error("Prompt não fornecido.");
 
-    // Build messages with optional reference image
+    // Build user content with optional reference image
     const userContent: any[] = [];
 
     if (referenceImage) {
@@ -27,12 +27,16 @@ serve(async (req) => {
         type: "image_url",
         image_url: { url: referenceImage },
       });
+      userContent.push({
+        type: "text",
+        text: `Using the attached reference image as the architectural base, generate an enhanced photorealistic render. Maintain the structure, proportions, and layout from the reference while applying the following specifications:\n\n${prompt}`,
+      });
+    } else {
+      userContent.push({
+        type: "text",
+        text: `Generate an ultra-photorealistic architectural image:\n\n${prompt}`,
+      });
     }
-
-    userContent.push({
-      type: "text",
-      text: `Generate an ultra-photorealistic architectural image based on the following prompt. ${referenceImage ? 'Use the attached reference image as the base — maintain its structure, proportions, and architectural elements while enhancing it according to the prompt instructions.' : ''}\n\nPROMPT:\n${prompt}`,
-    });
 
     const maxRetries = 3;
     for (let attempt = 0; attempt < maxRetries; attempt++) {
@@ -46,6 +50,7 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           model: "google/gemini-3.1-flash-image-preview",
+          modalities: ["image", "text"],
           messages: [
             {
               role: "user",
@@ -83,43 +88,24 @@ serve(async (req) => {
       }
 
       const data = await response.json();
-      
-      // Extract image from response — Nano Banana returns inline images
       const message = data.choices?.[0]?.message;
-      
-      if (message?.content) {
-        // Check if content is an array (multimodal response)
-        if (Array.isArray(message.content)) {
-          for (const part of message.content) {
-            if (part.type === "image_url" && part.image_url?.url) {
-              console.log("Imagem gerada com sucesso via Nano Banana 2");
-              return new Response(
-                JSON.stringify({ imageUrl: part.image_url.url }),
-                { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-              );
-            }
-          }
-        }
-        
-        // Check if content is a string with base64 image
-        if (typeof message.content === "string") {
-          const base64Match = message.content.match(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/);
-          if (base64Match) {
-            console.log("Imagem gerada com sucesso (base64) via Nano Banana 2");
-            return new Response(
-              JSON.stringify({ imageUrl: base64Match[0] }),
-              { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-          }
+
+      // Extract image from message.images array (Nano Banana format)
+      const images = message?.images;
+      if (images && images.length > 0) {
+        const imageUrl = images[0]?.image_url?.url;
+        if (imageUrl) {
+          console.log("Imagem gerada com sucesso via Nano Banana 2");
+          return new Response(
+            JSON.stringify({ imageUrl }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
         }
       }
 
-      // Log full response structure for debugging
-      console.log("Response structure:", JSON.stringify(data).substring(0, 500));
-      
+      console.log("Nenhuma imagem na resposta, tentando novamente...");
       if (attempt < maxRetries - 1) {
-        console.log("Nenhuma imagem na resposta, tentando novamente...");
-        await sleep(1000);
+        await sleep(1500);
         continue;
       }
 
