@@ -17,14 +17,14 @@ Fachadista - Architectural prompt generator
 
 ## AI Integration
 - Edge function: generate-prompt → Lovable AI Gateway (google/gemini-2.5-flash, tool calling for structured JSON)
-- Edge function: generate-render → Lovable AI Gateway (google/gemini-3.1-flash-image-preview aka Nano Banana 2)
+- Edge function: generate-render → Lovable AI Gateway (google/gemini-3-pro-image-preview aka Nano Banana Pro)
   - CRITICAL: must use `modalities: ["image", "text"]` in request body
+  - Uses system message with architectural photographer persona
   - Image returned in `message.images[0].image_url.url` (base64 data URI)
   - Supports image-to-image: send reference as image_url in user content
 - API Key: LOVABLE_API_KEY (auto-provisioned) for both prompt and render
-- FAL_KEY still configured but no longer used (kept as fallback)
 
 ## Removed
 - src/repo-source/ (raw downloaded files, replaced by adapted versions)
 - Direct Google Gemini API calls (migrated to Lovable AI Gateway)
-- fal.ai integration (replaced by Nano Banana 2)
+- fal.ai integration (replaced by Nano Banana Pro)
