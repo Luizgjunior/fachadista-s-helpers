@@ -278,7 +278,8 @@ export const generateArchitecturalPrompt = async (
 export const generateSamplePreview = async (
   prompt: string,
   socialFormat: string,
-  params: PromptParameters
+  params: PromptParameters,
+  referenceImage?: string
 ): Promise<string> => {
   console.log('Chamando edge function generate-render via fal.ai');
 
@@ -288,7 +289,7 @@ export const generateSamplePreview = async (
   const maxRetries = 3;
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     const { data, error } = await supabase.functions.invoke('generate-render', {
-      body: { prompt: enrichedPrompt, aspectRatio },
+      body: { prompt: enrichedPrompt, aspectRatio, referenceImage },
     });
 
     if (error) {
