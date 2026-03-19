@@ -213,7 +213,7 @@ const Index = () => {
 
     setPreviewLoading(true);
     try {
-      const url = await generateSamplePreview(result.english, params.socialFormat, params);
+      const url = await generateSamplePreview(result.english, params.socialFormat, params, images[0]);
       if (url) {
         const updatedResult = { ...result, previewUrl: url };
         setResult(updatedResult);
