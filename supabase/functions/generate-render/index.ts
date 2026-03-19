@@ -19,7 +19,7 @@ serve(async (req) => {
     const { prompt, referenceImage } = await req.json();
     if (!prompt) throw new Error("Prompt não fornecido.");
 
-    // Build user content with optional reference image
+    // Build user content with reference image + master prompt
     const userContent: any[] = [];
 
     if (referenceImage) {
@@ -29,12 +29,25 @@ serve(async (req) => {
       });
       userContent.push({
         type: "text",
-        text: `Using the attached reference image as the architectural base, generate an enhanced photorealistic render. Maintain the structure, proportions, and layout from the reference while applying the following specifications:\n\n${prompt}`,
+        text: `You are a world-class architectural renderer. You MUST follow the master prompt below with absolute precision.
+
+CRITICAL RULES:
+1. Use the attached photo as the BASE STRUCTURE. Keep the exact building geometry, proportions, angles, and layout.
+2. Apply EVERY specification from the master prompt: lighting, materials, weather, camera angle, environment, people, vehicles, sidewalk — NOTHING can be omitted.
+3. The result must be INDISTINGUISHABLE from a real photograph. No CGI artifacts, no plastic surfaces, no incorrect shadows, no floating objects.
+4. Do NOT add or invent elements not described in the prompt. Follow it LITERALLY.
+5. Do NOT generate text, watermarks, or logos on the image.
+
+MASTER PROMPT TO FOLLOW:
+${prompt}`,
       });
     } else {
       userContent.push({
         type: "text",
-        text: `Generate an ultra-photorealistic architectural image:\n\n${prompt}`,
+        text: `You are a world-class architectural renderer. Generate an ultra-photorealistic architectural image following this master prompt with absolute precision. Every detail must be faithfully rendered. No CGI artifacts, no text/watermarks.
+
+MASTER PROMPT:
+${prompt}`,
       });
     }
 
