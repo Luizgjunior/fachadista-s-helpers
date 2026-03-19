@@ -7,6 +7,28 @@ const corsHeaders = {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+const SYSTEM_PROMPT = `You are a world-class architectural photographer and photorealistic renderer with 30 years of experience shooting buildings for Architectural Digest, Dezeen, and ArchDaily.
+
+CORE IDENTITY:
+- You produce images INDISTINGUISHABLE from photographs taken with a Phase One IQ4 150MP or Hasselblad X2D 100C.
+- Every image must pass as a real photograph — no CGI artifacts, no AI tells.
+
+TECHNICAL STANDARDS:
+- Lens physics: accurate depth of field, chromatic aberration at edges, natural vignetting
+- Light transport: physically correct global illumination, caustics on glass, subsurface scattering on translucent materials
+- Material fidelity: micro-texture on concrete (pores, aggregate), wood grain variation, metal reflections with environment mapping, glass with correct refraction index
+- Atmospheric effects: volumetric light through dust/moisture, accurate sky gradient, cloud shadow mapping on surfaces
+- Urban context: realistic sidewalk wear patterns, natural vegetation with leaf variation, appropriate street furniture aging
+
+ABSOLUTE PROHIBITIONS:
+- NO plastic-looking surfaces or uniform textures
+- NO floating objects or physically impossible shadows
+- NO symmetrical or repeated vegetation patterns
+- NO oversaturated or HDR-tonemapped look
+- NO text, watermarks, logos, or signatures on the image
+- NO invented architectural elements not in the prompt
+- NO anime, cartoon, illustration, or painterly styles`;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -19,7 +41,6 @@ serve(async (req) => {
     const { prompt, referenceImage } = await req.json();
     if (!prompt) throw new Error("Prompt não fornecido.");
 
-    // Build user content with reference image + master prompt
     const userContent: any[] = [];
 
     if (referenceImage) {
@@ -29,31 +50,37 @@ serve(async (req) => {
       });
       userContent.push({
         type: "text",
-        text: `You are a world-class architectural renderer. You MUST follow the master prompt below with absolute precision.
+        text: `REFERENCE IMAGE ATTACHED — use it as the BASE STRUCTURE.
 
-CRITICAL RULES:
-1. Use the attached photo as the BASE STRUCTURE. Keep the exact building geometry, proportions, angles, and layout.
-2. Apply EVERY specification from the master prompt: lighting, materials, weather, camera angle, environment, people, vehicles, sidewalk — NOTHING can be omitted.
-3. The result must be INDISTINGUISHABLE from a real photograph. No CGI artifacts, no plastic surfaces, no incorrect shadows, no floating objects.
-4. Do NOT add or invent elements not described in the prompt. Follow it LITERALLY.
-5. Do NOT generate text, watermarks, or logos on the image.
+GEOMETRY PRESERVATION RULES:
+- Keep the EXACT building footprint, floor count, window positions, roof line, and facade proportions from the reference photo.
+- Maintain the precise camera angle, perspective lines, and vanishing points.
+- Do NOT add, remove, or relocate windows, doors, balconies, or structural elements unless the prompt explicitly says so.
 
-MASTER PROMPT TO FOLLOW:
+RENDERING DIRECTIVES:
+- Apply every material, lighting, weather, and environmental specification from the master prompt below with surgical precision.
+- Render micro-details: mortar lines between bricks, rain streaks on glass, dust on ledges, rust on metal fixtures.
+- Vegetation must have botanical accuracy — correct leaf shapes, natural growth patterns, seasonal consistency.
+- People and vehicles (if specified) must have correct scale relative to the building and cast proper shadows.
+
+MASTER PROMPT TO RENDER:
 ${prompt}`,
       });
     } else {
       userContent.push({
         type: "text",
-        text: `You are a world-class architectural renderer. Generate an ultra-photorealistic architectural image following this master prompt with absolute precision. Every detail must be faithfully rendered. No CGI artifacts, no text/watermarks.
+        text: `Generate an ultra-photorealistic architectural photograph following every specification below. The result must be indistinguishable from a real photo shot on a medium-format camera.
 
-MASTER PROMPT:
+Render micro-details: material textures at close inspection, accurate light bounce between surfaces, atmospheric depth with subtle haze. Vegetation must be botanically accurate. People/vehicles must be correctly scaled with proper shadows.
+
+MASTER PROMPT TO RENDER:
 ${prompt}`,
       });
     }
 
     const maxRetries = 3;
     for (let attempt = 0; attempt < maxRetries; attempt++) {
-      console.log(`Gerando imagem via Nano Banana 2, tentativa ${attempt + 1}/${maxRetries}`);
+      console.log(`Gerando imagem via Nano Banana Pro, tentativa ${attempt + 1}/${maxRetries}`);
 
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
@@ -62,13 +89,11 @@ ${prompt}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-3.1-flash-image-preview",
+          model: "google/gemini-3-pro-image-preview",
           modalities: ["image", "text"],
           messages: [
-            {
-              role: "user",
-              content: userContent,
-            },
+            { role: "system", content: SYSTEM_PROMPT },
+            { role: "user", content: userContent },
           ],
         }),
       });
@@ -103,12 +128,11 @@ ${prompt}`,
       const data = await response.json();
       const message = data.choices?.[0]?.message;
 
-      // Extract image from message.images array (Nano Banana format)
       const images = message?.images;
       if (images && images.length > 0) {
         const imageUrl = images[0]?.image_url?.url;
         if (imageUrl) {
-          console.log("Imagem gerada com sucesso via Nano Banana 2");
+          console.log("Imagem gerada com sucesso via Nano Banana Pro");
           return new Response(
             JSON.stringify({ imageUrl }),
             { headers: { ...corsHeaders, "Content-Type": "application/json" } }
