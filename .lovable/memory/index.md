@@ -16,12 +16,12 @@ Fachadista - Architectural prompt generator
 - Components: src/components/fachadista/
 
 ## AI Integration
-- Edge function: generate-prompt (Google Gemini API direct, model: gemini-2.0-flash)
-- Edge function: generate-render (Google Gemini API direct, model: gemini-2.0-flash-preview-image-generation)
-- API Key: VITE_GEMINI_API_KEY (configured as Supabase Secret)
-- No Lovable AI Gateway — direct Google API calls
-- 500 images/day free on Google AI Studio free tier
+- Edge function: generate-prompt → Lovable AI Gateway (google/gemini-2.5-flash, tool calling for structured JSON)
+- Edge function: generate-render → fal.ai REST API (fal-ai/flux/schnell)
+- API Key: LOVABLE_API_KEY (auto-provisioned) for prompts
+- API Key: FAL_KEY (user secret) for image generation
+- fal.ai returns image URLs (not base64)
 
 ## Removed
 - src/repo-source/ (raw downloaded files, replaced by adapted versions)
-- Lovable AI Gateway integration (migrated to direct Google API)
+- Direct Google Gemini API calls (migrated to Lovable AI Gateway + fal.ai)

@@ -8,11 +8,11 @@ const corsHeaders = {
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const ASPECT_RATIO_MAP: Record<string, string> = {
-  "9:16": "9:16",
-  "3:4": "3:4",
-  "1:1": "1:1",
-  "16:9": "16:9",
-  "4:3": "4:3",
+  "9:16": "portrait_16_9",
+  "3:4": "portrait_4_3",
+  "1:1": "square_hd",
+  "16:9": "landscape_16_9",
+  "4:3": "landscape_4_3",
 };
 
 serve(async (req) => {
@@ -21,40 +21,31 @@ serve(async (req) => {
   }
 
   try {
-    const GEMINI_API_KEY = Deno.env.get("VITE_GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) throw new Error("VITE_GEMINI_API_KEY não configurada.");
+    const FAL_KEY = Deno.env.get("FAL_KEY");
+    if (!FAL_KEY) throw new Error("FAL_KEY não configurada.");
 
     const { prompt, aspectRatio } = await req.json();
     if (!prompt) throw new Error("Prompt não fornecido.");
 
-    const ratio = ASPECT_RATIO_MAP[aspectRatio] || "16:9";
+    const imageSize = ASPECT_RATIO_MAP[aspectRatio] || "landscape_16_9";
 
     const maxRetries = 3;
     for (let attempt = 0; attempt < maxRetries; attempt++) {
-      console.log(`Gerando imagem, tentativa ${attempt + 1}/${maxRetries}`);
+      console.log(`Gerando imagem via fal.ai, tentativa ${attempt + 1}/${maxRetries}, size=${imageSize}`);
 
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: "user",
-                parts: [{ text: prompt }],
-              },
-            ],
-            generationConfig: {
-              responseModalities: ["IMAGE", "TEXT"],
-              imageGenerationConfig: {
-                numberOfImages: 1,
-                aspectRatio: ratio,
-              },
-            },
-          }),
-        }
-      );
+      const response = await fetch("https://fal.run/fal-ai/flux/schnell", {
+        method: "POST",
+        headers: {
+          Authorization: `Key ${FAL_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt,
+          image_size: imageSize,
+          num_images: 1,
+          enable_safety_checker: false,
+        }),
+      });
 
       if (response.status === 429 && attempt < maxRetries - 1) {
         const delay = Math.pow(2, attempt + 1) * 2000;
@@ -66,7 +57,7 @@ serve(async (req) => {
       if (!response.ok) {
         const statusCode = response.status;
         const errorText = await response.text();
-        console.error("Gemini Image API error:", statusCode, errorText);
+        console.error("fal.ai API error:", statusCode, errorText);
 
         if (statusCode === 429) {
           return new Response(
@@ -74,33 +65,28 @@ serve(async (req) => {
             { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
-        if (statusCode === 403) {
+        if (statusCode === 401 || statusCode === 403) {
           return new Response(
-            JSON.stringify({ error: "API Key sem permissão para geração de imagens." }),
+            JSON.stringify({ error: "FAL_KEY inválida ou sem permissão." }),
             { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
-        throw new Error(`Erro Gemini Image API: ${statusCode} - ${errorText}`);
+        throw new Error(`Erro fal.ai API: ${statusCode} - ${errorText}`);
       }
 
       const data = await response.json();
-      console.log("Response candidates:", data.candidates?.length);
+      console.log("fal.ai response images:", data.images?.length);
 
-      for (const candidate of data.candidates || []) {
-        for (const part of candidate.content?.parts || []) {
-          if (part.inlineData?.data) {
-            const mimeType = part.inlineData.mimeType || "image/png";
-            const imageUrl = `data:${mimeType};base64,${part.inlineData.data}`;
-            console.log("Imagem gerada com sucesso, mime:", mimeType);
-            return new Response(
-              JSON.stringify({ imageUrl }),
-              { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-          }
-        }
+      const imageUrl = data.images?.[0]?.url;
+      if (!imageUrl) {
+        throw new Error("Nenhuma imagem retornada na resposta.");
       }
 
-      throw new Error("Nenhuma imagem retornada na resposta.");
+      console.log("Imagem gerada com sucesso via fal.ai");
+      return new Response(
+        JSON.stringify({ imageUrl }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     throw new Error("Limite de tentativas excedido. Tente novamente.");
