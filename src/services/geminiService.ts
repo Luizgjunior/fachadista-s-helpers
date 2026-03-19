@@ -278,7 +278,8 @@ export const generateArchitecturalPrompt = async (
 export const generateSamplePreview = async (
   prompt: string,
   socialFormat: string,
-  params: PromptParameters
+  params: PromptParameters,
+  referenceImage?: string
 ): Promise<string> => {
   console.log('Chamando edge function generate-render via fal.ai');
 

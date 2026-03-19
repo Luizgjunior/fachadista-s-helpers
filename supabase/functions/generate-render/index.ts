@@ -7,12 +7,12 @@ const corsHeaders = {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-const ASPECT_RATIO_MAP: Record<string, string> = {
-  "9:16": "portrait_16_9",
-  "3:4": "portrait_4_3",
-  "1:1": "square_hd",
-  "16:9": "landscape_16_9",
-  "4:3": "landscape_4_3",
+const ASPECT_RATIO_MAP: Record<string, { width: number; height: number }> = {
+  "9:16": { width: 768, height: 1344 },
+  "3:4": { width: 768, height: 1024 },
+  "1:1": { width: 1024, height: 1024 },
+  "16:9": { width: 1344, height: 768 },
+  "4:3": { width: 1024, height: 768 },
 };
 
 serve(async (req) => {
@@ -24,27 +24,53 @@ serve(async (req) => {
     const FAL_KEY = Deno.env.get("FAL_KEY");
     if (!FAL_KEY) throw new Error("FAL_KEY não configurada.");
 
-    const { prompt, aspectRatio } = await req.json();
+    const { prompt, aspectRatio, referenceImage } = await req.json();
     if (!prompt) throw new Error("Prompt não fornecido.");
 
-    const imageSize = ASPECT_RATIO_MAP[aspectRatio] || "landscape_16_9";
+    const size = ASPECT_RATIO_MAP[aspectRatio] || ASPECT_RATIO_MAP["16:9"];
+
+    // Decide: image-to-image (with reference) or text-to-image (without)
+    const hasReference = !!referenceImage;
+    const endpoint = hasReference
+      ? "https://fal.run/fal-ai/flux/dev/image-to-image"
+      : "https://fal.run/fal-ai/flux/schnell";
+
+    const body: Record<string, any> = {
+      prompt,
+      num_images: 1,
+      enable_safety_checker: false,
+    };
+
+    if (hasReference) {
+      // image-to-image: send reference image + strength
+      body.image_url = referenceImage; // base64 data URI or URL
+      body.strength = 0.75; // balance between reference fidelity and prompt creativity
+      body.num_inference_steps = 35;
+      body.guidance_scale = 7.5;
+      body.image_size = { width: size.width, height: size.height };
+    } else {
+      // text-to-image: use preset size names
+      const sizePresetMap: Record<string, string> = {
+        "9:16": "portrait_16_9",
+        "3:4": "portrait_4_3",
+        "1:1": "square_hd",
+        "16:9": "landscape_16_9",
+        "4:3": "landscape_4_3",
+      };
+      body.image_size = sizePresetMap[aspectRatio] || "landscape_16_9";
+    }
 
     const maxRetries = 3;
     for (let attempt = 0; attempt < maxRetries; attempt++) {
-      console.log(`Gerando imagem via fal.ai, tentativa ${attempt + 1}/${maxRetries}, size=${imageSize}`);
+      console.log(`Gerando imagem via fal.ai (${hasReference ? 'img2img' : 'txt2img'}), tentativa ${attempt + 1}/${maxRetries}`);
 
-      const response = await fetch("https://fal.run/fal-ai/flux/schnell", {
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           Authorization: `Key ${FAL_KEY}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          prompt,
-          image_size: imageSize,
-          num_images: 1,
-          enable_safety_checker: false,
-        }),
+        body: JSON.stringify(body),
       });
 
       if (response.status === 429 && attempt < maxRetries - 1) {
