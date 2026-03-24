@@ -37,7 +37,7 @@ const Admin = () => {
             </div>
             <div className="flex items-center gap-2 md:gap-3">
               <h1 className="text-lg md:text-2xl font-black tracking-tighter text-foreground uppercase italic">
-                FCD<span className="text-primary">VP</span>
+                NEW<span className="text-primary">R</span>
               </h1>
               <span className="text-[9px] md:text-[10px] font-black text-primary-foreground bg-primary px-2 py-0.5 rounded-lg uppercase tracking-widest">
                 Admin

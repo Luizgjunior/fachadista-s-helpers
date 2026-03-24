@@ -48,7 +48,7 @@ const PromptResult = ({
     if (!result.previewUrl) return;
     const a = document.createElement("a");
     a.href = result.previewUrl;
-    a.download = `fcd-render-${result.id}.png`;
+    a.download = `newrender-${result.id}.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
