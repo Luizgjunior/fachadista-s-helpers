@@ -20,7 +20,7 @@ const sections = [
   {
     title: "4. Compartilhamento de Dados",
     content:
-      "As imagens enviadas são processadas pela API do Google Gemini, conforme a política de privacidade do Google. Não vendemos, alugamos ou compartilhamos seus dados pessoais com terceiros para fins comerciais.",
+       "As imagens enviadas são processadas pela API do Google Gemini, conforme a política de privacidade do Google. Não vendemos, alugamos ou compartilhamos seus dados pessoais com terceiros para fins comerciais.",
   },
   {
     title: "5. Seus Direitos (LGPD)",
