@@ -5,7 +5,7 @@ import LegalFooter from "@/components/shared/LegalFooter";
 const sections = [
   {
     title: "1. Controlador dos Dados",
-    content: "FCD ViewPrompt — suporte@fcdviewprompt.com.br",
+    content: "NewRender — suporte@newrender.com.br",
   },
   {
     title: "2. Dados que Coletamos",
