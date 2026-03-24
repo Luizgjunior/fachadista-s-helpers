@@ -399,6 +399,11 @@ export default function AdminUsers({ admin, currentProfile }: AdminUsersProps) {
     await loadUsers();
   };
 
+  const handleCreateUser = async (data: { email: string; password: string; full_name?: string; plan_id?: string; credits?: number }) => {
+    await admin.createUser(data);
+    await loadUsers();
+  };
+
   const handleDeleteUser = (user: Profile) => {
     if (user.id === currentProfile?.id) {
       toast.error("Você não pode excluir sua própria conta.");
