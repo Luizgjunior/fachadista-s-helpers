@@ -333,6 +333,7 @@ export default function AdminUsers({ admin, currentProfile }: AdminUsersProps) {
     message: string;
     action: () => Promise<void>;
   } | null>(null);
+  const [createModal, setCreateModal] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const LIMIT = 10;
