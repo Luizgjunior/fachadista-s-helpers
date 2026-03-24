@@ -1,6 +1,6 @@
 {
-  "name": "FCD ViewPrompt",
-  "short_name": "FCDViewPrompt",
+  "name": "NewRender",
+  "short_name": "NewRender",
   "description": "Gerador de prompts profissionais para ArchViz com IA",
   "start_url": "/",
   "display": "standalone",

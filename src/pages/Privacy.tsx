@@ -5,7 +5,7 @@ import LegalFooter from "@/components/shared/LegalFooter";
 const sections = [
   {
     title: "1. Controlador dos Dados",
-    content: "FCD ViewPrompt — suporte@fcdviewprompt.com.br",
+    content: "NewRender — suporte@newrender.com.br",
   },
   {
     title: "2. Dados que Coletamos",
@@ -20,12 +20,12 @@ const sections = [
   {
     title: "4. Compartilhamento de Dados",
     content:
-      "As imagens enviadas são processadas pela API do Google Gemini, conforme a política de privacidade do Google. Não vendemos, alugamos ou compartilhamos seus dados pessoais com terceiros para fins comerciais.",
+       "As imagens enviadas são processadas pela API do Google Gemini, conforme a política de privacidade do Google. Não vendemos, alugamos ou compartilhamos seus dados pessoais com terceiros para fins comerciais.",
   },
   {
     title: "5. Seus Direitos (LGPD)",
     content:
-      "Conforme a Lei Geral de Proteção de Dados (Lei 13.709/2018), você tem direito a:\n\n• Acesso aos seus dados pessoais.\n• Correção de dados incompletos ou desatualizados.\n• Exclusão dos seus dados.\n• Portabilidade dos dados.\n\nSolicitações devem ser enviadas para: suporte@fcdviewprompt.com.br",
+      "Conforme a Lei Geral de Proteção de Dados (Lei 13.709/2018), você tem direito a:\n\n• Acesso aos seus dados pessoais.\n• Correção de dados incompletos ou desatualizados.\n• Exclusão dos seus dados.\n• Portabilidade dos dados.\n\nSolicitações devem ser enviadas para: suporte@newrender.com.br",
   },
   {
     title: "6. Cookies e Armazenamento Local",
@@ -39,7 +39,7 @@ const sections = [
   },
   {
     title: "8. Contato do Encarregado (DPO)",
-    content: "Para questões sobre privacidade e proteção de dados: suporte@fcdviewprompt.com.br",
+    content: "Para questões sobre privacidade e proteção de dados: suporte@newrender.com.br",
   },
 ];
 
@@ -54,7 +54,7 @@ const Privacy = () => (
           <Sparkles className="w-4 h-4 text-primary-foreground" />
         </div>
         <span className="text-sm font-black tracking-tight text-foreground uppercase italic">
-          FCD <span className="text-primary">VIEW</span>PROMPT
+          NEW<span className="text-primary">RENDER</span>
         </span>
       </div>
     </header>

@@ -6,12 +6,12 @@ const sections = [
   {
     title: "1. Aceitação dos Termos",
     content:
-      "Ao acessar ou utilizar o FCD ViewPrompt, você concorda com estes Termos de Uso. Se não concordar com qualquer parte, não utilize o serviço.",
+      "Ao acessar ou utilizar o NewRender, você concorda com estes Termos de Uso. Se não concordar com qualquer parte, não utilize o serviço.",
   },
   {
     title: "2. Descrição do Serviço",
     content:
-      "O FCD ViewPrompt é uma ferramenta de geração de prompts para visualização arquitetônica (ArchViz) utilizando inteligência artificial. O serviço analisa imagens de projetos arquitetônicos e gera prompts otimizados para ferramentas como Midjourney.",
+      "O NewRender é uma ferramenta de geração de prompts para visualização arquitetônica (ArchViz) utilizando inteligência artificial. O serviço analisa imagens de projetos arquitetônicos e gera prompts otimizados para ferramentas como Midjourney.",
   },
   {
     title: "3. Conta e Acesso",
@@ -30,7 +30,7 @@ const sections = [
   {
     title: "6. Propriedade Intelectual",
     content:
-      "Os prompts gerados pertencem ao usuário que os criou. A plataforma FCD ViewPrompt, incluindo seu código-fonte, design e marca, são propriedade exclusiva da FCD ViewPrompt.",
+      "Os prompts gerados pertencem ao usuário que os criou. A plataforma NewRender, incluindo seu código-fonte, design e marca, são propriedade exclusiva da NewRender.",
   },
   {
     title: "7. Limitação de Responsabilidade",
@@ -44,7 +44,7 @@ const sections = [
   },
   {
     title: "9. Contato",
-    content: "Para dúvidas sobre estes termos, entre em contato: suporte@fcdviewprompt.com.br",
+    content: "Para dúvidas sobre estes termos, entre em contato: suporte@newrender.com.br",
   },
 ];
 
@@ -60,7 +60,7 @@ const Terms = () => (
           <Sparkles className="w-4 h-4 text-primary-foreground" />
         </div>
         <span className="text-sm font-black tracking-tight text-foreground uppercase italic">
-          FCD <span className="text-primary">VIEW</span>PROMPT
+          NEW<span className="text-primary">RENDER</span>
         </span>
       </div>
     </header>

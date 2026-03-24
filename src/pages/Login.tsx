@@ -94,7 +94,7 @@ const Login = () => {
               <Sparkles className="w-6 h-6 text-primary-foreground" />
             </div>
             <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-foreground uppercase italic">
-              FCD <span className="text-primary">VIEW</span>PROMPT
+              NEW<span className="text-primary">RENDER</span>
             </h1>
           </div>
           <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.3em]">
@@ -284,7 +284,7 @@ const Login = () => {
 
         <div className="text-center mt-6 space-y-2">
           <p className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-[0.3em]">
-            © {new Date().getFullYear()} FCD VIEWPROMPT
+            © {new Date().getFullYear()} NEWRENDER
           </p>
           <div className="flex items-center justify-center gap-2">
             <Link to="/terms" className="text-[9px] font-bold text-muted-foreground/40 hover:text-muted-foreground uppercase tracking-widest transition-colors">
