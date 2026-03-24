@@ -30,7 +30,7 @@ const sections = [
   {
     title: "6. Propriedade Intelectual",
     content:
-      "Os prompts gerados pertencem ao usuário que os criou. A plataforma FCD ViewPrompt, incluindo seu código-fonte, design e marca, são propriedade exclusiva da FCD ViewPrompt.",
+      "Os prompts gerados pertencem ao usuário que os criou. A plataforma NewRender, incluindo seu código-fonte, design e marca, são propriedade exclusiva da NewRender.",
   },
   {
     title: "7. Limitação de Responsabilidade",
