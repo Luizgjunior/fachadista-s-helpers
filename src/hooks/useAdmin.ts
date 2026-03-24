@@ -304,6 +304,30 @@ export function useAdmin(profile: Profile | null) {
     [isAdmin]
   );
 
+  const createUser = useCallback(
+    async (data: { email: string; password: string; full_name?: string; plan_id?: string; credits?: number }) => {
+      if (!isAdmin) return null;
+
+      const { data: result, error } = await supabase.functions.invoke("admin-create-user", {
+        body: data,
+      });
+
+      if (error) {
+        toast.error("Erro ao criar usuário.");
+        return null;
+      }
+
+      if (result?.error) {
+        toast.error(result.error);
+        return null;
+      }
+
+      toast.success("Usuário criado com sucesso.");
+      return result.user;
+    },
+    [isAdmin]
+  );
+
   const getCaktoOrders = useCallback(async (limit = 50): Promise<CaktoOrder[]> => {
     if (!isAdmin) return [];
     const { data, error } = await supabase
