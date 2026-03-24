@@ -25,7 +25,7 @@ const sections = [
   {
     title: "5. Seus Direitos (LGPD)",
     content:
-      "Conforme a Lei Geral de Proteção de Dados (Lei 13.709/2018), você tem direito a:\n\n• Acesso aos seus dados pessoais.\n• Correção de dados incompletos ou desatualizados.\n• Exclusão dos seus dados.\n• Portabilidade dos dados.\n\nSolicitações devem ser enviadas para: suporte@fcdviewprompt.com.br",
+      "Conforme a Lei Geral de Proteção de Dados (Lei 13.709/2018), você tem direito a:\n\n• Acesso aos seus dados pessoais.\n• Correção de dados incompletos ou desatualizados.\n• Exclusão dos seus dados.\n• Portabilidade dos dados.\n\nSolicitações devem ser enviadas para: suporte@newrender.com.br",
   },
   {
     title: "6. Cookies e Armazenamento Local",
