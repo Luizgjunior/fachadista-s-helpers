@@ -55,7 +55,7 @@ const AppHeader = ({
               <Sparkles className="w-4 h-4 text-primary-foreground" />
             </div>
             <h1 className="text-lg font-black tracking-tighter text-foreground uppercase italic">
-              FCD<span className="text-primary">VP</span>
+              NEW<span className="text-primary">R</span>
             </h1>
           </div>
 
