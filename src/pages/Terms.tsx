@@ -44,7 +44,7 @@ const sections = [
   },
   {
     title: "9. Contato",
-    content: "Para dúvidas sobre estes termos, entre em contato: suporte@fcdviewprompt.com.br",
+    content: "Para dúvidas sobre estes termos, entre em contato: suporte@newrender.com.br",
   },
 ];
 
