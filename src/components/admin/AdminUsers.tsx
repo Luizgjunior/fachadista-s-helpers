@@ -172,6 +172,116 @@ function EditModal({
   );
 }
 
+// Create user modal
+function CreateUserModal({
+  onClose,
+  onConfirm,
+}: {
+  onClose: () => void;
+  onConfirm: (data: { email: string; password: string; full_name?: string; plan_id?: string; credits?: number }) => Promise<void>;
+}) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [planId, setPlanId] = useState("free");
+  const [credits, setCredits] = useState(10);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!email || !password) {
+      toast.error("Email e senha são obrigatórios.");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Senha deve ter no mínimo 6 caracteres.");
+      return;
+    }
+    setSubmitting(true);
+    await onConfirm({ email, password, full_name: fullName || undefined, plan_id: planId, credits });
+    setSubmitting(false);
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200">
+      <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-sm bg-surface rounded-3xl border border-border shadow-2xl p-6 space-y-5 animate-in zoom-in-95 duration-200">
+        <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
+          <X className="w-5 h-5" />
+        </button>
+
+        <div>
+          <h3 className="text-sm font-black uppercase tracking-wider text-foreground">Criar Novo Usuário</h3>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Nome Completo</label>
+          <input
+            type="text"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Opcional"
+            className="w-full bg-field-bg border border-field-border rounded-xl px-4 py-3 text-sm focus:border-field-focus focus:ring-4 focus:ring-primary/10 outline-none"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">E-mail *</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full bg-field-bg border border-field-border rounded-xl px-4 py-3 text-sm focus:border-field-focus focus:ring-4 focus:ring-primary/10 outline-none"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Senha *</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Mín. 6 caracteres"
+            className="w-full bg-field-bg border border-field-border rounded-xl px-4 py-3 text-sm focus:border-field-focus focus:ring-4 focus:ring-primary/10 outline-none"
+          />
+        </div>
+
+        <div className="flex gap-3">
+          <div className="flex-1 space-y-2">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Plano</label>
+            <select
+              value={planId}
+              onChange={(e) => setPlanId(e.target.value)}
+              className="w-full bg-field-bg border border-field-border rounded-xl px-4 py-3 text-sm focus:border-field-focus focus:ring-4 focus:ring-primary/10 outline-none"
+            >
+              <option value="free">Free</option>
+              <option value="pro">Pro</option>
+            </select>
+          </div>
+          <div className="flex-1 space-y-2">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Créditos</label>
+            <input
+              type="number"
+              value={credits}
+              onChange={(e) => setCredits(parseInt(e.target.value) || 0)}
+              className="w-full bg-field-bg border border-field-border rounded-xl px-4 py-3 text-sm focus:border-field-focus focus:ring-4 focus:ring-primary/10 outline-none"
+            />
+          </div>
+        </div>
+
+        <button
+          onClick={handleSubmit}
+          disabled={!email || !password || submitting}
+          className="w-full py-3.5 bg-primary text-primary-foreground rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-lg shadow-primary/20 hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+          Criar Usuário
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // Confirm dialog
 function ConfirmDialog({
   title,
