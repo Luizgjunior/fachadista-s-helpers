@@ -15,6 +15,7 @@ interface AdminUsersProps {
     toggleAdmin: (userId: string, makeAdmin: boolean) => Promise<boolean>;
     updateUserProfile: (userId: string, data: { full_name?: string; email?: string }) => Promise<boolean>;
     deleteUser: (userId: string) => Promise<boolean>;
+    createUser: (data: { email: string; password: string; full_name?: string; plan_id?: string; credits?: number }) => Promise<any>;
   };
   currentProfile: Profile | null;
 }
