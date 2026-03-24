@@ -6,7 +6,7 @@ const sections = [
   {
     title: "1. Aceitação dos Termos",
     content:
-      "Ao acessar ou utilizar o FCD ViewPrompt, você concorda com estes Termos de Uso. Se não concordar com qualquer parte, não utilize o serviço.",
+      "Ao acessar ou utilizar o NewRender, você concorda com estes Termos de Uso. Se não concordar com qualquer parte, não utilize o serviço.",
   },
   {
     title: "2. Descrição do Serviço",

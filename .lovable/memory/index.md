@@ -1,13 +1,11 @@
-# Memory: index.md
-Updated: now
-
-Fachadista - Architectural prompt generator
+NewRender - Architectural prompt generator
 
 ## Design System
 - Brand color: Fuchsia (HSL 292 84% 45%) as --primary and --brand
 - Custom tokens: brand, brand-light, brand-glow, surface, field-bg, field-border, toggle-on/off
 - Font: Inter (imported via Google Fonts)
 - Style: Uppercase tracking, rounded cards (up to 45px radius), glass-panel effect
+- Logo format: NEW<span className="text-primary">RENDER</span> (RENDER in fuchsia)
 
 ## Architecture
 - Types: src/types/fachadista.ts
@@ -28,3 +26,4 @@ Fachadista - Architectural prompt generator
 - src/repo-source/ (raw downloaded files, replaced by adapted versions)
 - Direct Google Gemini API calls (migrated to Lovable AI Gateway)
 - fal.ai integration (replaced by Nano Banana Pro)
+- Old brand name "FCD ViewPrompt" / "ARCHVIZ INTELLIGENCE LAB" (renamed to NewRender)

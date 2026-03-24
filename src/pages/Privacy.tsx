@@ -39,7 +39,7 @@ const sections = [
   },
   {
     title: "8. Contato do Encarregado (DPO)",
-    content: "Para questões sobre privacidade e proteção de dados: suporte@fcdviewprompt.com.br",
+    content: "Para questões sobre privacidade e proteção de dados: suporte@newrender.com.br",
   },
 ];
 
