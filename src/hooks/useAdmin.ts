@@ -351,6 +351,7 @@ export function useAdmin(profile: Profile | null) {
     toggleAdmin,
     updateUserProfile,
     deleteUser,
+    createUser,
     getTransactions,
     getDailyPrompts,
     rechargeProUsers,
