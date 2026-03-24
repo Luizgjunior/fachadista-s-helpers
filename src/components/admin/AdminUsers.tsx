@@ -465,6 +465,13 @@ export default function AdminUsers({ admin, currentProfile }: AdminUsersProps) {
             </button>
           ))}
         </div>
+        <button
+          onClick={() => setCreateModal(true)}
+          className="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl text-[10px] font-black uppercase tracking-wider shadow-lg shadow-primary/20 hover:opacity-90 transition-all whitespace-nowrap"
+        >
+          <UserPlus className="w-4 h-4" />
+          Criar Usuário
+        </button>
       </div>
 
       {/* Table */}
