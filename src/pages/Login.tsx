@@ -94,7 +94,7 @@ const Login = () => {
               <Sparkles className="w-6 h-6 text-primary-foreground" />
             </div>
             <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-foreground uppercase italic">
-              FCD <span className="text-primary">VIEW</span>PROMPT
+              NEW<span className="text-primary">RENDER</span>
             </h1>
           </div>
           <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.3em]">
