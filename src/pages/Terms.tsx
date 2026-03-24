@@ -11,7 +11,7 @@ const sections = [
   {
     title: "2. Descrição do Serviço",
     content:
-      "O FCD ViewPrompt é uma ferramenta de geração de prompts para visualização arquitetônica (ArchViz) utilizando inteligência artificial. O serviço analisa imagens de projetos arquitetônicos e gera prompts otimizados para ferramentas como Midjourney.",
+      "O NewRender é uma ferramenta de geração de prompts para visualização arquitetônica (ArchViz) utilizando inteligência artificial. O serviço analisa imagens de projetos arquitetônicos e gera prompts otimizados para ferramentas como Midjourney.",
   },
   {
     title: "3. Conta e Acesso",
