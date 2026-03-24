@@ -49,6 +49,18 @@ const Index = () => {
   const [beforeImage, setBeforeImage] = useState<string | null>(null);
   const [afterImage, setAfterImage] = useState<string | null>(null);
 
+  // Auto-populate comparator when switching modes
+  useEffect(() => {
+    if (appMode === 'comparator') {
+      if (images.length > 0 && !beforeImage) {
+        setBeforeImage(images[0]);
+      }
+      if (result?.previewUrl && !afterImage) {
+        setAfterImage(result.previewUrl);
+      }
+    }
+  }, [appMode]);
+
   const [params, setParams] = useState<PromptParameters>(DEFAULT_PARAMS);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
