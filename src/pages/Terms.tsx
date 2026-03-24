@@ -60,7 +60,7 @@ const Terms = () => (
           <Sparkles className="w-4 h-4 text-primary-foreground" />
         </div>
         <span className="text-sm font-black tracking-tight text-foreground uppercase italic">
-          FCD <span className="text-primary">VIEW</span>PROMPT
+          NEW<span className="text-primary">RENDER</span>
         </span>
       </div>
     </header>

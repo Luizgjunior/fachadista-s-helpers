@@ -154,7 +154,7 @@ const AppHeader = ({
             </div>
           </div>
           <h1 className="text-2xl lg:text-3xl font-black tracking-tighter text-foreground uppercase italic">
-            FCD <span className="text-primary">VIEW</span>PROMPT
+            NEW<span className="text-primary">RENDER</span>
           </h1>
         </div>
 

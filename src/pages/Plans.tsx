@@ -48,7 +48,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "E se eu tiver algum problema?",
-    a: "Nossa equipe está disponível pelo e-mail suporte@fcdviewprompt.com.br para resolver qualquer situação.",
+    a: "Nossa equipe está disponível pelo e-mail suporte@newrender.com.br para resolver qualquer situação.",
   },
 ];
 

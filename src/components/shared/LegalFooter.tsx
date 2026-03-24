@@ -32,7 +32,7 @@ export default function LegalFooter() {
         </Link>
         <span className="text-[9px] text-muted-foreground/30">•</span>
         <a
-          href="mailto:suporte@fcdviewprompt.com.br"
+          href="mailto:suporte@newrender.com.br"
           className="text-[9px] font-bold text-muted-foreground/40 hover:text-muted-foreground uppercase tracking-widest transition-colors"
         >
           Contato

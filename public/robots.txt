@@ -5,4 +5,4 @@ Allow: /privacy
 Disallow: /admin
 Disallow: /login
 
-Sitemap: https://fcdviewprompt.com.br/sitemap.xml
+Sitemap: https://newrender.com.br/sitemap.xml

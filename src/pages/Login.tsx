@@ -284,7 +284,7 @@ const Login = () => {
 
         <div className="text-center mt-6 space-y-2">
           <p className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-[0.3em]">
-            © {new Date().getFullYear()} FCD VIEWPROMPT
+            © {new Date().getFullYear()} NEWRENDER
           </p>
           <div className="flex items-center justify-center gap-2">
             <Link to="/terms" className="text-[9px] font-bold text-muted-foreground/40 hover:text-muted-foreground uppercase tracking-widest transition-colors">
