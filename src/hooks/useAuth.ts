@@ -123,6 +123,17 @@ export function useAuth() {
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
+
+    // Clear all caches so the user always sees the latest version
+    localStorage.clear();
+    sessionStorage.clear();
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    }
+
+    // Force a full reload to clear any in-memory state and fetch fresh assets
+    window.location.replace('/login');
   };
 
   const refreshProfile = useCallback(async () => {
