@@ -651,6 +651,14 @@ export default function AdminUsers({ admin, currentProfile }: AdminUsersProps) {
           onCancel={() => setConfirmAction(null)}
         />
       )}
+
+      {/* Create User Modal */}
+      {createModal && (
+        <CreateUserModal
+          onClose={() => setCreateModal(false)}
+          onConfirm={handleCreateUser}
+        />
+      )}
     </div>
   );
 }
