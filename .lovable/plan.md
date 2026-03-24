@@ -1,36 +1,43 @@
 
 
-## Plano: Melhorar a qualidade da geração de imagem
+## Plano: Renomear sistema para NewRender
 
-### Situação atual
-- O render usa o modelo **Nano Banana 2** (`google/gemini-3.1-flash-image-preview`) — rápido, mas não é o de maior qualidade disponível.
-- O prompt enviado ao modelo de imagem é bom, mas pode ser mais técnico e direcionado para fotorrealismo arquitetônico.
-- O `buildImagePrompt` no `geminiService.ts` já enriquece o prompt com detalhes de iluminação, clima e materiais, mas esse prompt enriquecido poderia ser melhor estruturado para o modelo de imagem.
+Trocar todas as referências de "FCD ViewPrompt" / "FCD VIEWPROMPT" para **NewRender**, com a parte "RENDER" em cor fuchsia nas partes estilizadas do logo.
 
-### Melhorias propostas
+### Mapeamento de substituições
 
-**1. Usar o modelo de maior qualidade: `google/gemini-3-pro-image-preview`**
-- É o modelo "Nano Banana Pro" — produz resultados significativamente melhores, com mais fidelidade a detalhes arquitetônicos, texturas e iluminação.
-- Tradeoff: é mais lento e mais caro. Podemos oferecer como opção ou usar como padrão.
-
-**2. Aprimorar o system prompt de renderização**
-- Adicionar instruções mais específicas sobre preservação de geometria, micro-texturas, física de luz e composição fotográfica.
-- Incluir referências técnicas de câmera (lente, abertura, ISO) diretamente no prompt de renderização.
-- Reforçar negative prompts para evitar artefatos comuns (superfícies plásticas, sombras incorretas, vegetação artificial).
-
-**3. Adicionar um `system` message separado**
-- Atualmente tudo vai em uma única mensagem `user`. Separar o papel do modelo em uma mensagem `system` pode melhorar a aderência às instruções.
+| De | Para |
+|---|---|
+| `FCD <span className="text-primary">VIEW</span>PROMPT` | `NEW<span className="text-primary">RENDER</span>` |
+| `FCD VIEWPROMPT` (texto puro, uppercase) | `NEWRENDER` |
+| `FCD ViewPrompt` (texto corrido) | `NewRender` |
+| `FCDViewPrompt` (short_name) | `NewRender` |
+| `ARCHVIZ INTELLIGENCE LAB` | `NEWRENDER` |
+| `fcdviewprompt.com.br` (URLs/emails) | `newrender.com.br` |
+| `suporte@fcdviewprompt.com.br` | `suporte@newrender.com.br` |
 
 ### Arquivos alterados
 
-| Arquivo | Mudança |
+| Arquivo | Tipo de mudança |
 |---|---|
-| `supabase/functions/generate-render/index.ts` | Trocar modelo para `gemini-3-pro-image-preview`, adicionar system message, melhorar instruções de renderização |
+| `index.html` | Meta tags, title, canonical, OG, Twitter |
+| `public/manifest.json` | name, short_name |
+| `public/sitemap.xml` | URLs do domínio |
+| `public/robots.txt` | URL do sitemap |
+| `src/components/fachadista/AppHeader.tsx` | Logo estilizado |
+| `src/components/shared/LegalFooter.tsx` | Nome no footer + copyright + email |
+| `src/pages/Login.tsx` | Logo estilizado + copyright |
+| `src/pages/NotFound.tsx` | Logo estilizado |
+| `src/pages/Terms.tsx` | Logo estilizado + conteúdo legal |
+| `src/pages/Privacy.tsx` | Logo estilizado + conteúdo legal |
+| `src/pages/Plans.tsx` | Email de contato no FAQ |
+| `.lovable/memory/index.md` | Atualizar nome do projeto |
 
-### Detalhes técnicos
+### Detalhes
 
-- **Modelo**: `google/gemini-3-pro-image-preview` (maior qualidade)
-- **System message**: Persona de fotógrafo arquitetônico profissional com regras técnicas rígidas
-- **User message**: Imagem de referência + prompt mestre enriquecido com instruções de fidelidade geométrica, micro-texturas e negative prompts expandidos
-- Nenhuma alteração no frontend ou no `geminiService.ts`
+- Nas partes estilizadas (header, login, 404, legal pages): `NEW<span className="text-primary">RENDER</span>`
+- No copyright do footer: `© 2026 NEWRENDER`
+- Emails mudam para `suporte@newrender.com.br`
+- URLs canônicas mudam para `newrender.com.br`
+- Nenhuma alteração funcional — apenas branding textual
 
