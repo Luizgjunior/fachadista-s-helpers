@@ -191,12 +191,22 @@ serve(async (req) => {
       });
       userContent.push({
         type: "text",
-        text: `REFERENCE IMAGE ATTACHED — use it as the BASE STRUCTURE.
+        text: `REFERENCE IMAGE ATTACHED — use it as the ABSOLUTE BASE STRUCTURE. This is the most critical instruction.
+
+CAMERA ANGLE & ORIENTATION PRESERVATION (HIGHEST PRIORITY):
+- The output image MUST be rendered from the EXACT SAME camera position, angle, height, and direction as the reference image.
+- If the building in the reference is viewed from the RIGHT side, the render MUST show the right side. If from the LEFT, show the left side. NEVER mirror or flip the viewing direction.
+- Preserve the EXACT perspective: same vanishing points, same horizon line height, same lens focal length impression.
+- If the reference shows a 3/4 view (e.g., front + right side visible), the render must show the SAME 3/4 view with the same proportions of each facade visible.
+- If the camera is at street level looking slightly up, maintain that EXACT elevation angle.
+- If the camera is elevated (drone/aerial), maintain that EXACT bird's-eye angle.
+- The building's orientation in the frame (centered, left-aligned, right-aligned) must match the reference EXACTLY.
 
 GEOMETRY PRESERVATION RULES:
 - Keep the EXACT building footprint, floor count, window positions, roof line, and facade proportions from the reference photo.
-- Maintain the precise camera angle, perspective lines, and vanishing points.
+- Preserve the EXACT number of floors, balconies, and structural bays visible.
 - Do NOT add, remove, or relocate windows, doors, balconies, or structural elements unless the prompt explicitly says so.
+- The building silhouette and massing must be pixel-level faithful to the reference.
 
 ASPECT RATIO: Output MUST be ${aspectRatio}.
 
