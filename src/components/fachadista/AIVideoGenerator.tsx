@@ -72,9 +72,9 @@ const AIVideoGenerator = ({
     };
   }, [generating]);
 
-  const pollStatus = useCallback((requestId: string) => {
+  const pollStatus = useCallback((requestId: string, statusUrl?: string, responseUrl?: string) => {
     let attempts = 0;
-    const maxAttempts = 60; // ~5 min with 5s interval
+    const maxAttempts = 60;
 
     pollingRef.current = setInterval(async () => {
       attempts++;
@@ -87,12 +87,12 @@ const AIVideoGenerator = ({
 
       try {
         const { data, error } = await supabase.functions.invoke("generate-video", {
-          body: { action: "poll", requestId },
+          body: { action: "poll", requestId, statusUrl, responseUrl },
         });
 
         if (error) {
           console.error("Poll error:", error);
-          return; // Keep polling
+          return;
         }
 
         if (data?.status === "COMPLETED" && data?.videoUrl) {
@@ -106,7 +106,6 @@ const AIVideoGenerator = ({
           setGenerating(false);
           toast.error("Falha na geração do vídeo.");
         }
-        // Otherwise keep polling (IN_QUEUE, IN_PROGRESS)
       } catch (err) {
         console.error("Poll exception:", err);
       }
