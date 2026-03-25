@@ -128,15 +128,15 @@ const USE_CASES = [
 ];
 
 const PLANS = [
-  { name: "Starter", credits: 50, price: "R$ 19,90", perCredit: "R$ 0,40", popular: false, features: ["50 créditos", "~16 prompts ou ~10 renders", "Válido por 12 meses", "Comparador de renders"] },
-  { name: "Pro", credits: 200, price: "R$ 49,90", perCredit: "R$ 0,25", popular: true, features: ["200 créditos", "~66 prompts ou ~40 renders", "Válido por 12 meses", "Economia de 37%", "Preview visual IA", "Suporte prioritário"] },
-  { name: "Studio", credits: 500, price: "R$ 99,90", perCredit: "R$ 0,20", popular: false, features: ["500 créditos", "~166 prompts ou ~100 renders", "Válido por 12 meses", "Economia de 50%", "Acesso antecipado a novidades", "Suporte VIP"] },
+  { name: "Starter", credits: 50, price: "R$ 19,90", perCredit: "R$ 0,40", popular: false, features: ["50 créditos", "~16 prompts, ~10 renders ou ~1 vídeo IA", "Válido por 12 meses", "Comparador de renders"] },
+  { name: "Pro", credits: 200, price: "R$ 49,90", perCredit: "R$ 0,25", popular: true, features: ["200 créditos", "~66 prompts, ~40 renders ou ~6 vídeos IA", "Válido por 12 meses", "Economia de 37%", "Preview visual IA", "Suporte prioritário"] },
+  { name: "Studio", credits: 500, price: "R$ 99,90", perCredit: "R$ 0,20", popular: false, features: ["500 créditos", "~166 prompts, ~100 renders ou ~16 vídeos IA", "Válido por 12 meses", "Economia de 50%", "Acesso antecipado a novidades", "Suporte VIP"] },
 ];
 
 const FAQ = [
   { q: "Como funciona o NewRender?", a: "Você faz upload de uma imagem do seu projeto (SketchUp, planta, croqui), configura parâmetros como iluminação e estilo, e nossa IA gera um prompt profissional otimizado. Com esse prompt, você pode gerar um render fotorrealista diretamente na plataforma." },
   { q: "Preciso saber usar Midjourney?", a: "Não! O NewRender gera o prompt pronto para copiar e colar. Além disso, você pode gerar o render direto na nossa plataforma sem precisar de nenhuma outra ferramenta." },
-  { q: "Quanto custa gerar um prompt?", a: "Cada geração de prompt consome 3 créditos. Cada render com IA consome 10 créditos. Você pode comprar pacotes de créditos sem mensalidade." },
+  { q: "Quanto custa cada operação?", a: "Prompt: 3 créditos. Render com IA: 5 créditos. Vídeo animação IA: 30 créditos. Você pode comprar pacotes de créditos sem mensalidade." },
   { q: "Os créditos expiram?", a: "Não! Seus créditos ficam na conta até serem usados. Sem prazo de validade, sem surpresas." },
   { q: "Posso usar qualquer tipo de imagem?", a: "Sim! SketchUp, Revit, AutoCAD, fotos de maquete, croquis à mão livre, plantas humanizadas — qualquer referência visual funciona." },
   { q: "A qualidade do render é profissional?", a: "Sim. Nosso sistema usa modelos de IA de última geração com prompts otimizados especificamente para arquitetura, gerando resultados com qualidade de estúdio de renderização." },
