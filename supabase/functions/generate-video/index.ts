@@ -97,37 +97,37 @@ serve(async (req) => {
 
     // ── ACTION: POLL ──
     if (action === "poll") {
-      const { requestId } = body;
+      const { requestId, statusUrl, responseUrl } = body;
       if (!requestId) throw new Error("requestId não fornecido.");
 
-      const statusRes = await fetch(
-        `https://queue.fal.run/${FAL_MODEL}/requests/${requestId}/status`,
-        {
-          method: "GET",
-          headers: { Authorization: `Key ${FAL_KEY}` },
-        }
-      );
+      // Use the status_url returned by submit, or build it
+      const pollUrl = statusUrl || `https://queue.fal.run/${FAL_MODEL}/requests/${requestId}/status`;
+
+      const statusRes = await fetch(`${pollUrl}?logs=1`, {
+        method: "GET",
+        headers: { Authorization: `Key ${FAL_KEY}` },
+      });
 
       if (!statusRes.ok) {
         const errText = await statusRes.text();
         console.error("Poll status error:", statusRes.status, errText);
+        // Return IN_PROGRESS so client keeps polling
         return new Response(JSON.stringify({ status: "IN_PROGRESS" }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
       const statusData = await statusRes.json();
-      console.log("Poll status:", JSON.stringify(statusData));
+      console.log("Poll status:", statusData.status);
 
       if (statusData.status === "COMPLETED") {
-        // Fetch the result
-        const resultRes = await fetch(
-          `https://queue.fal.run/${FAL_MODEL}/requests/${requestId}`,
-          {
-            method: "GET",
-            headers: { Authorization: `Key ${FAL_KEY}` },
-          }
-        );
+        // Fetch the result using response_url or build it
+        const resultUrl = responseUrl || `https://queue.fal.run/${FAL_MODEL}/requests/${requestId}`;
+        
+        const resultRes = await fetch(resultUrl, {
+          method: "GET",
+          headers: { Authorization: `Key ${FAL_KEY}` },
+        });
 
         if (!resultRes.ok) {
           const errText = await resultRes.text();
@@ -154,7 +154,6 @@ serve(async (req) => {
         });
       }
 
-      // IN_QUEUE or IN_PROGRESS
       return new Response(JSON.stringify({ status: statusData.status || "IN_PROGRESS" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
