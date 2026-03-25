@@ -7,11 +7,13 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const DYNAMIC_ELEMENTS = "cars driving smoothly on the road with realistic motion, people walking naturally on sidewalks with natural body movement, lights flickering and glowing realistically turning on and off, neon signs illuminating, street lamps casting warm light, headlights and taillights visible on moving vehicles, window lights toggling softly";
+
 const MOVEMENT_PRESETS: Record<string, string> = {
-  orbital: "Slow smooth orbital camera movement around the building, cinematic dolly, maintaining framing, professional architectural videography",
-  zoom_dramatic: "Slow dramatic zoom-in toward the building entrance, cinematic depth of field, smooth steady camera, professional quality",
-  ambiente_vivo: "Static camera, clouds moving slowly across sky, subtle wind rustling vegetation and trees, reflections shimmering on glass facades, people walking naturally on sidewalk, realistic ambient motion",
-  flyover: "Aerial flyover camera slowly moving forward over the building, revealing full architecture and surroundings, smooth cinematic drone shot",
+  orbital: `Slow smooth orbital camera movement around the building, cinematic dolly, maintaining framing, professional architectural videography, ${DYNAMIC_ELEMENTS}`,
+  zoom_dramatic: `Slow dramatic zoom-in toward the building entrance, cinematic depth of field, smooth steady camera, professional quality, ${DYNAMIC_ELEMENTS}`,
+  ambiente_vivo: `Static camera, clouds moving slowly across sky, subtle wind rustling vegetation and trees, reflections shimmering on glass facades, ${DYNAMIC_ELEMENTS}, realistic ambient motion`,
+  flyover: `Aerial flyover camera slowly moving forward over the building, revealing full architecture and surroundings, smooth cinematic drone shot, ${DYNAMIC_ELEMENTS}`,
 };
 
 const FAL_MODEL = "fal-ai/kling-video/v2.1/standard/image-to-video";
