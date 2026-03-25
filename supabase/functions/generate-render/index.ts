@@ -131,7 +131,6 @@ const getAspectRatio = (params?: RenderParams): string => {
    ═══════════════════════════════════════════════ */
 
 const buildSystemPrompt = (aspectRatio: string, projectType?: string, cameraAngle?: string): string => {
-  let projectSpecific = '';
   const keepRefAngle = cameraAngle === 'Manter ângulo da referência';
 
   let cameraInstructions = '';
