@@ -208,7 +208,7 @@ serve(async (req) => {
     // Enrich prompt server-side if params provided
     const enrichedPrompt = params ? buildEnrichedPrompt(prompt, params) : prompt;
     const aspectRatio = params ? getAspectRatio(params) : (clientAspectRatio || '16:9');
-    const systemPrompt = buildSystemPrompt(aspectRatio, params?.projectType);
+    const systemPrompt = buildSystemPrompt(aspectRatio, params?.projectType, params?.cameraAngle);
 
     const userContent: any[] = [];
 
