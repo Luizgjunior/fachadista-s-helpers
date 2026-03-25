@@ -64,6 +64,7 @@ export type Database = {
       }
       credit_packages: {
         Row: {
+          billing_interval: string | null
           cakto_checkout_url: string | null
           created_at: string | null
           credits: number
@@ -74,8 +75,10 @@ export type Database = {
           is_popular: boolean
           name: string
           price_brl: number
+          type: string
         }
         Insert: {
+          billing_interval?: string | null
           cakto_checkout_url?: string | null
           created_at?: string | null
           credits: number
@@ -86,8 +89,10 @@ export type Database = {
           is_popular?: boolean
           name: string
           price_brl: number
+          type?: string
         }
         Update: {
+          billing_interval?: string | null
           cakto_checkout_url?: string | null
           created_at?: string | null
           credits?: number
@@ -98,6 +103,7 @@ export type Database = {
           is_popular?: boolean
           name?: string
           price_brl?: number
+          type?: string
         }
         Relationships: []
       }
@@ -176,6 +182,8 @@ export type Database = {
           id: string
           is_admin: boolean
           plan_id: string | null
+          subscription_id: string | null
+          subscription_status: string | null
           total_prompts_generated: number
           updated_at: string | null
         }
@@ -188,6 +196,8 @@ export type Database = {
           id: string
           is_admin?: boolean
           plan_id?: string | null
+          subscription_id?: string | null
+          subscription_status?: string | null
           total_prompts_generated?: number
           updated_at?: string | null
         }
@@ -200,6 +210,8 @@ export type Database = {
           id?: string
           is_admin?: boolean
           plan_id?: string | null
+          subscription_id?: string | null
+          subscription_status?: string | null
           total_prompts_generated?: number
           updated_at?: string | null
         }

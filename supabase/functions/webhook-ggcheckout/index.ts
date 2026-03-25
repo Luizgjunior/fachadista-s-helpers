@@ -23,20 +23,30 @@ Deno.serve(async (req) => {
     const payload = await req.json()
     console.log('ggCheckout webhook payload:', JSON.stringify(payload))
 
-    // Extrair status - adaptar conforme payload real do ggCheckout
+    // Extrair status
     const status = payload?.status || payload?.order?.status || payload?.payment?.status
     const normalizedStatus = String(status).toLowerCase()
 
-    // Só processar compras aprovadas/pagas
-    if (!['approved', 'paid', 'completed', 'pago', 'aprovado'].includes(normalizedStatus)) {
+    // Só processar compras/renovações aprovadas
+    if (!['approved', 'paid', 'completed', 'pago', 'aprovado', 'active', 'renewed'].includes(normalizedStatus)) {
       return new Response(JSON.stringify({ message: 'Status ignorado: ' + status }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       })
     }
 
-    // Extrair dados do payload - múltiplos formatos possíveis
+    // Detectar tipo de evento (compra única, nova assinatura, renovação)
+    const eventType = (
+      payload?.event || payload?.type || payload?.event_type || ''
+    ).toLowerCase()
+    const isRenewal = eventType.includes('renew') || eventType.includes('recur') || eventType.includes('subscription_payment')
+    const isSubscription = isRenewal || eventType.includes('subscription') || payload?.subscription_id
+
+    // Extrair dados do payload
     const orderId = String(
       payload?.order?.id || payload?.id || payload?.transaction_id || payload?.payment?.id || ''
+    )
+    const subscriptionId = String(
+      payload?.subscription_id || payload?.subscription?.id || payload?.order?.subscription_id || ''
     )
     const customerEmail = (
       payload?.customer?.email || payload?.buyer?.email || payload?.email || ''
@@ -53,17 +63,17 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Criar cliente Supabase com service role
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
     // Verificar se pedido já foi processado
+    const orderKey = `gg_${orderId}`
     const { data: existingOrder } = await supabase
       .from('cakto_orders')
       .select('id')
-      .eq('id', `gg_${orderId}`)
+      .eq('id', orderKey)
       .single()
 
     if (existingOrder) {
@@ -76,14 +86,14 @@ Deno.serve(async (req) => {
     // Buscar usuário pelo email
     const { data: profile } = await supabase
       .from('profiles')
-      .select('id, email, credits')
+      .select('id, email, credits, plan_id, subscription_status')
       .eq('email', customerEmail)
       .single()
 
     if (!profile) {
       console.error('Usuário não encontrado:', customerEmail)
       await supabase.from('cakto_orders').insert({
-        id: `gg_${orderId}`,
+        id: orderKey,
         user_id: null,
         package_id: null,
         credits_added: 0,
@@ -106,42 +116,60 @@ Deno.serve(async (req) => {
       .single()
 
     const creditsToAdd = creditPackage?.credits ?? Math.max(Math.floor(amountPaid * 2.5), 10)
+    const packageType = creditPackage?.type || 'one_time'
 
-    // Adicionar créditos ao usuário
+    // Atualizar perfil do usuário
+    const profileUpdate: Record<string, unknown> = {
+      credits: profile.credits + creditsToAdd,
+      updated_at: new Date().toISOString()
+    }
+
+    // Se for assinatura, atualizar status e subscription_id
+    if (isSubscription || packageType === 'subscription') {
+      profileUpdate.subscription_status = 'active'
+      profileUpdate.plan_id = creditPackage?.id ?? profile.plan_id
+      if (subscriptionId) {
+        profileUpdate.subscription_id = subscriptionId
+      }
+    }
+
     await supabase
       .from('profiles')
-      .update({
-        credits: profile.credits + creditsToAdd,
-        updated_at: new Date().toISOString()
-      })
+      .update(profileUpdate)
       .eq('id', profile.id)
+
+    // Descrição da transação
+    const txDescription = isRenewal
+      ? `Renovação mensal via ggCheckout - ${creditPackage?.name ?? 'Plano'} - Pedido ${orderId}`
+      : `Compra via ggCheckout - ${creditPackage?.name ?? 'Pacote'} - Pedido ${orderId}`
 
     // Registrar transação
     await supabase.from('credit_transactions').insert({
       user_id: profile.id,
       amount: creditsToAdd,
-      type: 'purchase',
-      description: `Compra via ggCheckout - ${creditPackage?.name ?? 'Pacote'} - Pedido ${orderId}`
+      type: isRenewal ? 'recharge' : 'purchase',
+      description: txDescription
     })
 
     // Registrar pedido
     await supabase.from('cakto_orders').insert({
-      id: `gg_${orderId}`,
+      id: orderKey,
       user_id: profile.id,
       package_id: creditPackage?.id ?? null,
       credits_added: creditsToAdd,
       amount_paid: amountPaid,
       customer_email: customerEmail,
-      status: 'approved'
+      status: isRenewal ? 'renewed' : 'approved'
     })
 
-    console.log(`Créditos adicionados: ${creditsToAdd} para ${customerEmail}`)
+    console.log(`Créditos adicionados: ${creditsToAdd} para ${customerEmail} (${isRenewal ? 'renovação' : 'compra'})`)
 
     return new Response(
       JSON.stringify({
         success: true,
         credits_added: creditsToAdd,
-        user: customerEmail
+        user: customerEmail,
+        type: isRenewal ? 'renewal' : 'purchase'
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
