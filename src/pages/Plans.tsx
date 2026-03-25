@@ -21,6 +21,7 @@ interface CreditPackage {
   is_popular: boolean;
   is_active: boolean;
   features: unknown;
+  gg_checkout_url: string | null;
 }
 
 const getFeatures = (features: unknown): string[] => {
@@ -40,7 +41,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Como funciona o pagamento?",
-    a: "Os pagamentos serão processados com segurança pela plataforma Cakto, aceitando Pix, cartão de crédito (parcelado) e boleto bancário.",
+    a: "Os pagamentos são processados com segurança pela plataforma ggCheckout, aceitando Pix, cartão de crédito (parcelado) e boleto bancário.",
   },
   {
     q: "Quanto tempo para os créditos aparecerem?",
@@ -54,7 +55,7 @@ const FAQ_ITEMS = [
 
 const STEPS = [
   { icon: ShoppingCart, title: "Escolha seu pacote", desc: "Selecione a quantidade de créditos ideal para seu volume de trabalho" },
-  { icon: CreditCard, title: "Pague com segurança", desc: "Pix, cartão de crédito ou boleto bancário via plataforma Cakto" },
+  { icon: CreditCard, title: "Pague com segurança", desc: "Pix, cartão de crédito ou boleto bancário via ggCheckout" },
   { icon: Zap, title: "Créditos instantâneos", desc: "Seus créditos são adicionados automaticamente em até 1 minuto" },
 ];
 
@@ -171,15 +172,22 @@ const Plans = () => {
                   </ul>
 
                   <button
-                    disabled
-                    className={`w-full py-4 rounded-2xl font-black text-sm uppercase tracking-[0.2em] cursor-not-allowed opacity-70 transition-all ${
+                    onClick={() => {
+                      if (pkg.gg_checkout_url) {
+                        const url = new URL(pkg.gg_checkout_url);
+                        if (profile?.email) url.searchParams.set('email', profile.email);
+                        window.open(url.toString(), '_blank');
+                      } else {
+                        navigate("/login");
+                      }
+                    }}
+                    className={`w-full py-4 rounded-2xl font-black text-sm uppercase tracking-[0.2em] transition-all active:scale-95 ${
                       pkg.is_popular
-                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                        : "bg-field-bg border border-border text-muted-foreground"
+                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:opacity-90"
+                        : "bg-field-bg border border-border text-foreground hover:border-primary/30"
                     }`}
-                    title="Pagamento disponível em breve"
                   >
-                    Em breve
+                    {pkg.gg_checkout_url ? "Comprar agora" : "Começar grátis"}
                   </button>
                 </div>
               ))}
@@ -241,22 +249,22 @@ const Plans = () => {
         </div>
       </section>
 
-      {/* Coming soon banner */}
+      {/* CTA banner */}
       <section className="px-4 pb-16 md:pb-20">
         <div className="max-w-2xl mx-auto bg-primary/5 border border-primary/20 rounded-[32px] p-8 text-center">
           <Sparkles className="w-8 h-8 text-primary mx-auto mb-4" />
           <h3 className="text-xl font-black uppercase tracking-tight text-foreground mb-3">
-            Pagamentos chegando em breve!
+            Compre créditos e comece a criar!
           </h3>
           <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
-            Estamos finalizando a integração com a Cakto. Em breve você poderá comprar créditos
-            diretamente aqui. Por enquanto, seu plano Free inclui 10 créditos para explorar.
+            Escolha o pacote ideal acima e comece a gerar prompts, renders e vídeos IA
+            profissionais em minutos. Pagamento seguro via ggCheckout.
           </p>
           <button
-            onClick={() => navigate("/app")}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="bg-primary text-primary-foreground px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:opacity-90 transition-all active:scale-95"
           >
-            Voltar ao app e gerar prompts
+            Ver pacotes acima ↑
           </button>
         </div>
       </section>

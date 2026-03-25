@@ -68,6 +68,7 @@ export type Database = {
           created_at: string | null
           credits: number
           features: Json | null
+          gg_checkout_url: string | null
           id: string
           is_active: boolean
           is_popular: boolean
@@ -79,6 +80,7 @@ export type Database = {
           created_at?: string | null
           credits: number
           features?: Json | null
+          gg_checkout_url?: string | null
           id: string
           is_active?: boolean
           is_popular?: boolean
@@ -90,6 +92,7 @@ export type Database = {
           created_at?: string | null
           credits?: number
           features?: Json | null
+          gg_checkout_url?: string | null
           id?: string
           is_active?: boolean
           is_popular?: boolean
