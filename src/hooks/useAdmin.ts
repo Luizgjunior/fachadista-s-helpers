@@ -16,6 +16,31 @@ export interface AdminMetrics {
   credits_consumed_30d: number;
 }
 
+export interface FinancialMetrics {
+  active_subscribers: number;
+  mrr: number;
+  revenue_30d: number;
+  revenue_total: number;
+  churned_users: number;
+  total_orders: number;
+  orders_30d: number;
+  avg_ticket: number;
+}
+
+export interface DailyRevenue {
+  day: string;
+  revenue: number;
+  orders: number;
+}
+
+export interface RevenueByPlan {
+  package_id: string;
+  package_name: string;
+  orders: number;
+  revenue: number;
+  credits_sold: number;
+}
+
 export interface CreditTransaction {
   id: string;
   user_id: string;
@@ -58,6 +83,44 @@ export function useAdmin(profile: Profile | null) {
       return null;
     }
     return data as unknown as AdminMetrics;
+  }, [isAdmin]);
+
+  const getFinancialMetrics = useCallback(async (): Promise<FinancialMetrics | null> => {
+    if (!isAdmin) return null;
+    const { data, error } = await supabase
+      .from("admin_financial_metrics" as any)
+      .select("*")
+      .single();
+    if (error) {
+      console.error("Error fetching financial metrics:", error);
+      return null;
+    }
+    return data as unknown as FinancialMetrics;
+  }, [isAdmin]);
+
+  const getDailyRevenue = useCallback(async (): Promise<DailyRevenue[]> => {
+    if (!isAdmin) return [];
+    const { data, error } = await supabase
+      .from("admin_daily_revenue" as any)
+      .select("*")
+      .order("day", { ascending: true });
+    if (error) {
+      console.error("Error fetching daily revenue:", error);
+      return [];
+    }
+    return (data ?? []) as unknown as DailyRevenue[];
+  }, [isAdmin]);
+
+  const getRevenueByPlan = useCallback(async (): Promise<RevenueByPlan[]> => {
+    if (!isAdmin) return [];
+    const { data, error } = await supabase
+      .from("admin_revenue_by_plan" as any)
+      .select("*");
+    if (error) {
+      console.error("Error fetching revenue by plan:", error);
+      return [];
+    }
+    return (data ?? []) as unknown as RevenueByPlan[];
   }, [isAdmin]);
 
   const getUsers = useCallback(
@@ -106,7 +169,6 @@ export function useAdmin(profile: Profile | null) {
         return false;
       }
 
-      // Record transaction
       const txType = delta >= 0 ? "bonus" : "consume";
       await supabase.from("credit_transactions").insert({
         user_id: userId,
@@ -175,7 +237,6 @@ export function useAdmin(profile: Profile | null) {
         return [];
       }
 
-      // Exclude admin transactions
       return (data ?? [])
         .filter((row: any) => !row.profiles?.is_admin)
         .map((row: any) => ({
@@ -209,7 +270,6 @@ export function useAdmin(profile: Profile | null) {
       return [];
     }
 
-    // Aggregate by day, excluding admin prompts
     const counts: Record<string, number> = {};
     for (const row of (data ?? []) as any[]) {
       if (row.profiles?.is_admin) continue;
@@ -240,7 +300,6 @@ export function useAdmin(profile: Profile | null) {
   const getCreditSummary = useCallback(async () => {
     if (!isAdmin) return { totalConsumed: 0, totalDistributed: 0, avgBalance: 0 };
 
-    // Get transactions joined with profiles to exclude admins
     const { data: txData } = await supabase
       .from("credit_transactions")
       .select("amount, type, profiles!credit_transactions_user_id_fkey(is_admin)");
@@ -253,7 +312,6 @@ export function useAdmin(profile: Profile | null) {
       else totalDistributed += Math.abs(tx.amount);
     }
 
-    // Get average balance excluding admins
     const { data: profiles } = await supabase
       .from("profiles")
       .select("credits")
@@ -289,7 +347,6 @@ export function useAdmin(profile: Profile | null) {
   const deleteUser = useCallback(
     async (userId: string) => {
       if (!isAdmin) return false;
-      // Delete profile (cascades to transactions and prompts via FK)
       const { error } = await supabase
         .from("profiles")
         .delete()
@@ -345,6 +402,9 @@ export function useAdmin(profile: Profile | null) {
   return {
     isAdmin,
     getMetrics,
+    getFinancialMetrics,
+    getDailyRevenue,
+    getRevenueByPlan,
     getUsers,
     updateUserCredits,
     updateUserPlan,
