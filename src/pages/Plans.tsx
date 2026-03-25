@@ -85,7 +85,7 @@ const Plans = () => {
       {/* Breadcrumb */}
       <div className="border-b border-border bg-surface px-4 md:px-10 py-3">
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/app")}
           className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Voltar ao app
