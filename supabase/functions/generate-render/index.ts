@@ -99,9 +99,14 @@ const buildEnrichedPrompt = (prompt: string, params?: RenderParams): string => {
     ? SIDEWALK_MAP[params.sidewalkType] || 'realistic sidewalk pavement'
     : 'natural ground integration';
 
+  const cameraAngle = params.cameraAngle && params.cameraAngle !== 'Nenhuma das opção'
+    ? CAMERA_ANGLE_MAP[params.cameraAngle] || ''
+    : '';
+
   const parts: string[] = [
     style,
     prompt,
+    cameraAngle ? `Camera angle: ${cameraAngle}` : '',
     `Lighting: ${lighting}`,
     `Weather and sky: ${weather}`,
     `Environment: ${environment}`,
