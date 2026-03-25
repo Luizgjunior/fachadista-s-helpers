@@ -50,7 +50,7 @@ const Admin = () => {
               {profile?.email}
             </span>
             <button
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/app")}
               className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground bg-field-bg border border-border px-3 py-2 rounded-xl transition-all"
             >
               <ArrowLeft className="w-3.5 h-3.5" />

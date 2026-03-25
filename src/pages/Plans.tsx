@@ -253,7 +253,7 @@ const Plans = () => {
             diretamente aqui. Por enquanto, seu plano Free inclui 10 créditos para explorar.
           </p>
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/app")}
             className="bg-primary text-primary-foreground px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:opacity-90 transition-all active:scale-95"
           >
             Voltar ao app e gerar prompts
