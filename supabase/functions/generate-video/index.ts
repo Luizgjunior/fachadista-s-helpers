@@ -14,41 +14,39 @@ const CAMERA_PRESETS: Record<string, string> = {
   flyover: "Aerial flyover camera slowly moving forward over the building, smooth cinematic drone shot",
 };
 
+const FALLBACK_CAR_PROMPT = "At least one visible car must move clearly during the 5-second shot with noticeable displacement: driving forward on the street, turning naturally, or slowly parking into a visible spot. Never keep all cars frozen. Preserve the exact same building, framing, perspective, and architecture from the source image.";
+
 const FAL_MODEL = "fal-ai/kling-video/v2.1/standard/image-to-video";
 
 const IMAGE_ANALYSIS_SYSTEM_PROMPT = `You are an expert architectural animation director. Analyze the provided architectural render image and generate a highly detailed animation prompt for a 5-second video.
 
-PRIORITY RULES (in order):
-1. **CARS** - TOP PRIORITY. Identify every car visible. Describe EXACTLY:
-   - Position (left side, right side, parked, on the road)
-   - Direction they should drive (based on road orientation)
-   - If parked: describe a car slowly pulling into the parking spot or idling with brake lights on
-   - If on the road: describe smooth realistic driving motion with headlights/taillights glowing
-   - Cars MUST move realistically - wheels turning, slight suspension bounce
+STRICT RULES:
+- Keep the building, facade, composition, camera angle, and perspective faithful to the original image.
+- Do not redesign the architecture. Animate the existing scene only.
+- Return only one English prompt, with no explanations.
 
-2. **PEOPLE** - Identify any people or where people would naturally walk:
-   - Describe natural walking motion on sidewalks
-   - People entering/exiting the building
-   - Natural body movement, arms swinging, casual pace
+PRIORITY 1 — CARS (MANDATORY WHEN CARS, STREETS, DRIVEWAYS, OR PARKING ARE VISIBLE):
+- Detect every visible car and infer the road or parking flow from the image.
+- At least one car must have obvious visible displacement across the shot.
+- If a car is on the street: make it drive realistically in the correct lane/direction suggested by the image.
+- If a car is near a curb or parking area: make it slowly park, pull out, or creep forward naturally.
+- Mention wheel rotation, forward movement, realistic spacing, headlights/taillights if appropriate.
+- Never leave all cars static.
 
-3. **LIGHTS** - Identify all light sources:
-   - Building signage: describe neon/LED signs flickering on, glowing warmly
-   - Street lamps: warm glow casting light pools on ground
-   - Window lights: some turning on, some already lit, warm interior glow
-   - Car headlights and taillights: bright, realistic beam spread
-   - If nighttime: emphasize dramatic lighting effects
+PRIORITY 2 — PEOPLE:
+- If people are visible or would naturally exist in the scene, make them walk naturally on sidewalks or near the entrance.
+- Use casual walking pace and believable body movement.
 
-4. **ENVIRONMENT** - Secondary ambient motion:
-   - Trees/vegetation swaying gently in wind
-   - Clouds moving across sky
-   - Reflections on glass facades shimmering
-   - Shadows shifting subtly
+PRIORITY 3 — LIGHTS:
+- If there are signs, lamps, windows, or car lights, make them glow, pulse softly, turn on, or flicker naturally.
+- Night scenes should emphasize lighting changes more strongly.
 
-OUTPUT: Return ONLY the animation prompt in English, no explanations. Be extremely specific about car movements and directions. The prompt should read like a professional cinematography direction sheet.`;
+PRIORITY 4 — ENVIRONMENT:
+- Add subtle scene-faithful ambient motion like trees swaying, clouds drifting, reflections shimmering.
+- Keep motion realistic and secondary to the cars.
 
-/**
- * Analyze the render image using Lovable AI to generate a scene-faithful prompt
- */
+The final prompt must strongly emphasize car motion as the hero action when cars or road access are present.`;
+
 async function analyzeImageForAnimation(
   imageUrl: string,
   cameraPreset: string,
@@ -63,7 +61,7 @@ async function analyzeImageForAnimation(
       content: [
         {
           type: "text",
-          text: `Analyze this architectural render and create an animation prompt. Camera style: "${cameraDirection}". Focus heavily on car movements (driving direction, parking, headlights) and people walking. Describe exactly what should move and how, based on what you see in the image.`,
+          text: `Analyze this architectural render and create a faithful animation prompt. Camera style: "${cameraDirection}". Priority order: 1) cars moving clearly and realistically, including parking when appropriate, 2) people walking, 3) lights activating naturally. Respect the original image composition and infer the correct driving direction from the visible street, driveway, curb, and parking layout.`,
         },
         {
           type: "image_url",
@@ -88,8 +86,7 @@ async function analyzeImageForAnimation(
   if (!response.ok) {
     const errText = await response.text();
     console.error("AI analysis error:", response.status, errText);
-    // Fallback to preset-based prompt
-    return `${cameraDirection}, cars driving smoothly on the road with realistic motion and glowing headlights, people walking naturally on sidewalks, lights turning on and glowing warmly, neon signs illuminating, street lamps casting warm light, window lights toggling softly, professional architectural videography`;
+    return `${cameraDirection}. ${FALLBACK_CAR_PROMPT} People walk naturally on sidewalks. Signs, lamps, windows, and headlights glow realistically. Professional architectural videography.`;
   }
 
   const data = await response.json();
@@ -97,18 +94,14 @@ async function analyzeImageForAnimation(
 
   if (!analysisPrompt) {
     console.error("Empty AI analysis, using fallback");
-    return `${cameraDirection}, cars driving smoothly on the road with realistic motion and glowing headlights, people walking naturally on sidewalks, lights turning on and glowing warmly, professional architectural videography`;
+    return `${cameraDirection}. ${FALLBACK_CAR_PROMPT} People walk naturally on sidewalks. Signs, lamps, windows, and headlights glow realistically. Professional architectural videography.`;
   }
 
-  // Combine camera direction with AI-generated scene analysis
-  const finalPrompt = `${cameraDirection}. ${analysisPrompt}`;
-  console.log("AI-generated animation prompt:", finalPrompt.substring(0, 200) + "...");
+  const finalPrompt = `${cameraDirection}. ${analysisPrompt} Mandatory vehicle rule: if any car, driveway, curbside lane, or parking bay is visible, animate at least one car with clearly noticeable motion over the shot—driving through the street or performing a slow realistic parking maneuver. Do not leave all vehicles static. Preserve the exact architecture and framing from the source render.`;
+  console.log("AI-generated animation prompt:", finalPrompt.substring(0, 260) + "...");
   return finalPrompt;
 }
 
-/**
- * Upload base64 image to Fal storage to avoid sending large payloads
- */
 async function uploadToFalStorage(base64DataUri: string, falKey: string): Promise<string> {
   if (base64DataUri.startsWith("http")) return base64DataUri;
 
@@ -159,27 +152,22 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: authError } = await createClient(
-      SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!
-    ).auth.getUser(token);
+    const {
+      data: { user },
+      error: authError,
+    } = await createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!).auth.getUser(token);
     if (authError || !user) throw new Error("Token inválido.");
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("is_admin")
-      .eq("id", user.id)
-      .single();
+    const { data: profile } = await supabase.from("profiles").select("is_admin").eq("id", user.id).single();
     const isAdmin = profile?.is_admin === true;
 
     const body = await req.json();
     const { action } = body;
 
-    // ── ACTION: SUBMIT ──
     if (!action || action === "submit") {
       const { imageUrl, preset, customPrompt } = body;
       if (!imageUrl) throw new Error("imageUrl não fornecida.");
 
-      // Consume credits (skip for admin)
       if (!isAdmin) {
         const COST = 30;
         const { data: hasCredits } = await supabase.rpc("consume_credits_bulk", {
@@ -196,7 +184,6 @@ serve(async (req) => {
         }
       }
 
-      // Upload base64 to Fal storage
       let processedImageUrl = imageUrl;
       if (imageUrl.startsWith("data:")) {
         try {
@@ -207,19 +194,18 @@ serve(async (req) => {
         }
       }
 
-      // Generate animation prompt: use AI analysis or fallback to preset
       let movementPrompt: string;
       if (customPrompt) {
-        movementPrompt = customPrompt;
+        movementPrompt = `${customPrompt} ${FALLBACK_CAR_PROMPT}`;
       } else if (LOVABLE_API_KEY) {
         try {
           movementPrompt = await analyzeImageForAnimation(processedImageUrl, preset || "ambiente_vivo", LOVABLE_API_KEY);
         } catch (e) {
           console.error("AI analysis failed, using preset fallback:", e);
-          movementPrompt = `${CAMERA_PRESETS[preset] || CAMERA_PRESETS.ambiente_vivo}, cars driving smoothly on the road with realistic motion, people walking naturally, lights glowing warmly, professional architectural videography`;
+          movementPrompt = `${CAMERA_PRESETS[preset] || CAMERA_PRESETS.ambiente_vivo}. ${FALLBACK_CAR_PROMPT} People walk naturally. Lights glow and activate realistically. Professional architectural videography.`;
         }
       } else {
-        movementPrompt = `${CAMERA_PRESETS[preset] || CAMERA_PRESETS.ambiente_vivo}, cars driving smoothly on the road with realistic motion, people walking naturally, lights glowing warmly, professional architectural videography`;
+        movementPrompt = `${CAMERA_PRESETS[preset] || CAMERA_PRESETS.ambiente_vivo}. ${FALLBACK_CAR_PROMPT} People walk naturally. Lights glow and activate realistically. Professional architectural videography.`;
       }
 
       console.log("Final prompt length:", movementPrompt.length);
@@ -234,8 +220,9 @@ serve(async (req) => {
           image_url: processedImageUrl,
           prompt: movementPrompt,
           duration: "5",
-          negative_prompt: "blur, distort, low quality, watermark, text overlay, jitter, flickering, morphing architecture, deformed buildings, melting structures, static cars, frozen people, no motion",
-          cfg_scale: 0.5,
+          negative_prompt:
+            "blur, distort, low quality, watermark, text overlay, jitter, morphing architecture, deformed buildings, melting structures, frozen cars, parked static vehicles only, zero vehicle displacement, mannequin people, broken lighting, camera angle change, building redesign",
+          cfg_scale: 0.6,
         }),
       });
 
@@ -248,17 +235,19 @@ serve(async (req) => {
       const submitData = await submitRes.json();
       console.log("Fal job submitted:", submitData.request_id);
 
-      return new Response(JSON.stringify({
-        requestId: submitData.request_id,
-        statusUrl: submitData.status_url,
-        responseUrl: submitData.response_url,
-        status: "IN_QUEUE",
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({
+          requestId: submitData.request_id,
+          statusUrl: submitData.status_url,
+          responseUrl: submitData.response_url,
+          status: "IN_QUEUE",
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
-    // ── ACTION: POLL ──
     if (action === "poll") {
       const { requestId, statusUrl, responseUrl } = body;
       if (!requestId) throw new Error("requestId não fornecido.");
@@ -316,12 +305,15 @@ serve(async (req) => {
         });
       }
 
-      return new Response(JSON.stringify({
-        status: statusData.status || "IN_PROGRESS",
-        queuePosition: statusData.queue_position,
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({
+          status: statusData.status || "IN_PROGRESS",
+          queuePosition: statusData.queue_position,
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
     throw new Error(`Ação desconhecida: ${action}`);
