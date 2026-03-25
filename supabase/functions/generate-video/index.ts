@@ -7,18 +7,14 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
 const MOVEMENT_PRESETS: Record<string, string> = {
-  orbital:
-    "Slow smooth orbital camera movement around the building, cinematic dolly, maintaining framing",
-  zoom_dramatic:
-    "Slow dramatic zoom-in toward the building entrance, cinematic depth of field",
-  ambiente_vivo:
-    "Static camera, clouds moving slowly, subtle wind in vegetation, reflections shimmering on glass, people walking",
-  flyover:
-    "Aerial flyover camera slowly moving forward, revealing the full building and surroundings",
+  orbital: "Slow smooth orbital camera movement around the building, cinematic dolly, maintaining framing",
+  zoom_dramatic: "Slow dramatic zoom-in toward the building entrance, cinematic depth of field",
+  ambiente_vivo: "Static camera, clouds moving slowly, subtle wind in vegetation, reflections shimmering on glass, people walking",
+  flyover: "Aerial flyover camera slowly moving forward, revealing the full building and surroundings",
 };
+
+const FAL_MODEL = "fal-ai/kling-video/v2.1/standard/image-to-video";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -32,45 +28,42 @@ serve(async (req) => {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Auth
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("Não autenticado.");
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const token = authHeader.replace("Bearer ", "");
-    const {
-      data: { user },
-      error: authError,
-    } = await createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!).auth.getUser(token);
+    const { data: { user }, error: authError } = await createClient(
+      SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!
+    ).auth.getUser(token);
     if (authError || !user) throw new Error("Token inválido.");
 
-    // Check credits (30)
-    const COST = 30;
-    const { data: hasCredits } = await supabase.rpc("consume_credits_bulk", {
-      p_user_id: user.id,
-      p_amount: COST,
-      p_description: "Geração de vídeo IA",
-    });
-
-    if (hasCredits === false) {
-      return new Response(JSON.stringify({ error: "Créditos insuficientes. Necessário: 30" }), {
-        status: 402,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     const body = await req.json();
-    const { imageUrl, preset, customPrompt } = body;
+    const { action } = body;
 
-    if (!imageUrl) throw new Error("imageUrl não fornecida.");
+    // ── ACTION: SUBMIT ──
+    if (!action || action === "submit") {
+      const { imageUrl, preset, customPrompt } = body;
+      if (!imageUrl) throw new Error("imageUrl não fornecida.");
 
-    const movementPrompt =
-      customPrompt || MOVEMENT_PRESETS[preset] || MOVEMENT_PRESETS.ambiente_vivo;
+      // Consume credits
+      const COST = 30;
+      const { data: hasCredits } = await supabase.rpc("consume_credits_bulk", {
+        p_user_id: user.id,
+        p_amount: COST,
+        p_description: "Geração de vídeo IA",
+      });
 
-    // Submit to Fal AI Queue
-    const submitRes = await fetch(
-      "https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video",
-      {
+      if (hasCredits === false) {
+        return new Response(JSON.stringify({ error: "Créditos insuficientes. Necessário: 30" }), {
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const movementPrompt = customPrompt || MOVEMENT_PRESETS[preset] || MOVEMENT_PRESETS.ambiente_vivo;
+
+      const submitRes = await fetch(`https://queue.fal.run/${FAL_MODEL}`, {
         method: "POST",
         headers: {
           Authorization: `Key ${FAL_KEY}`,
@@ -81,73 +74,95 @@ serve(async (req) => {
           prompt: movementPrompt,
           duration: "5",
         }),
-      }
-    );
+      });
 
-    if (!submitRes.ok) {
-      const errText = await submitRes.text();
-      console.error("Fal submit error:", errText);
-      throw new Error(`Fal AI error: ${submitRes.status}`);
+      if (!submitRes.ok) {
+        const errText = await submitRes.text();
+        console.error("Fal submit error:", submitRes.status, errText);
+        throw new Error(`Fal AI submit error: ${submitRes.status}`);
+      }
+
+      const submitData = await submitRes.json();
+      console.log("Fal job submitted:", submitData.request_id);
+
+      return new Response(JSON.stringify({
+        requestId: submitData.request_id,
+        status: "IN_QUEUE",
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    const { request_id } = await submitRes.json();
-    console.log("Fal job submitted:", request_id);
-
-    // Poll for completion (max 180s)
-    const maxPollTime = 180_000;
-    const startTime = Date.now();
-    let pollInterval = 3000;
-
-    while (Date.now() - startTime < maxPollTime) {
-      await sleep(pollInterval);
-      pollInterval = Math.min(pollInterval * 1.2, 8000);
+    // ── ACTION: POLL ──
+    if (action === "poll") {
+      const { requestId } = body;
+      if (!requestId) throw new Error("requestId não fornecido.");
 
       const statusRes = await fetch(
-        `https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video/requests/${request_id}/status`,
+        `https://queue.fal.run/${FAL_MODEL}/requests/${requestId}/status`,
         {
+          method: "GET",
           headers: { Authorization: `Key ${FAL_KEY}` },
         }
       );
 
       if (!statusRes.ok) {
-        console.error("Poll error:", statusRes.status);
-        continue;
-      }
-
-      const status = await statusRes.json();
-      console.log("Poll status:", status.status);
-
-      if (status.status === "COMPLETED") {
-        // Fetch result
-        const resultRes = await fetch(
-          `https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video/requests/${request_id}`,
-          {
-            headers: { Authorization: `Key ${FAL_KEY}` },
-          }
-        );
-
-        if (!resultRes.ok) throw new Error("Erro ao buscar resultado do vídeo.");
-
-        const result = await resultRes.json();
-        const videoUrl = result?.video?.url;
-
-        if (!videoUrl) throw new Error("URL do vídeo não encontrada na resposta.");
-
-        return new Response(JSON.stringify({ videoUrl }), {
+        const errText = await statusRes.text();
+        console.error("Poll status error:", statusRes.status, errText);
+        return new Response(JSON.stringify({ status: "IN_PROGRESS" }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
-      if (status.status === "FAILED") {
-        throw new Error("Geração de vídeo falhou no Fal AI.");
+      const statusData = await statusRes.json();
+      console.log("Poll status:", JSON.stringify(statusData));
+
+      if (statusData.status === "COMPLETED") {
+        // Fetch the result
+        const resultRes = await fetch(
+          `https://queue.fal.run/${FAL_MODEL}/requests/${requestId}`,
+          {
+            method: "GET",
+            headers: { Authorization: `Key ${FAL_KEY}` },
+          }
+        );
+
+        if (!resultRes.ok) {
+          const errText = await resultRes.text();
+          console.error("Result fetch error:", resultRes.status, errText);
+          throw new Error("Erro ao buscar resultado do vídeo.");
+        }
+
+        const result = await resultRes.json();
+        const videoUrl = result?.video?.url;
+
+        if (!videoUrl) {
+          console.error("No video URL in result:", JSON.stringify(result));
+          throw new Error("URL do vídeo não encontrada.");
+        }
+
+        return new Response(JSON.stringify({ status: "COMPLETED", videoUrl }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
+
+      if (statusData.status === "FAILED") {
+        return new Response(JSON.stringify({ status: "FAILED", error: "Geração falhou." }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // IN_QUEUE or IN_PROGRESS
+      return new Response(JSON.stringify({ status: statusData.status || "IN_PROGRESS" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    throw new Error("Timeout: vídeo não ficou pronto em 180s.");
+    throw new Error(`Ação desconhecida: ${action}`);
   } catch (err: any) {
     console.error("generate-video error:", err);
     return new Response(JSON.stringify({ error: err.message || "Erro interno" }), {
-      status: err.message?.includes("Créditos") ? 402 : 500,
+      status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

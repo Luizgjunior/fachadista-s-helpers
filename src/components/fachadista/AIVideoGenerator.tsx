@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Video, Download, RefreshCw, Sparkles } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Download, RefreshCw, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
@@ -42,9 +42,18 @@ const AIVideoGenerator = ({
   const [selectedPreset, setSelectedPreset] = useState(0);
   const [fakeProgress, setFakeProgress] = useState(0);
   const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const canGenerate = isAdmin || userCredits >= CREDIT_COSTS.VIDEO;
 
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, []);
+
+  // Progress animation
   useEffect(() => {
     if (!generating) {
       setFakeProgress(0);
@@ -52,8 +61,8 @@ const AIVideoGenerator = ({
       return;
     }
     const progressInterval = setInterval(() => {
-      setFakeProgress((p) => (p >= 95 ? 95 : p + Math.random() * 3));
-    }, 2000);
+      setFakeProgress((p) => (p >= 95 ? 95 : p + Math.random() * 2));
+    }, 3000);
     const msgInterval = setInterval(() => {
       setLoadingMsgIndex((i) => (i + 1) % loadingMessages.length);
     }, 8000);
@@ -62,6 +71,47 @@ const AIVideoGenerator = ({
       clearInterval(msgInterval);
     };
   }, [generating]);
+
+  const pollStatus = useCallback((requestId: string) => {
+    let attempts = 0;
+    const maxAttempts = 60; // ~5 min with 5s interval
+
+    pollingRef.current = setInterval(async () => {
+      attempts++;
+      if (attempts > maxAttempts) {
+        if (pollingRef.current) clearInterval(pollingRef.current);
+        setGenerating(false);
+        toast.error("Timeout: o vídeo não ficou pronto a tempo.");
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase.functions.invoke("generate-video", {
+          body: { action: "poll", requestId },
+        });
+
+        if (error) {
+          console.error("Poll error:", error);
+          return; // Keep polling
+        }
+
+        if (data?.status === "COMPLETED" && data?.videoUrl) {
+          if (pollingRef.current) clearInterval(pollingRef.current);
+          setVideoUrl(data.videoUrl);
+          setGenerating(false);
+          onCreditsConsumed();
+          toast.success("Vídeo gerado com sucesso!");
+        } else if (data?.status === "FAILED") {
+          if (pollingRef.current) clearInterval(pollingRef.current);
+          setGenerating(false);
+          toast.error("Falha na geração do vídeo.");
+        }
+        // Otherwise keep polling (IN_QUEUE, IN_PROGRESS)
+      } catch (err) {
+        console.error("Poll exception:", err);
+      }
+    }, 5000);
+  }, [onCreditsConsumed]);
 
   const generate = async () => {
     if (!canGenerate) {
@@ -76,24 +126,22 @@ const AIVideoGenerator = ({
       const preset = PRESETS[selectedPreset].key;
 
       const { data, error } = await supabase.functions.invoke("generate-video", {
-        body: { imageUrl, preset },
+        body: { action: "submit", imageUrl, preset },
       });
 
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      if (data?.videoUrl) {
-        setVideoUrl(data.videoUrl);
-        onCreditsConsumed();
-        toast.success("Vídeo gerado com sucesso!");
+      if (data?.requestId) {
+        // Start client-side polling
+        pollStatus(data.requestId);
       } else {
-        throw new Error("Resposta sem URL de vídeo.");
+        throw new Error("Sem requestId na resposta.");
       }
     } catch (err: any) {
       console.error("Video generation error:", err);
-      toast.error(err.message || "Erro ao gerar vídeo.");
-    } finally {
       setGenerating(false);
+      toast.error(err.message || "Erro ao iniciar geração de vídeo.");
     }
   };
 
@@ -168,7 +216,7 @@ const AIVideoGenerator = ({
           </div>
           <Progress value={fakeProgress} className="h-1" />
           <p className="text-[9px] text-muted-foreground">
-            A geração pode levar até 2 minutos. Não feche esta página.
+            A geração pode levar até 3 minutos. Não feche esta página.
           </p>
         </div>
       )}
