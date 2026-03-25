@@ -64,11 +64,20 @@ const ASPECT_RATIO_MAP: Record<string, string> = {
   'Nenhuma das opção': '16:9',
 };
 
+const CAMERA_ANGLE_MAP: Record<string, string> = {
+  'Nível do Olhar': 'Eye-level street photography perspective at approximately 1.6m height, horizontal camera with no tilt, natural human viewpoint',
+  'Grande Angular': 'Wide-angle lens perspective (14-24mm equivalent), slight barrel distortion, dramatic spatial depth, capturing full building width',
+  'Close-up': 'Close-up architectural detail shot with shallow depth of field, macro-level material texture visibility, tight framing on facade details',
+  'Drone / Aéreo': 'Aerial drone perspective at 30-50m elevation, looking down at 30-45° angle, revealing roof geometry and site context, bird\'s-eye urban planning view',
+  'Manter ângulo da referência': 'CRITICAL: Reproduce the EXACT camera position, height, tilt, rotation, and viewing direction from the reference image. The viewing angle must be identical — same side of the building visible, same perspective convergence, same horizon placement. Do NOT deviate from the reference camera setup in any way.',
+};
+
 interface RenderParams {
   projectType?: string;
   socialFormat?: string;
   visualStyle?: string;
   environmentType?: string;
+  cameraAngle?: string;
   lighting?: string;
   weather?: string;
   peopleCount?: number;
@@ -90,9 +99,14 @@ const buildEnrichedPrompt = (prompt: string, params?: RenderParams): string => {
     ? SIDEWALK_MAP[params.sidewalkType] || 'realistic sidewalk pavement'
     : 'natural ground integration';
 
+  const cameraAngle = params.cameraAngle && params.cameraAngle !== 'Nenhuma das opção'
+    ? CAMERA_ANGLE_MAP[params.cameraAngle] || ''
+    : '';
+
   const parts: string[] = [
     style,
     prompt,
+    cameraAngle ? `Camera angle: ${cameraAngle}` : '',
     `Lighting: ${lighting}`,
     `Weather and sky: ${weather}`,
     `Environment: ${environment}`,
@@ -116,7 +130,20 @@ const getAspectRatio = (params?: RenderParams): string => {
    SYSTEM PROMPT — expanded with negative prompts
    ═══════════════════════════════════════════════ */
 
-const buildSystemPrompt = (aspectRatio: string, projectType?: string): string => {
+const buildSystemPrompt = (aspectRatio: string, projectType?: string, cameraAngle?: string): string => {
+  let projectSpecific = '';
+  const keepRefAngle = cameraAngle === 'Manter ângulo da referência';
+
+  let cameraInstructions = '';
+  if (keepRefAngle) {
+    cameraInstructions = `\nCAMERA ANGLE PRESERVATION (HIGHEST PRIORITY — overrides all other camera directives):
+- You MUST reproduce the EXACT camera position, height, tilt, pan, and rotation from the reference image.
+- If the reference shows the building from the RIGHT side, render it from the RIGHT side. If from the LEFT, render from the LEFT. NEVER mirror or flip.
+- Match the EXACT perspective convergence: same vanishing points, same lens focal length feel, same horizon line height.
+- If a 3/4 view is shown (e.g., front + right facade), keep the EXACT same proportion of each facade visible.
+- The building's position and orientation in the frame must be IDENTICAL to the reference.
+- This rule supersedes any other framing or composition guideline.`;
+  }
   let projectSpecific = '';
   if (projectType === 'Projeto de Interiores') {
     projectSpecific = `\nPROJECT TYPE: INTERIOR DESIGN
@@ -147,6 +174,7 @@ TECHNICAL STANDARDS:
 - Atmospheric effects: volumetric light through dust/moisture, accurate sky gradient, cloud shadow mapping on surfaces
 - Urban context: realistic sidewalk wear patterns, natural vegetation with leaf variation, appropriate street furniture aging
 ${projectSpecific}
+${cameraInstructions}
 
 ABSOLUTE PROHIBITIONS:
 - NO plastic-looking surfaces or uniform textures
@@ -180,7 +208,7 @@ serve(async (req) => {
     // Enrich prompt server-side if params provided
     const enrichedPrompt = params ? buildEnrichedPrompt(prompt, params) : prompt;
     const aspectRatio = params ? getAspectRatio(params) : (clientAspectRatio || '16:9');
-    const systemPrompt = buildSystemPrompt(aspectRatio, params?.projectType);
+    const systemPrompt = buildSystemPrompt(aspectRatio, params?.projectType, params?.cameraAngle);
 
     const userContent: any[] = [];
 
