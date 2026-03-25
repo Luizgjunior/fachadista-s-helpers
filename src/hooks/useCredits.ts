@@ -69,13 +69,20 @@ export function useCredits({ profile, refreshProfile }: UseCreditsOptions) {
     [consumeCredits]
   );
 
+  const consumeVideoCredits = useCallback(
+    () => consumeCredits(CREDIT_COSTS.VIDEO, "Geração de vídeo IA"),
+    [consumeCredits]
+  );
+
   return {
     credits,
     hasCredits,
     hasCreditsForPrompt,
     hasCreditsForImage,
+    hasCreditsForVideo,
     consumeCredits,
     consumePromptCredits,
     consumeImageCredits,
+    consumeVideoCredits,
   };
 }

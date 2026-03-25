@@ -169,9 +169,15 @@ const PromptResult = ({
               )}
             </div>
 
-            {/* Ken Burns Video — only after render */}
+            {/* AI Video — only after render */}
             {result.previewUrl && !previewLoading && (
-              <KenBurnsVideo imageUrl={result.previewUrl} fileName={`newrender-${result.id}`} />
+              <AIVideoGenerator
+                imageUrl={result.previewUrl}
+                fileName={`newrender-${result.id}`}
+                userCredits={userCredits}
+                isAdmin={isAdmin}
+                onCreditsConsumed={onCreditsConsumed}
+              />
             )}
           </div>
         </div>
