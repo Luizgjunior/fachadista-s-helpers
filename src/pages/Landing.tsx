@@ -417,7 +417,7 @@ const Landing = () => {
                 )}
                 <p className="text-[11px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-3">{plan.name}</p>
                 <div className="mb-1">
-                  <span className="text-5xl font-black tabular-nums">{plan.credits}</span>
+                  <span className="text-5xl font-black tabular-nums"><CountUp target={plan.credits} /></span>
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">créditos</p>
                 <p className="text-2xl font-black mb-1">{plan.price}</p>
