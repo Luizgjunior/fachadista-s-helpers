@@ -1,51 +1,64 @@
 
 
-## Análise: Qualidade de Renderização e Geração de Vídeos
+## Plano: Integrar Fal AI para Vídeo + Precificação com Lucro 5x
 
-### Bug Crítico Encontrado
+### Cálculo de Custos e Precificação
 
-Há um **bug de compilação** no `generate-render/index.ts`: a variável `projectSpecific` é declarada **duas vezes** (linhas 134 e 147), o que causa erro no Deno. Isso significa que os project-specific prompts (Interiores, Planta) provavelmente **não estão funcionando**.
+| Recurso | Custo Fal AI (USD) | Custo ~BRL (R$5.50/USD) | Créditos cobrados | Valor do crédito (plano 200cr = R$49,90) | Receita por uso | Margem |
+|---|---|---|---|---|---|---|
+| **Vídeo 5s (Standard)** | $0.28 | R$1,54 | **10 créditos** | R$2,50 | R$2,50 | **1,6x** |
+| **Vídeo 5s (Pro)** | $0.49 | R$2,70 | **10 créditos** | R$2,50 | R$2,50 | ~1x |
+| **Vídeo 10s (Standard)** | $0.56 | R$3,08 | **20 créditos** | R$5,00 | R$5,00 | **1,6x** |
 
-### Melhorias de Qualidade de Imagem
+Com o plano de 200 créditos a R$49,90, cada crédito vale ~R$0,25.
 
-| Melhoria | O que faz |
-|---|---|
-| **Corrigir bug do `projectSpecific` duplicado** | Remove a primeira declaração vazia e mantém a lógica correta |
-| **Técnica de multi-pass (2 gerações)** | Gera uma imagem inicial, depois usa `edit-image` para refinar detalhes — resultado mais nítido |
-| **Upscale prompt** | Adicionar instruções de resolução "8K ultra-high resolution, extreme detail at pixel level" no system prompt |
-| **Negative prompt expandido** | Adicionar proibições contra: moiré patterns, banding em céu, aliasing em bordas, bloom excessivo |
-| **Material-specific micro-details** | Expandir os STYLE_MAP com sub-instruções de textura por material (vidro, concreto, metal, madeira) |
-| **Seed consistency** | Não disponível via Lovable AI Gateway — não é possível fixar seed |
+Para atingir **margem 5x** real:
 
-### Geração de Vídeos
+| Recurso | Custo real BRL | Créditos (lucro 5x) | Receita | Margem |
+|---|---|---|---|---|
+| **Vídeo 5s (Standard)** | R$1,54 | **30 créditos** (R$7,50) | R$7,50 | **4,9x** ✅ |
+| **Vídeo 10s (Standard)** | R$3,08 | **60 créditos** (R$15,00) | R$15,00 | **4,9x** ✅ |
+| Prompt (Lovable AI) | ~R$0,05 | 3 créditos (R$0,75) | R$0,75 | **15x** ✅ |
+| Render imagem (Lovable AI) | ~R$0,10 | 5 créditos (R$1,25) | R$1,25 | **12x** ✅ |
 
-**Situação atual**: O Lovable AI Gateway **não suporta geração de vídeo** diretamente. Os modelos disponíveis geram apenas imagens estáticas e texto.
+**Decisão: Usar Kling 2.1 Standard (melhor custo-benefício) e cobrar 30 créditos por vídeo de 5s.**
 
-**Alternativas viáveis**:
+### Implementação
 
-1. **Vídeo "Ken Burns" a partir do render** — Usar CSS/canvas para criar um efeito de câmera lenta (pan + zoom suave) sobre a imagem renderizada. Resultado: um vídeo de 5-10s com movimento cinematográfico. Pode ser feito 100% no frontend com canvas + MediaRecorder API, sem custo adicional de API.
+**1. Remover Ken Burns**
+- Deletar `src/components/fachadista/KenBurnsVideo.tsx`
+- Remover referência do `PromptResult.tsx`
 
-2. **Slideshow animado** — Gerar múltiplos renders (ângulos diferentes, dia/noite) e criar um vídeo com transições suaves entre eles usando Remotion no sandbox.
+**2. Nova edge function `supabase/functions/generate-video/index.ts`**
+- Endpoint: `fal-ai/kling-video/v2.1/standard/image-to-video`
+- Fluxo: submit job → polling status → retorna URL do vídeo MP4
+- Usa `FAL_KEY` (já configurada nos secrets)
+- Consome 30 créditos via `consume_credits_bulk`
+- Timeout máximo: 120s de polling
 
-3. **API externa (Runway, Kling, etc.)** — Integraria um serviço de vídeo generativo externo. Requer chave API adicional e tem custo significativo por geração (~$0.50-2.00/vídeo).
+**3. Atualizar `src/hooks/useCredits.ts`**
+- Adicionar `CREDIT_COSTS.VIDEO = 30`
+- Adicionar `hasCreditsForVideo` e `consumeVideoCredits`
 
-### Plano Proposto
+**4. Criar componente `src/components/fachadista/AIVideoGenerator.tsx`**
+- Botão "Gerar Animação IA" com custo exibido (30 créditos)
+- Presets de movimento: "Câmera orbital", "Zoom dramático", "Ambiente vivo"
+- Loading com mensagens progressivas e polling
+- Player de vídeo MP4 com download
+- Aparece apenas após render concluído
 
-**Fase 1 — Correções e qualidade (imediato)**:
-1. Corrigir bug do `projectSpecific` duplicado no `generate-render`
-2. Expandir negative prompts com mais proibições técnicas
-3. Adicionar instruções de micro-textura por tipo de material
+**5. Atualizar `src/components/fachadista/PromptResult.tsx`**
+- Substituir `KenBurnsVideo` por `AIVideoGenerator`
+- Passar `userCredits`, `isAdmin`, e `consumeVideoCredits`
 
-**Fase 2 — Vídeo Ken Burns (sem custo extra)**:
-4. Criar botão "Gerar Vídeo" que aparece após o render
-5. Aplicar efeito Ken Burns (pan + zoom lento) sobre o render usando canvas
-6. Exportar como MP4/WebM de 5-8 segundos via MediaRecorder API
-7. Botão de download do vídeo
+**6. Atualizar página de Planos**
+- Incluir vídeos no cálculo: "X prompts ou Y renders ou Z vídeos IA"
 
-### Detalhes Técnicos
+### Detalhes técnicos
 
-- **Bug fix**: Remover linha 134 (`let projectSpecific = '';`) que sobrescreve a declaração da linha 147
-- **Ken Burns**: Usa `<canvas>` com `requestAnimationFrame` para animar crop/zoom sobre a imagem, e `canvas.captureStream()` + `MediaRecorder` para gravar como vídeo
-- **Formato de saída**: WebM (suportado nativamente) com fallback para download de GIF animado em Safari
-- Nenhuma API externa necessária para o vídeo Ken Burns
+- API Fal AI Queue: `POST https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video` com `{ image_url, prompt, duration: "5" }`
+- Polling: `GET https://queue.fal.run/.../requests/{id}/status` até `COMPLETED`
+- Resposta: `{ video: { url: "https://v3.fal.media/..." } }`
+- A imagem do render será enviada como base64 data URL ou URL pública
+- Prompt de movimento será derivado do prompt arquitetônico + preset de câmera
 
