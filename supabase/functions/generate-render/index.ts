@@ -130,7 +130,20 @@ const getAspectRatio = (params?: RenderParams): string => {
    SYSTEM PROMPT — expanded with negative prompts
    ═══════════════════════════════════════════════ */
 
-const buildSystemPrompt = (aspectRatio: string, projectType?: string): string => {
+const buildSystemPrompt = (aspectRatio: string, projectType?: string, cameraAngle?: string): string => {
+  let projectSpecific = '';
+  const keepRefAngle = cameraAngle === 'Manter ângulo da referência';
+
+  let cameraInstructions = '';
+  if (keepRefAngle) {
+    cameraInstructions = `\nCAMERA ANGLE PRESERVATION (HIGHEST PRIORITY — overrides all other camera directives):
+- You MUST reproduce the EXACT camera position, height, tilt, pan, and rotation from the reference image.
+- If the reference shows the building from the RIGHT side, render it from the RIGHT side. If from the LEFT, render from the LEFT. NEVER mirror or flip.
+- Match the EXACT perspective convergence: same vanishing points, same lens focal length feel, same horizon line height.
+- If a 3/4 view is shown (e.g., front + right facade), keep the EXACT same proportion of each facade visible.
+- The building's position and orientation in the frame must be IDENTICAL to the reference.
+- This rule supersedes any other framing or composition guideline.`;
+  }
   let projectSpecific = '';
   if (projectType === 'Projeto de Interiores') {
     projectSpecific = `\nPROJECT TYPE: INTERIOR DESIGN
