@@ -249,22 +249,22 @@ const Plans = () => {
         </div>
       </section>
 
-      {/* Coming soon banner */}
+      {/* CTA banner */}
       <section className="px-4 pb-16 md:pb-20">
         <div className="max-w-2xl mx-auto bg-primary/5 border border-primary/20 rounded-[32px] p-8 text-center">
           <Sparkles className="w-8 h-8 text-primary mx-auto mb-4" />
           <h3 className="text-xl font-black uppercase tracking-tight text-foreground mb-3">
-            Pagamentos chegando em breve!
+            Compre créditos e comece a criar!
           </h3>
           <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
-            Estamos finalizando a integração com a Cakto. Em breve você poderá comprar créditos
-            diretamente aqui. Por enquanto, seu plano Free inclui 10 créditos para explorar.
+            Escolha o pacote ideal acima e comece a gerar prompts, renders e vídeos IA
+            profissionais em minutos. Pagamento seguro via ggCheckout.
           </p>
           <button
-            onClick={() => navigate("/app")}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="bg-primary text-primary-foreground px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:opacity-90 transition-all active:scale-95"
           >
-            Voltar ao app e gerar prompts
+            Ver pacotes acima ↑
           </button>
         </div>
       </section>
