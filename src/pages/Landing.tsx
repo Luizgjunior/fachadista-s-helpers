@@ -128,9 +128,9 @@ const USE_CASES = [
 ];
 
 const PLANS = [
-  { name: "Starter", credits: 50, price: "R$ 29,90", perCredit: "R$ 0,60", popular: false, features: ["50 créditos", "~16 prompts ou ~5 renders", "Sem expiração", "Suporte por e-mail"] },
-  { name: "Pro", credits: 200, price: "R$ 79,90", perCredit: "R$ 0,40", popular: true, features: ["200 créditos", "~66 prompts ou ~20 renders", "Sem expiração", "Suporte prioritário", "Acesso antecipado a novidades"] },
-  { name: "Studio", credits: 500, price: "R$ 149,90", perCredit: "R$ 0,30", popular: false, features: ["500 créditos", "~166 prompts ou ~50 renders", "Sem expiração", "Suporte VIP", "Acesso antecipado a novidades", "Consultoria de prompt"] },
+  { name: "Starter", credits: 50, price: "R$ 19,90", perCredit: "R$ 0,40", popular: false, features: ["50 créditos", "~16 prompts ou ~10 renders", "Válido por 12 meses", "Comparador de renders"] },
+  { name: "Pro", credits: 200, price: "R$ 49,90", perCredit: "R$ 0,25", popular: true, features: ["200 créditos", "~66 prompts ou ~40 renders", "Válido por 12 meses", "Economia de 37%", "Preview visual IA", "Suporte prioritário"] },
+  { name: "Studio", credits: 500, price: "R$ 99,90", perCredit: "R$ 0,20", popular: false, features: ["500 créditos", "~166 prompts ou ~100 renders", "Válido por 12 meses", "Economia de 50%", "Acesso antecipado a novidades", "Suporte VIP"] },
 ];
 
 const FAQ = [
