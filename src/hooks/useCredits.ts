@@ -11,6 +11,7 @@ interface UseCreditsOptions {
 export const CREDIT_COSTS = {
   PROMPT: 3,
   IMAGE: 5,
+  VIDEO: 30,
 } as const;
 
 export function useCredits({ profile, refreshProfile }: UseCreditsOptions) {
