@@ -23,6 +23,7 @@ interface PromptResultProps {
   onGeneratePreview: () => void;
   userCredits: number;
   isAdmin: boolean;
+  onCreditsConsumed: () => void;
 }
 
 const PromptResult = ({
