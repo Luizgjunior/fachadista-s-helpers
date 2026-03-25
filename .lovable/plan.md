@@ -1,64 +1,62 @@
 
 
-## Plano: Integrar ggCheckout para Pagamento de Créditos
+## Modelo Híbrido: Assinatura Mensal + Créditos Avulsos
 
-### Visão Geral
+### Como funciona
 
-Substituir o webhook Cakto pelo ggCheckout, ativar os botões de compra na página de planos, e receber webhooks de pagamento aprovado para creditar automaticamente os créditos na conta do usuário.
-
-### Fluxo do Checkout
+Sim, é possível combinar os dois modelos. O cliente assina um plano mensal (recebe créditos todo mês) e, se acabar antes do próximo ciclo, compra créditos avulsos.
 
 ```text
-Usuário clica "Comprar"
-       │
-       ▼
-Redireciona para checkout.ggcheckout.com/{slug}
-       │
-       ▼
-Usuário paga (Pix, Cartão, Boleto)
-       │
-       ▼
-ggCheckout envia webhook POST → Edge Function /webhook-ggcheckout
-       │
-       ▼
-Edge Function valida → identifica pacote → adiciona créditos → registra pedido
+┌─────────────────────────────────┐
+│  ASSINATURA MENSAL (recorrente) │
+│  Ex: Pro R$49,90/mês → 200 cr  │
+│  Créditos recarregam todo mês   │
+└────────────┬────────────────────┘
+             │
+             │  Acabou os créditos?
+             ▼
+┌─────────────────────────────────┐
+│  CRÉDITOS AVULSOS (pagto único) │
+│  Ex: +50 cr por R$19,90        │
+│  Compra quantas vezes quiser    │
+└─────────────────────────────────┘
 ```
 
-### Etapas de Implementação
+### O que precisa no ggCheckout
 
-**1. Adicionar coluna `gg_checkout_url` na tabela `credit_packages`**
-- Migration para adicionar coluna `gg_checkout_url text` (nullable)
-- Inserir as URLs dos checkout pages que você já criou no ggCheckout para cada pacote (Starter, Pro, Studio)
+1. **Produtos recorrentes** — criar 2-3 planos de assinatura mensal no ggCheckout (Starter, Pro, Studio) com cobrança recorrente
+2. **Produtos avulsos** — criar pacotes de créditos extras como pagamento único (já temos isso hoje)
+3. **Webhooks** — o ggCheckout precisa enviar webhook tanto para pagamento único quanto para renovação mensal
 
-**2. Criar Edge Function `webhook-ggcheckout`**
-- Baseada na estrutura existente do `webhook-cakto`, adaptada ao payload do ggCheckout
-- Validação de segurança via header secreto (ex: `x-gg-secret`)
-- Fluxo: validar secret → extrair dados (order ID, email, valor) → verificar duplicata → buscar usuário → identificar pacote → adicionar créditos → registrar transação e pedido
-- A URL será: `https://pbxztrijlqurueyfcush.supabase.co/functions/v1/webhook-ggcheckout`
+### Implementação no sistema
 
-**3. Configurar secret do webhook**
-- Adicionar secret `GGCHECKOUT_WEBHOOK_SECRET` via ferramenta de secrets
-- Você configurará essa mesma string no painel do ggCheckout como header do webhook
+**1. Separar a página de planos em 2 seções**
+- **Assinaturas** (tabs ou seção superior): planos mensais com recarga automática
+- **Créditos avulsos** (seção inferior): pacotes de compra única para quem quer recarregar
 
-**4. Ativar botões de compra na página `/plans`**
-- Trocar botões "Em breve" (disabled) por botões ativos que redirecionam para a `gg_checkout_url` do pacote
-- Adicionar `?email={userEmail}` na URL para pré-preencher o email do comprador
-- Mesma lógica na landing page
+**2. Adicionar campos na tabela `credit_packages`**
+- `type`: `'subscription'` ou `'one_time'` para diferenciar
+- `billing_interval`: `'monthly'` para assinaturas
 
-**5. Atualizar textos e FAQ**
-- Trocar referências "Cakto" por "ggCheckout" no FAQ da página de planos
-- Atualizar texto "Pagamentos chegando em breve" para CTA ativo
+**3. Atualizar webhook para tratar renovações**
+- Quando o ggCheckout enviar webhook de renovação mensal, o sistema identifica que é renovação (não compra nova) e adiciona os créditos do ciclo
+- Usar o campo `order_id` para diferenciar primeira compra de renovação
 
-### O Que Você Precisará Fazer
+**4. Gestão de assinatura no perfil do usuário**
+- Salvar `plan_id` e `subscription_status` no perfil
+- Mostrar status da assinatura no app (ativo, cancelado, etc.)
 
-1. **No painel ggCheckout**: Configurar webhook customizado apontando para a URL da edge function com o header secreto
-2. **Me informar**: As URLs dos 3 checkout pages (Starter, Pro, Studio) para eu inserir no banco
-3. **Me informar**: A estrutura exata do payload do webhook (ou eu uso a estrutura padrão documentada do ggCheckout)
+### Pré-requisito importante
 
-### Detalhes Técnicos
+Antes de implementar, preciso saber:
 
-- A edge function `webhook-ggcheckout` terá `verify_jwt = false` (webhooks externos não enviam JWT)
-- Reutiliza tabelas existentes: `cakto_orders` (renomear para `checkout_orders` ou manter e adicionar coluna `source`), `credit_transactions`, `profiles`
-- Fallback: se o pacote não for identificado pelo valor, usa quantidade padrão baseada no preço
-- O webhook Cakto existente será mantido como fallback (sem exclusão)
+- **O ggCheckout suporta cobranças recorrentes (assinatura)?** Nem todos os gateways de pagamento suportam. Se não suportar, podemos usar outro gateway para assinaturas (como Stripe) ou manter apenas créditos avulsos
+- **Quantos planos de assinatura quer oferecer?** (ex: Básico R$29,90/mês com 100cr, Pro R$49,90/mês com 200cr, etc.)
+
+### Alternativa simples (sem assinatura)
+
+Se o ggCheckout não suportar recorrência, podemos manter apenas **pacotes avulsos** mas com uma abordagem de "planos sugeridos":
+- Mostrar os pacotes como se fossem planos (Starter, Pro, Studio)
+- O cliente compra manualmente todo mês quando quiser
+- Sem cobrança automática, sem cancelamento — mais simples
 
