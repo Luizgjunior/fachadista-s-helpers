@@ -64,11 +64,20 @@ const ASPECT_RATIO_MAP: Record<string, string> = {
   'Nenhuma das opção': '16:9',
 };
 
+const CAMERA_ANGLE_MAP: Record<string, string> = {
+  'Nível do Olhar': 'Eye-level street photography perspective at approximately 1.6m height, horizontal camera with no tilt, natural human viewpoint',
+  'Grande Angular': 'Wide-angle lens perspective (14-24mm equivalent), slight barrel distortion, dramatic spatial depth, capturing full building width',
+  'Close-up': 'Close-up architectural detail shot with shallow depth of field, macro-level material texture visibility, tight framing on facade details',
+  'Drone / Aéreo': 'Aerial drone perspective at 30-50m elevation, looking down at 30-45° angle, revealing roof geometry and site context, bird\'s-eye urban planning view',
+  'Manter ângulo da referência': 'CRITICAL: Reproduce the EXACT camera position, height, tilt, rotation, and viewing direction from the reference image. The viewing angle must be identical — same side of the building visible, same perspective convergence, same horizon placement. Do NOT deviate from the reference camera setup in any way.',
+};
+
 interface RenderParams {
   projectType?: string;
   socialFormat?: string;
   visualStyle?: string;
   environmentType?: string;
+  cameraAngle?: string;
   lighting?: string;
   weather?: string;
   peopleCount?: number;
