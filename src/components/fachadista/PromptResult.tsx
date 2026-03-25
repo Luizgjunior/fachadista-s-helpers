@@ -167,6 +167,11 @@ const PromptResult = ({
                 </>
               )}
             </div>
+
+            {/* Ken Burns Video — only after render */}
+            {result.previewUrl && !previewLoading && (
+              <KenBurnsVideo imageUrl={result.previewUrl} fileName={`newrender-${result.id}`} />
+            )}
           </div>
         </div>
       </div>
