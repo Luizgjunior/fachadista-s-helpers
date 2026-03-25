@@ -1,4 +1,4 @@
-import { Copy, Check, Zap, Sparkles, Eye, RefreshCw, Download } from "lucide-react";
+import { Copy, Check, Zap, Sparkles, Eye, RefreshCw, Download, Maximize2, X } from "lucide-react";
 import { GeneratedPrompt } from "@/types/fachadista";
 import { Progress } from "@/components/ui/progress";
 import { useState, useEffect } from "react";
@@ -31,6 +31,7 @@ const PromptResult = ({
 }: PromptResultProps) => {
   const [fakeProgress, setFakeProgress] = useState(0);
   const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
+  const [viewerOpen, setViewerOpen] = useState(false);
   const canGenerate = isAdmin || userCredits >= CREDIT_COSTS.IMAGE;
 
   useEffect(() => {
@@ -143,26 +144,33 @@ const PromptResult = ({
               {result.previewUrl && !previewLoading && (
                 <>
                   <img src={result.previewUrl} className="w-full h-full object-cover" alt="Render IA" />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center gap-2 md:gap-3 opacity-0 group-hover:opacity-100">
+                  {/* Always-visible action bar on mobile, hover on desktop */}
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-3 flex items-center justify-center gap-2 md:opacity-0 md:group-hover:opacity-100 transition-all">
+                    <button
+                      onClick={() => setViewerOpen(true)}
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/90 text-foreground text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:bg-white shadow-lg active:scale-95 transition-all"
+                    >
+                      <Maximize2 className="w-3.5 h-3.5" /> Visualizar
+                    </button>
                     <button
                       onClick={handleDownload}
-                      className="flex items-center gap-1.5 px-3.5 py-2 md:px-4 md:py-2.5 rounded-xl bg-white/90 text-foreground text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:bg-white shadow-lg"
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/90 text-foreground text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:bg-white shadow-lg active:scale-95 transition-all"
                     >
-                      <Download className="w-3.5 h-3.5 md:w-4 md:h-4" /> Baixar
+                      <Download className="w-3.5 h-3.5" /> Baixar
                     </button>
                     <button
                       onClick={onGeneratePreview}
                       disabled={!canGenerate}
-                      className={`flex items-center gap-1.5 px-3.5 py-2 md:px-4 md:py-2.5 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest shadow-lg ${
+                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all ${
                         canGenerate
                           ? 'bg-primary text-primary-foreground hover:opacity-90'
                           : 'bg-muted text-muted-foreground cursor-not-allowed'
                       }`}
                     >
-                      <RefreshCw className="w-3.5 h-3.5 md:w-4 md:h-4" /> Regenerar
+                      <RefreshCw className="w-3.5 h-3.5" /> Novo
                     </button>
                   </div>
-                  <span className="absolute bottom-2 right-2 md:bottom-3 md:right-3 bg-black/60 text-white text-[8px] md:text-[9px] font-black uppercase tracking-widest px-2 py-0.5 md:py-1 rounded-lg backdrop-blur-sm">
+                  <span className="absolute top-2 right-2 md:top-3 md:right-3 bg-black/60 text-white text-[8px] md:text-[9px] font-black uppercase tracking-widest px-2 py-0.5 md:py-1 rounded-lg backdrop-blur-sm">
                     IA Generated
                   </span>
                 </>
@@ -182,6 +190,46 @@ const PromptResult = ({
           </div>
         </div>
       </div>
+
+      {/* Fullscreen Image Viewer Modal */}
+      {viewerOpen && result.previewUrl && (
+        <div
+          className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setViewerOpen(false)}
+        >
+          <button
+            onClick={() => setViewerOpen(false)}
+            className="absolute top-4 right-4 z-50 p-2.5 rounded-full bg-white/10 text-white hover:bg-white/20 active:scale-95 transition-all"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <img
+            src={result.previewUrl}
+            alt="Render IA - Visualização"
+            className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div className="flex gap-3 mt-4" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={handleDownload}
+              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-white text-black text-[10px] font-black uppercase tracking-widest hover:bg-white/90 active:scale-95 shadow-lg transition-all"
+            >
+              <Download className="w-4 h-4" /> Baixar Imagem
+            </button>
+            <button
+              onClick={onGeneratePreview}
+              disabled={!canGenerate}
+              className={`flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all ${
+                canGenerate
+                  ? 'bg-primary text-primary-foreground hover:opacity-90'
+                  : 'bg-muted text-muted-foreground cursor-not-allowed'
+              }`}
+            >
+              <RefreshCw className="w-4 h-4" /> Regenerar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
