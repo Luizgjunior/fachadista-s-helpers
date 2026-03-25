@@ -325,6 +325,7 @@ const Index = () => {
                   onGeneratePreview={generatePreview}
                   userCredits={credits}
                   isAdmin={profile?.is_admin ?? false}
+                  onCreditsConsumed={refreshProfile}
                 />
               )}
             </div>
