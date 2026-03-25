@@ -3,7 +3,7 @@ import { GeneratedPrompt } from "@/types/fachadista";
 import { Progress } from "@/components/ui/progress";
 import { useState, useEffect } from "react";
 import { CREDIT_COSTS } from "@/hooks/useCredits";
-import KenBurnsVideo from "./KenBurnsVideo";
+import AIVideoGenerator from "./AIVideoGenerator";
 
 const loadingMessages = [
   "Analisando composição arquitetônica...",
@@ -23,10 +23,11 @@ interface PromptResultProps {
   onGeneratePreview: () => void;
   userCredits: number;
   isAdmin: boolean;
+  onCreditsConsumed: () => void;
 }
 
 const PromptResult = ({
-  result, copied, onCopy, previewLoading, onGeneratePreview, userCredits, isAdmin,
+  result, copied, onCopy, previewLoading, onGeneratePreview, userCredits, isAdmin, onCreditsConsumed,
 }: PromptResultProps) => {
   const [fakeProgress, setFakeProgress] = useState(0);
   const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
@@ -168,9 +169,15 @@ const PromptResult = ({
               )}
             </div>
 
-            {/* Ken Burns Video — only after render */}
+            {/* AI Video — only after render */}
             {result.previewUrl && !previewLoading && (
-              <KenBurnsVideo imageUrl={result.previewUrl} fileName={`newrender-${result.id}`} />
+              <AIVideoGenerator
+                imageUrl={result.previewUrl}
+                fileName={`newrender-${result.id}`}
+                userCredits={userCredits}
+                isAdmin={isAdmin}
+                onCreditsConsumed={onCreditsConsumed}
+              />
             )}
           </div>
         </div>

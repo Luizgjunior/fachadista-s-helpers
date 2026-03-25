@@ -11,6 +11,7 @@ interface UseCreditsOptions {
 export const CREDIT_COSTS = {
   PROMPT: 3,
   IMAGE: 5,
+  VIDEO: 30,
 } as const;
 
 export function useCredits({ profile, refreshProfile }: UseCreditsOptions) {
@@ -19,6 +20,7 @@ export function useCredits({ profile, refreshProfile }: UseCreditsOptions) {
   const hasCredits = isAdmin || credits > 0;
   const hasCreditsForPrompt = isAdmin || credits >= CREDIT_COSTS.PROMPT;
   const hasCreditsForImage = isAdmin || credits >= CREDIT_COSTS.IMAGE;
+  const hasCreditsForVideo = isAdmin || credits >= CREDIT_COSTS.VIDEO;
 
   const consumeCredits = useCallback(
     async (amount: number, description?: string) => {
@@ -67,13 +69,20 @@ export function useCredits({ profile, refreshProfile }: UseCreditsOptions) {
     [consumeCredits]
   );
 
+  const consumeVideoCredits = useCallback(
+    () => consumeCredits(CREDIT_COSTS.VIDEO, "Geração de vídeo IA"),
+    [consumeCredits]
+  );
+
   return {
     credits,
     hasCredits,
     hasCreditsForPrompt,
     hasCreditsForImage,
+    hasCreditsForVideo,
     consumeCredits,
     consumePromptCredits,
     consumeImageCredits,
+    consumeVideoCredits,
   };
 }
