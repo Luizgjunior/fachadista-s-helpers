@@ -33,6 +33,44 @@ const scaleUp: Variants = {
   visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
 };
 
+/* ─── Animated Counter ─── */
+const CountUp = ({ target, duration = 1.5 }: { target: number; duration?: number }) => {
+  const [count, setCount] = useState(0);
+  const [started, setStarted] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setStarted(true); observer.disconnect(); } },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
+    const steps = 40;
+    const increment = target / steps;
+    const stepTime = (duration * 1000) / steps;
+    let current = 0;
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= target) {
+        setCount(target);
+        clearInterval(timer);
+      } else {
+        setCount(Math.round(current));
+      }
+    }, stepTime);
+    return () => clearInterval(timer);
+  }, [started, target, duration]);
+
+  return <span ref={ref}>{count}</span>;
+};
+
 /* ─── Before / After Slider ─── */
 const BeforeAfterSlider = ({ before, after, label }: { before: string; after: string; label: string }) => {
   const [position, setPosition] = useState(50);
