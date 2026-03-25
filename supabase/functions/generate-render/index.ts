@@ -203,6 +203,7 @@ ABSOLUTE PROHIBITIONS:
 - NO excessive bloom or lens flare artifacts
 - NO unnaturally smooth skin on people (maintain pore-level detail)
 - NO repeated identical window reflections (each must reflect its actual surroundings)`;
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
