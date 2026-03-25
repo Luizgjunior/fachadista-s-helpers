@@ -20,6 +20,7 @@ export function useCredits({ profile, refreshProfile }: UseCreditsOptions) {
   const hasCredits = isAdmin || credits > 0;
   const hasCreditsForPrompt = isAdmin || credits >= CREDIT_COSTS.PROMPT;
   const hasCreditsForImage = isAdmin || credits >= CREDIT_COSTS.IMAGE;
+  const hasCreditsForVideo = isAdmin || credits >= CREDIT_COSTS.VIDEO;
 
   const consumeCredits = useCallback(
     async (amount: number, description?: string) => {
