@@ -128,9 +128,9 @@ const USE_CASES = [
 ];
 
 const PLANS = [
-  { name: "Starter", credits: 50, price: "R$ 19,90", perCredit: "R$ 0,40", popular: false, features: ["50 créditos", "~16 prompts, ~10 renders ou ~1 vídeo IA", "Válido por 12 meses", "Comparador de renders"] },
-  { name: "Pro", credits: 200, price: "R$ 49,90", perCredit: "R$ 0,25", popular: true, features: ["200 créditos", "~66 prompts, ~40 renders ou ~6 vídeos IA", "Válido por 12 meses", "Economia de 37%", "Preview visual IA", "Suporte prioritário"] },
-  { name: "Studio", credits: 500, price: "R$ 99,90", perCredit: "R$ 0,20", popular: false, features: ["500 créditos", "~166 prompts, ~100 renders ou ~16 vídeos IA", "Válido por 12 meses", "Economia de 50%", "Acesso antecipado a novidades", "Suporte VIP"] },
+  { name: "Starter", credits: 50, price: "R$ 19,90", perCredit: "R$ 0,40", popular: false, features: ["50 créditos/mês", "~16 prompts, ~10 renders ou ~1 vídeo IA", "Recarga automática mensal", "Comparador de renders"] },
+  { name: "Pro", credits: 200, price: "R$ 49,90", perCredit: "R$ 0,25", popular: true, features: ["200 créditos/mês", "~66 prompts, ~40 renders ou ~6 vídeos IA", "Recarga automática mensal", "Economia de 37%", "Preview visual IA", "Suporte prioritário"] },
+  { name: "Studio", credits: 500, price: "R$ 99,90", perCredit: "R$ 0,20", popular: false, features: ["500 créditos/mês", "~166 prompts, ~100 renders ou ~16 vídeos IA", "Recarga automática mensal", "Economia de 50%", "Acesso antecipado a novidades", "Suporte VIP"] },
 ];
 
 const FAQ = [
@@ -390,11 +390,11 @@ const Landing = () => {
             viewport={{ once: true, margin: "-80px" }}
             className="text-center mb-12"
           >
-            <span className="inline-block bg-primary/10 text-primary rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest mb-4">CRÉDITOS</span>
+            <span className="inline-block bg-primary/10 text-primary rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest mb-4">ASSINATURAS</span>
             <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tight">
-              Escolha seu <span className="text-primary">pacote</span>
+              Escolha seu <span className="text-primary">plano mensal</span>
             </h2>
-            <p className="text-sm text-muted-foreground mt-2">Sem assinatura. Sem mensalidade. Pague apenas quando precisar.</p>
+            <p className="text-sm text-muted-foreground mt-2">Receba créditos todo mês automaticamente. Cancele quando quiser.</p>
           </motion.div>
           <motion.div
             variants={staggerContainer}
@@ -419,9 +419,9 @@ const Landing = () => {
                 <div className="mb-1">
                   <span className="text-5xl font-black tabular-nums"><CountUp target={plan.credits} /></span>
                 </div>
-                <p className="text-sm text-muted-foreground mb-4">créditos</p>
+                <p className="text-sm text-muted-foreground mb-4">créditos/mês</p>
                 <p className="text-2xl font-black mb-1">{plan.price}</p>
-                <p className="text-[10px] text-muted-foreground mb-2">/pagamento único</p>
+                <p className="text-[10px] text-muted-foreground mb-2">/mês • cobrado automaticamente</p>
                 <span className="inline-block bg-field-bg border border-border rounded-xl px-3 py-1 text-[10px] font-bold text-muted-foreground mb-5">
                   {plan.perCredit} por crédito
                 </span>
@@ -442,10 +442,28 @@ const Landing = () => {
                       : 'bg-field-bg border border-border text-foreground hover:border-primary/30'
                   }`}
                 >
-                  Começar agora
+                  Assinar agora
                 </button>
               </motion.div>
             ))}
+          </motion.div>
+
+          {/* Avulsos note */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="mt-10 text-center bg-surface border border-border rounded-3xl p-6 max-w-lg mx-auto"
+          >
+            <Zap className="w-5 h-5 text-primary mx-auto mb-2" />
+            <p className="text-sm font-bold text-foreground mb-1">Acabou os créditos?</p>
+            <p className="text-xs text-muted-foreground">
+              Usuários cadastrados podem comprar créditos avulsos a qualquer momento, sem precisar de assinatura.{" "}
+              <button onClick={() => navigate("/login")} className="text-primary font-bold hover:underline">
+                Acessar minha conta →
+              </button>
+            </p>
           </motion.div>
         </div>
       </section>
