@@ -95,6 +95,8 @@ const AIVideoGenerator = ({
           return;
         }
 
+        console.log("Poll response:", data?.status, data?.queuePosition);
+
         if (data?.status === "COMPLETED" && data?.videoUrl) {
           if (pollingRef.current) clearInterval(pollingRef.current);
           setVideoUrl(data.videoUrl);
@@ -104,7 +106,9 @@ const AIVideoGenerator = ({
         } else if (data?.status === "FAILED") {
           if (pollingRef.current) clearInterval(pollingRef.current);
           setGenerating(false);
-          toast.error("Falha na geração do vídeo.");
+          toast.error(data?.error || "Falha na geração do vídeo.");
+        } else if (data?.status === "IN_QUEUE" && data?.queuePosition !== undefined) {
+          setFakeProgress(Math.min(10, fakeProgress));
         }
       } catch (err) {
         console.error("Poll exception:", err);
