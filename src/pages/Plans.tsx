@@ -41,7 +41,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Como funciona o pagamento?",
-    a: "Os pagamentos serão processados com segurança pela plataforma Cakto, aceitando Pix, cartão de crédito (parcelado) e boleto bancário.",
+    a: "Os pagamentos são processados com segurança pela plataforma ggCheckout, aceitando Pix, cartão de crédito (parcelado) e boleto bancário.",
   },
   {
     q: "Quanto tempo para os créditos aparecerem?",
