@@ -132,8 +132,7 @@ const AIVideoGenerator = ({
       if (data?.error) throw new Error(data.error);
 
       if (data?.requestId) {
-        // Start client-side polling
-        pollStatus(data.requestId);
+        pollStatus(data.requestId, data.statusUrl, data.responseUrl);
       } else {
         throw new Error("Sem requestId na resposta.");
       }
