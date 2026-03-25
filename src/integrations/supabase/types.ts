@@ -271,6 +271,27 @@ export type Database = {
       }
     }
     Views: {
+      admin_daily_revenue: {
+        Row: {
+          day: string | null
+          orders: number | null
+          revenue: number | null
+        }
+        Relationships: []
+      }
+      admin_financial_metrics: {
+        Row: {
+          active_subscribers: number | null
+          avg_ticket: number | null
+          churned_users: number | null
+          mrr: number | null
+          orders_30d: number | null
+          revenue_30d: number | null
+          revenue_total: number | null
+          total_orders: number | null
+        }
+        Relationships: []
+      }
       admin_metrics: {
         Row: {
           credits_consumed_30d: number | null
@@ -283,6 +304,16 @@ export type Database = {
           total_prompts: number | null
           total_renders: number | null
           total_users: number | null
+        }
+        Relationships: []
+      }
+      admin_revenue_by_plan: {
+        Row: {
+          credits_sold: number | null
+          orders: number | null
+          package_id: string | null
+          package_name: string | null
+          revenue: number | null
         }
         Relationships: []
       }
