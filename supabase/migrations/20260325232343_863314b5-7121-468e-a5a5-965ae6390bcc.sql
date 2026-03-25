@@ -1,0 +1,1 @@
+ALTER TABLE public.credit_packages ADD COLUMN IF NOT EXISTS gg_checkout_url text;
