@@ -128,9 +128,9 @@ const USE_CASES = [
 ];
 
 const PLANS = [
-  { name: "Starter", credits: 50, price: "R$ 19,90", perCredit: "R$ 0,40", popular: false, features: ["50 créditos", "~16 prompts, ~10 renders ou ~1 vídeo IA", "Válido por 12 meses", "Comparador de renders"] },
-  { name: "Pro", credits: 200, price: "R$ 49,90", perCredit: "R$ 0,25", popular: true, features: ["200 créditos", "~66 prompts, ~40 renders ou ~6 vídeos IA", "Válido por 12 meses", "Economia de 37%", "Preview visual IA", "Suporte prioritário"] },
-  { name: "Studio", credits: 500, price: "R$ 99,90", perCredit: "R$ 0,20", popular: false, features: ["500 créditos", "~166 prompts, ~100 renders ou ~16 vídeos IA", "Válido por 12 meses", "Economia de 50%", "Acesso antecipado a novidades", "Suporte VIP"] },
+  { name: "Starter", credits: 50, price: "R$ 19,90", perCredit: "R$ 0,40", popular: false, features: ["50 créditos/mês", "~16 prompts, ~10 renders ou ~1 vídeo IA", "Recarga automática mensal", "Comparador de renders"] },
+  { name: "Pro", credits: 200, price: "R$ 49,90", perCredit: "R$ 0,25", popular: true, features: ["200 créditos/mês", "~66 prompts, ~40 renders ou ~6 vídeos IA", "Recarga automática mensal", "Economia de 37%", "Preview visual IA", "Suporte prioritário"] },
+  { name: "Studio", credits: 500, price: "R$ 99,90", perCredit: "R$ 0,20", popular: false, features: ["500 créditos/mês", "~166 prompts, ~100 renders ou ~16 vídeos IA", "Recarga automática mensal", "Economia de 50%", "Acesso antecipado a novidades", "Suporte VIP"] },
 ];
 
 const FAQ = [
