@@ -44,7 +44,7 @@ const Login = () => {
       if (mode === "login") {
         const ok = await signInWithEmail(email, password);
         if (ok) {
-          navigate("/");
+          navigate("/app");
         } else {
           setError("E-mail ou senha incorretos.");
         }
