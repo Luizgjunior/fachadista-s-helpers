@@ -3,7 +3,7 @@ import { GeneratedPrompt } from "@/types/fachadista";
 import { Progress } from "@/components/ui/progress";
 import { useState, useEffect } from "react";
 import { CREDIT_COSTS } from "@/hooks/useCredits";
-import KenBurnsVideo from "./KenBurnsVideo";
+import AIVideoGenerator from "./AIVideoGenerator";
 
 const loadingMessages = [
   "Analisando composição arquitetônica...",
