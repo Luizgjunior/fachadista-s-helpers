@@ -83,10 +83,12 @@ serve(async (req) => {
       }
 
       const submitData = await submitRes.json();
-      console.log("Fal job submitted:", submitData.request_id);
+      console.log("Fal job submitted:", JSON.stringify(submitData));
 
       return new Response(JSON.stringify({
         requestId: submitData.request_id,
+        statusUrl: submitData.status_url,
+        responseUrl: submitData.response_url,
         status: "IN_QUEUE",
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
