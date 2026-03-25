@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Sparkles, Zap, Image, Layers, Eye, MessageSquare, ChevronDown, Star, Check } from "lucide-react";
-import { useState, useEffect } from "react";
+import { ArrowRight, Sparkles, Zap, Image, Layers, Eye, MessageSquare, Star, Check } from "lucide-react";
+import { useState } from "react";
+import { motion, type Variants } from "framer-motion";
 import LegalFooter from "@/components/shared/LegalFooter";
 import {
   Accordion,
@@ -15,6 +16,22 @@ import beforeKitchen from "@/assets/landing/before-kitchen.jpg";
 import afterKitchen from "@/assets/landing/after-kitchen.jpg";
 import beforeFacade from "@/assets/landing/before-facade.jpg";
 import afterFacade from "@/assets/landing/after-facade.jpg";
+
+/* ─── Animation variants ─── */
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
+
+const staggerContainer: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1 } },
+};
+
+const scaleUp: Variants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
+};
 
 /* ─── Before / After Slider ─── */
 const BeforeAfterSlider = ({ before, after, label }: { before: string; after: string; label: string }) => {
@@ -36,13 +53,10 @@ const BeforeAfterSlider = ({ before, after, label }: { before: string; after: st
         onMouseMove={(e) => dragging && handleMove(e.clientX, e.currentTarget.getBoundingClientRect())}
         onTouchMove={(e) => handleMove(e.touches[0].clientX, e.currentTarget.getBoundingClientRect())}
       >
-        {/* After (full) */}
         <img src={after} alt="Depois" className="absolute inset-0 w-full h-full object-cover" />
-        {/* Before (clipped) */}
         <div className="absolute inset-0 overflow-hidden" style={{ width: `${position}%` }}>
           <img src={before} alt="Antes" className="absolute inset-0 w-full h-full object-cover" style={{ minWidth: `${10000 / position}%` }} />
         </div>
-        {/* Divider */}
         <div className="absolute top-0 bottom-0 z-10" style={{ left: `${position}%`, transform: 'translateX(-50%)' }}>
           <div className="w-0.5 h-full bg-primary-foreground/80 shadow-lg" />
           <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/30">
@@ -50,7 +64,6 @@ const BeforeAfterSlider = ({ before, after, label }: { before: string; after: st
             <ArrowRight className="w-4 h-4 text-primary-foreground -ml-1" />
           </div>
         </div>
-        {/* Labels */}
         <span className="absolute top-3 left-3 bg-background/80 backdrop-blur-sm text-foreground text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full z-20">SketchUp</span>
         <span className="absolute top-3 right-3 bg-primary/90 backdrop-blur-sm text-primary-foreground text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full z-20">NewRender</span>
       </div>
@@ -101,9 +114,14 @@ const Landing = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col overflow-x-hidden">
       {/* ═══ NAV ═══ */}
-      <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
+      <motion.nav
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border"
+      >
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
           <span className="text-sm font-black uppercase tracking-[0.15em]">
             NEW<span className="text-primary">RENDER</span>
@@ -117,86 +135,163 @@ const Landing = () => {
             </button>
           </div>
         </div>
-      </nav>
+      </motion.nav>
 
       {/* ═══ HERO ═══ */}
       <section className="px-4 pt-16 pb-12 md:pt-28 md:pb-20 text-center">
-        <span className="inline-block bg-primary/10 text-primary rounded-full px-4 py-1.5 text-[9px] font-black uppercase tracking-widest mb-6 animate-in fade-in duration-700">
+        <motion.span
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="inline-block bg-primary/10 text-primary rounded-full px-4 py-1.5 text-[9px] font-black uppercase tracking-widest mb-6"
+        >
           ✦ INTELIGÊNCIA ARTIFICIAL PARA ARQUITETURA
-        </span>
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase italic tracking-tighter mb-5 leading-[0.9] animate-in fade-in slide-in-from-bottom-4 duration-700">
+        </motion.span>
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+          className="text-4xl md:text-6xl lg:text-7xl font-black uppercase italic tracking-tighter mb-5 leading-[0.9]"
+        >
           Do <span className="text-primary">SketchUp</span> ao<br />
           Render <span className="text-primary">Fotorrealista</span><br />
           em minutos
-        </h1>
-        <p className="text-sm md:text-base text-muted-foreground font-medium max-w-lg mx-auto mb-8 animate-in fade-in duration-700 delay-200">
-          Transforme qualquer projeto em renders profissionais com IA. 
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="text-sm md:text-base text-muted-foreground font-medium max-w-lg mx-auto mb-8"
+        >
+          Transforme qualquer projeto em renders profissionais com IA.
           Sem renderista, sem horas de espera, sem software pesado.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+        </motion.p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="flex flex-col sm:flex-row gap-3 justify-center"
+        >
           <button onClick={() => navigate("/login")} className="bg-primary text-primary-foreground px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:opacity-90 transition-all active:scale-95 flex items-center justify-center gap-2">
             <Sparkles className="w-4 h-4" /> Começar grátis
           </button>
           <a href="#exemplos" className="border border-border bg-surface px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-[0.2em] text-foreground hover:border-primary/30 transition-all active:scale-95 text-center">
             Ver exemplos
           </a>
-        </div>
-        <p className="text-[10px] text-muted-foreground/60 mt-4 font-bold uppercase tracking-widest">
+        </motion.div>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.7 }}
+          className="text-[10px] text-muted-foreground/60 mt-4 font-bold uppercase tracking-widest"
+        >
           10 créditos grátis • Sem cartão de crédito
-        </p>
+        </motion.p>
       </section>
 
       {/* ═══ BEFORE / AFTER ═══ */}
       <section id="exemplos" className="px-4 pb-16 md:pb-24">
-        <div className="text-center mb-10">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+          className="text-center mb-10"
+        >
           <span className="inline-block bg-primary/10 text-primary rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest mb-4">RESULTADOS REAIS</span>
           <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tight">
             Antes & <span className="text-primary">Depois</span>
           </h2>
           <p className="text-sm text-muted-foreground mt-2">Arraste para comparar o projeto original com o render gerado</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          <BeforeAfterSlider before={beforeFacade} after={afterFacade} label="Fachada Comercial" />
-          <BeforeAfterSlider before={beforeKitchen} after={afterKitchen} label="Cozinha Gourmet" />
-          <BeforeAfterSlider before={beforeBuilding} after={afterBuilding} label="Edifício Residencial" />
-        </div>
+        </motion.div>
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto"
+        >
+          {[
+            { before: beforeFacade, after: afterFacade, label: "Fachada Comercial" },
+            { before: beforeKitchen, after: afterKitchen, label: "Cozinha Gourmet" },
+            { before: beforeBuilding, after: afterBuilding, label: "Edifício Residencial" },
+          ].map((item, i) => (
+            <motion.div key={i} variants={scaleUp}>
+              <BeforeAfterSlider {...item} />
+            </motion.div>
+          ))}
+        </motion.div>
       </section>
 
       {/* ═══ FEATURES ═══ */}
       <section className="px-4 pb-16 md:pb-24 bg-surface-muted/50">
         <div className="max-w-5xl mx-auto py-16">
-          <div className="text-center mb-12">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            className="text-center mb-12"
+          >
             <span className="inline-block bg-primary/10 text-primary rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest mb-4">FUNCIONALIDADES</span>
             <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tight">
               Tudo que você <span className="text-primary">precisa</span>
             </h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          </motion.div>
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
+          >
             {FEATURES.map((f, i) => (
-              <div key={i} className="bg-surface border border-border rounded-3xl p-6 hover:border-primary/30 transition-all group">
+              <motion.div
+                key={i}
+                variants={fadeUp}
+                whileHover={{ y: -6, transition: { duration: 0.2 } }}
+                className="bg-surface border border-border rounded-3xl p-6 hover:border-primary/30 transition-colors group"
+              >
                 <div className="w-11 h-11 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-all">
                   <f.icon className="w-5 h-5" />
                 </div>
                 <h3 className="text-sm font-black uppercase tracking-wider mb-2">{f.title}</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ═══ USE CASES ═══ */}
       <section className="px-4 pb-16 md:pb-24">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            className="text-center mb-12"
+          >
             <span className="inline-block bg-primary/10 text-primary rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest mb-4">PARA QUEM É</span>
             <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tight">
               Casos de <span className="text-primary">uso</span>
             </h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          </motion.div>
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-1 sm:grid-cols-2 gap-5"
+          >
             {USE_CASES.map((uc, i) => (
-              <div key={i} className="bg-surface border border-border rounded-3xl p-6 flex gap-4 items-start">
+              <motion.div
+                key={i}
+                variants={fadeUp}
+                whileHover={{ x: 6, transition: { duration: 0.2 } }}
+                className="bg-surface border border-border rounded-3xl p-6 flex gap-4 items-start"
+              >
                 <div className="w-8 h-8 bg-primary/10 text-primary rounded-xl flex items-center justify-center flex-shrink-0 text-sm font-black">
                   {i + 1}
                 </div>
@@ -204,24 +299,36 @@ const Landing = () => {
                   <h3 className="text-sm font-black uppercase tracking-wider mb-1">{uc.title}</h3>
                   <p className="text-xs text-muted-foreground leading-relaxed">{uc.desc}</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ═══ TESTIMONIALS ═══ */}
       <section className="px-4 pb-16 md:pb-24 bg-surface-muted/50">
         <div className="max-w-4xl mx-auto py-16">
-          <div className="text-center mb-12">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            className="text-center mb-12"
+          >
             <span className="inline-block bg-primary/10 text-primary rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest mb-4">DEPOIMENTOS</span>
             <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tight">
               O que dizem nossos <span className="text-primary">usuários</span>
             </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          </motion.div>
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-5"
+          >
             {TESTIMONIALS.map((t, i) => (
-              <div key={i} className="bg-surface border border-border rounded-3xl p-6">
+              <motion.div key={i} variants={fadeUp} className="bg-surface border border-border rounded-3xl p-6">
                 <div className="flex gap-0.5 mb-3">
                   {[...Array(t.stars)].map((_, j) => (
                     <Star key={j} className="w-3.5 h-3.5 fill-primary text-primary" />
@@ -229,25 +336,42 @@ const Landing = () => {
                 </div>
                 <p className="text-sm text-foreground mb-4 italic">"{t.text}"</p>
                 <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t.name}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ═══ PLANS ═══ */}
       <section id="planos" className="px-4 pb-16 md:pb-24">
         <div className="max-w-5xl mx-auto pt-16">
-          <div className="text-center mb-12">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            className="text-center mb-12"
+          >
             <span className="inline-block bg-primary/10 text-primary rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest mb-4">CRÉDITOS</span>
             <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tight">
               Escolha seu <span className="text-primary">pacote</span>
             </h2>
             <p className="text-sm text-muted-foreground mt-2">Sem assinatura. Sem mensalidade. Pague apenas quando precisar.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          </motion.div>
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          >
             {PLANS.map((plan, i) => (
-              <div key={i} className={`relative bg-surface rounded-[32px] p-7 shadow-xl transition-all ${plan.popular ? 'border-2 border-primary shadow-primary/20 scale-[1.02]' : 'border border-border'}`}>
+              <motion.div
+                key={i}
+                variants={scaleUp}
+                whileHover={{ y: -8, transition: { duration: 0.25 } }}
+                className={`relative bg-surface rounded-[32px] p-7 shadow-xl transition-colors ${plan.popular ? 'border-2 border-primary shadow-primary/20' : 'border border-border'}`}
+              >
                 {plan.popular && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[9px] font-black uppercase tracking-widest px-4 py-1 rounded-full whitespace-nowrap">
                     MAIS POPULAR
@@ -282,54 +406,82 @@ const Landing = () => {
                 >
                   Começar agora
                 </button>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ═══ FAQ ═══ */}
       <section className="px-4 pb-16 md:pb-24 bg-surface-muted/50">
         <div className="max-w-2xl mx-auto py-16">
-          <div className="text-center mb-10">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            className="text-center mb-10"
+          >
             <span className="inline-block bg-primary/10 text-primary rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest mb-4">DÚVIDAS</span>
             <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tight">
               Perguntas <span className="text-primary">Frequentes</span>
             </h2>
-          </div>
-          <Accordion type="single" collapsible className="space-y-3">
-            {FAQ.map((item, i) => (
-              <AccordionItem key={i} value={`faq-${i}`} className="bg-surface border border-border rounded-2xl px-6 overflow-hidden">
-                <AccordionTrigger className="text-sm font-bold text-foreground hover:no-underline py-5 text-left">
-                  {item.q}
-                </AccordionTrigger>
-                <AccordionContent className="text-sm text-muted-foreground pb-5">
-                  {item.a}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+          </motion.div>
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+          >
+            <Accordion type="single" collapsible className="space-y-3">
+              {FAQ.map((item, i) => (
+                <motion.div key={i} variants={fadeUp}>
+                  <AccordionItem value={`faq-${i}`} className="bg-surface border border-border rounded-2xl px-6 overflow-hidden">
+                    <AccordionTrigger className="text-sm font-bold text-foreground hover:no-underline py-5 text-left">
+                      {item.q}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm text-muted-foreground pb-5">
+                      {item.a}
+                    </AccordionContent>
+                  </AccordionItem>
+                </motion.div>
+              ))}
+            </Accordion>
+          </motion.div>
         </div>
       </section>
 
       {/* ═══ CTA FINAL ═══ */}
-      <section className="px-4 pb-16 md:pb-24">
+      <motion.section
+        variants={scaleUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-80px" }}
+        className="px-4 pb-16 md:pb-24"
+      >
         <div className="max-w-2xl mx-auto bg-primary/5 border border-primary/20 rounded-[32px] p-8 md:p-12 text-center">
-          <Sparkles className="w-8 h-8 text-primary mx-auto mb-4" />
+          <motion.div
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+          >
+            <Sparkles className="w-8 h-8 text-primary mx-auto mb-4" />
+          </motion.div>
           <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight mb-3">
             Pronto para revolucionar<br />seus renders?
           </h2>
           <p className="text-sm text-muted-foreground mb-8 max-w-md mx-auto">
             Comece agora com 10 créditos grátis. Sem cartão de crédito, sem compromisso.
           </p>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/login")}
-            className="bg-primary text-primary-foreground px-10 py-4 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:opacity-90 transition-all active:scale-95"
+            className="bg-primary text-primary-foreground px-10 py-4 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl shadow-primary/20 transition-colors"
           >
             Criar conta grátis
-          </button>
+          </motion.button>
         </div>
-      </section>
+      </motion.section>
 
       <LegalFooter />
     </div>
