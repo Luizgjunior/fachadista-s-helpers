@@ -21,6 +21,7 @@ interface CreditPackage {
   is_popular: boolean;
   is_active: boolean;
   features: unknown;
+  gg_checkout_url: string | null;
 }
 
 const getFeatures = (features: unknown): string[] => {
