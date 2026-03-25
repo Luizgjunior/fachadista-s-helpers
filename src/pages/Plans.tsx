@@ -55,7 +55,7 @@ const FAQ_ITEMS = [
 
 const STEPS = [
   { icon: ShoppingCart, title: "Escolha seu pacote", desc: "Selecione a quantidade de créditos ideal para seu volume de trabalho" },
-  { icon: CreditCard, title: "Pague com segurança", desc: "Pix, cartão de crédito ou boleto bancário via plataforma Cakto" },
+  { icon: CreditCard, title: "Pague com segurança", desc: "Pix, cartão de crédito ou boleto bancário via ggCheckout" },
   { icon: Zap, title: "Créditos instantâneos", desc: "Seus créditos são adicionados automaticamente em até 1 minuto" },
 ];
 
