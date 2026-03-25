@@ -44,7 +44,7 @@ const Login = () => {
       if (mode === "login") {
         const ok = await signInWithEmail(email, password);
         if (ok) {
-          navigate("/");
+          navigate("/app");
         } else {
           setError("E-mail ou senha incorretos.");
         }
@@ -52,7 +52,7 @@ const Login = () => {
         const ok = await signUpWithEmail(email, password, fullName);
         if (ok) {
           toast.success("Bem-vindo! Você ganhou 10 créditos para começar.");
-          navigate("/");
+          navigate("/app");
         } else {
           setError("Erro ao criar conta. Tente novamente.");
         }

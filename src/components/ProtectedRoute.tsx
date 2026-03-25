@@ -32,7 +32,7 @@ export function AdminRoute({ user, profile, loading, children }: AdminRouteProps
   if (!user) return <Navigate to="/login" replace />;
   if (!profile?.is_admin) {
     toast.error("Acesso restrito");
-    return <Navigate to="/" replace />;
+    return <Navigate to="/app" replace />;
   }
   return <>{children}</>;
 }
