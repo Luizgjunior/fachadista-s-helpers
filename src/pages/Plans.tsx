@@ -172,15 +172,22 @@ const Plans = () => {
                   </ul>
 
                   <button
-                    disabled
-                    className={`w-full py-4 rounded-2xl font-black text-sm uppercase tracking-[0.2em] cursor-not-allowed opacity-70 transition-all ${
+                    onClick={() => {
+                      if (pkg.gg_checkout_url) {
+                        const url = new URL(pkg.gg_checkout_url);
+                        if (profile?.email) url.searchParams.set('email', profile.email);
+                        window.open(url.toString(), '_blank');
+                      } else {
+                        navigate("/login");
+                      }
+                    }}
+                    className={`w-full py-4 rounded-2xl font-black text-sm uppercase tracking-[0.2em] transition-all active:scale-95 ${
                       pkg.is_popular
-                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                        : "bg-field-bg border border-border text-muted-foreground"
+                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:opacity-90"
+                        : "bg-field-bg border border-border text-foreground hover:border-primary/30"
                     }`}
-                    title="Pagamento disponível em breve"
                   >
-                    Em breve
+                    {pkg.gg_checkout_url ? "Comprar agora" : "Começar grátis"}
                   </button>
                 </div>
               ))}
