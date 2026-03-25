@@ -3,6 +3,7 @@ import { GeneratedPrompt } from "@/types/fachadista";
 import { Progress } from "@/components/ui/progress";
 import { useState, useEffect } from "react";
 import { CREDIT_COSTS } from "@/hooks/useCredits";
+import KenBurnsVideo from "./KenBurnsVideo";
 
 const loadingMessages = [
   "Analisando composição arquitetônica...",
@@ -166,6 +167,11 @@ const PromptResult = ({
                 </>
               )}
             </div>
+
+            {/* Ken Burns Video — only after render */}
+            {result.previewUrl && !previewLoading && (
+              <KenBurnsVideo imageUrl={result.previewUrl} fileName={`newrender-${result.id}`} />
+            )}
           </div>
         </div>
       </div>

@@ -37,11 +37,11 @@ const ENVIRONMENT_MAP: Record<string, string> = {
 };
 
 const STYLE_MAP: Record<string, string> = {
-  'Hiper-realista': 'ultra-photorealistic architectural photography, 8K, indistinguishable from real photograph, Phase One IQ4 150MP medium format',
-  'V-Ray Render': 'professional V-Ray architectural render, physically-based materials, V-Ray Sun+Sky, GI with light cache, subtle lens bloom',
-  'Unreal Engine 5': 'Unreal Engine 5 real-time render, Nanite geometry, Lumen global illumination, path-traced reflections, cinematic quality',
-  'Sketch / Croqui': 'architectural hand-drawn sketch, pencil and ink linework, selective watercolor washes, paper texture, warm sepia tones',
-  'Maquete Eletrônica': 'digital architectural model, white maquette style, matte materials, shallow depth of field, scale figures, tilt-shift effect',
+  'Hiper-realista': 'ultra-photorealistic architectural photography, 8K ultra-high resolution, extreme detail at pixel level, indistinguishable from real photograph, Phase One IQ4 150MP medium format, micro-texture on every surface: visible concrete aggregate and pores, wood grain with knot detail, brushed metal directional scratches, glass with fingerprint smudges and dust particles, brick mortar depth variation',
+  'V-Ray Render': 'professional V-Ray architectural render, physically-based materials with PBR roughness/metallic maps, V-Ray Sun+Sky, GI with light cache and irradiance map, subtle lens bloom, caustics on glass surfaces, subsurface scattering on marble and translucent panels, 8K resolution with extreme material detail',
+  'Unreal Engine 5': 'Unreal Engine 5 real-time render, Nanite geometry with micro-polygon detail, Lumen global illumination with infinite bounces, path-traced reflections, virtual shadow maps, cinematic quality, ray-traced translucency on glass, 8K output resolution',
+  'Sketch / Croqui': 'architectural hand-drawn sketch, pencil and ink linework with varying pressure, selective watercolor washes with bleeding edges, paper texture with tooth grain, warm sepia tones, construction lines faintly visible',
+  'Maquete Eletrônica': 'digital architectural model, white maquette style, matte materials with subtle surface variation, shallow depth of field with bokeh, scale figures with natural poses, tilt-shift miniature effect',
 };
 
 const SIDEWALK_MAP: Record<string, string> = {
@@ -131,7 +131,6 @@ const getAspectRatio = (params?: RenderParams): string => {
    ═══════════════════════════════════════════════ */
 
 const buildSystemPrompt = (aspectRatio: string, projectType?: string, cameraAngle?: string): string => {
-  let projectSpecific = '';
   const keepRefAngle = cameraAngle === 'Manter ângulo da referência';
 
   let cameraInstructions = '';
@@ -176,6 +175,14 @@ TECHNICAL STANDARDS:
 ${projectSpecific}
 ${cameraInstructions}
 
+MATERIAL MICRO-DETAILS (apply to ALL renders):
+- Concrete: visible aggregate particles, form-tie holes, hairline cracks, rain staining, efflorescence at base
+- Glass: realistic reflections of sky and surroundings, slight green tint at edges, mullion shadows, interior visibility with curtains/furniture
+- Metal: directional brushing marks, oxidation patterns, welded joints, fastener heads, anodized color variation
+- Wood: grain direction following real lumber, knot detail, weathering silver-gray on exterior, end-grain checks
+- Stone: natural veining, fossil inclusions, chisel marks on rough-cut, polished reflections on honed surfaces
+- Brick: color variation between individual bricks, mortar recession depth, header/stretcher bond pattern accuracy
+
 ABSOLUTE PROHIBITIONS:
 - NO plastic-looking surfaces or uniform textures
 - NO floating objects or physically impossible shadows
@@ -189,7 +196,13 @@ ABSOLUTE PROHIBITIONS:
 - NO melted or warped architectural geometry
 - NO perspective distortion or converging verticals (unless explicitly requested)
 - NO uniform flat sky without cloud detail or atmospheric gradient
-- NO identical cloned people or vehicles`;
+- NO identical cloned people or vehicles
+- NO moiré patterns on facade grids or railings
+- NO color banding in sky gradients or smooth surfaces
+- NO aliasing on building edges or window frames
+- NO excessive bloom or lens flare artifacts
+- NO unnaturally smooth skin on people (maintain pore-level detail)
+- NO repeated identical window reflections (each must reflect its actual surroundings)`;
 };
 
 serve(async (req) => {

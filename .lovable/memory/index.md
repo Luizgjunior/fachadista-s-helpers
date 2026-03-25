@@ -22,8 +22,16 @@ NewRender - Architectural prompt generator
   - Prompt enrichment (buildImagePrompt) happens server-side
   - Receives { prompt, params, referenceImage } — aspect ratio derived from params.socialFormat
   - Dynamic system prompt with aspect ratio, project-type-specific instructions, expanded negative prompts
+  - Material micro-details for concrete, glass, metal, wood, stone, brick
+  - Camera angle preservation with HIGHEST PRIORITY when "Manter ângulo da referência" selected
   - Image returned in `message.images[0].image_url.url` (base64 data URI)
 - API Key: LOVABLE_API_KEY (auto-provisioned) for both prompt and render
+
+## Video Generation
+- Ken Burns effect via canvas + MediaRecorder API (no external API)
+- Component: src/components/fachadista/KenBurnsVideo.tsx
+- 4 presets: Zoom In, Zoom Out, Pan Direita, Pan Esquerda
+- Output: WebM 6s at 30fps, 1280x720, cubic ease in-out
 
 ## Removed
 - src/repo-source/ (raw downloaded files, replaced by adapted versions)
