@@ -145,29 +145,29 @@ const PromptResult = ({
                 <>
                   <img src={result.previewUrl} className="w-full h-full object-cover" alt="Render IA" />
                   {/* Always-visible action bar on mobile, hover on desktop */}
-                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-3 flex items-center justify-center gap-2 md:opacity-0 md:group-hover:opacity-100 transition-all">
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-2.5 flex items-center justify-center gap-1.5 md:opacity-0 md:group-hover:opacity-100 transition-all">
                     <button
                       onClick={() => setViewerOpen(true)}
-                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/90 text-foreground text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:bg-white shadow-lg active:scale-95 transition-all"
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/90 text-foreground text-[8px] md:text-[9px] font-black uppercase tracking-wider hover:bg-white shadow-md active:scale-95 transition-all"
                     >
-                      <Maximize2 className="w-3.5 h-3.5" /> Visualizar
+                      <Maximize2 className="w-3 h-3" /> Visualizar
                     </button>
                     <button
                       onClick={handleDownload}
-                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/90 text-foreground text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:bg-white shadow-lg active:scale-95 transition-all"
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/90 text-foreground text-[8px] md:text-[9px] font-black uppercase tracking-wider hover:bg-white shadow-md active:scale-95 transition-all"
                     >
-                      <Download className="w-3.5 h-3.5" /> Baixar
+                      <Download className="w-3 h-3" /> Baixar
                     </button>
                     <button
                       onClick={onGeneratePreview}
                       disabled={!canGenerate}
-                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all ${
+                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[8px] md:text-[9px] font-black uppercase tracking-wider shadow-md active:scale-95 transition-all ${
                         canGenerate
                           ? 'bg-primary text-primary-foreground hover:opacity-90'
                           : 'bg-muted text-muted-foreground cursor-not-allowed'
                       }`}
                     >
-                      <RefreshCw className="w-3.5 h-3.5" /> Novo
+                      <RefreshCw className="w-3 h-3" /> Novo
                     </button>
                   </div>
                   <span className="absolute top-2 right-2 md:top-3 md:right-3 bg-black/60 text-white text-[8px] md:text-[9px] font-black uppercase tracking-widest px-2 py-0.5 md:py-1 rounded-lg backdrop-blur-sm">
