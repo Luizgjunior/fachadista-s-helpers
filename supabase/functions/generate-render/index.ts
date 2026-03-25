@@ -175,6 +175,14 @@ TECHNICAL STANDARDS:
 ${projectSpecific}
 ${cameraInstructions}
 
+MATERIAL MICRO-DETAILS (apply to ALL renders):
+- Concrete: visible aggregate particles, form-tie holes, hairline cracks, rain staining, efflorescence at base
+- Glass: realistic reflections of sky and surroundings, slight green tint at edges, mullion shadows, interior visibility with curtains/furniture
+- Metal: directional brushing marks, oxidation patterns, welded joints, fastener heads, anodized color variation
+- Wood: grain direction following real lumber, knot detail, weathering silver-gray on exterior, end-grain checks
+- Stone: natural veining, fossil inclusions, chisel marks on rough-cut, polished reflections on honed surfaces
+- Brick: color variation between individual bricks, mortar recession depth, header/stretcher bond pattern accuracy
+
 ABSOLUTE PROHIBITIONS:
 - NO plastic-looking surfaces or uniform textures
 - NO floating objects or physically impossible shadows
@@ -188,8 +196,13 @@ ABSOLUTE PROHIBITIONS:
 - NO melted or warped architectural geometry
 - NO perspective distortion or converging verticals (unless explicitly requested)
 - NO uniform flat sky without cloud detail or atmospheric gradient
-- NO identical cloned people or vehicles`;
-};
+- NO identical cloned people or vehicles
+- NO moiré patterns on facade grids or railings
+- NO color banding in sky gradients or smooth surfaces
+- NO aliasing on building edges or window frames
+- NO excessive bloom or lens flare artifacts
+- NO unnaturally smooth skin on people (maintain pore-level detail)
+- NO repeated identical window reflections (each must reflect its actual surroundings)`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
