@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Sparkles, Zap, Image, Layers, Eye, MessageSquare, Star, Check } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, type Variants } from "framer-motion";
 import LegalFooter from "@/components/shared/LegalFooter";
 import {
@@ -31,6 +31,44 @@ const staggerContainer: Variants = {
 const scaleUp: Variants = {
   hidden: { opacity: 0, scale: 0.9 },
   visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
+};
+
+/* ─── Animated Counter ─── */
+const CountUp = ({ target, duration = 1.5 }: { target: number; duration?: number }) => {
+  const [count, setCount] = useState(0);
+  const [started, setStarted] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setStarted(true); observer.disconnect(); } },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
+    const steps = 40;
+    const increment = target / steps;
+    const stepTime = (duration * 1000) / steps;
+    let current = 0;
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= target) {
+        setCount(target);
+        clearInterval(timer);
+      } else {
+        setCount(Math.round(current));
+      }
+    }, stepTime);
+    return () => clearInterval(timer);
+  }, [started, target, duration]);
+
+  return <span ref={ref}>{count}</span>;
 };
 
 /* ─── Before / After Slider ─── */
@@ -379,7 +417,7 @@ const Landing = () => {
                 )}
                 <p className="text-[11px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-3">{plan.name}</p>
                 <div className="mb-1">
-                  <span className="text-5xl font-black tabular-nums">{plan.credits}</span>
+                  <span className="text-5xl font-black tabular-nums"><CountUp target={plan.credits} /></span>
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">créditos</p>
                 <p className="text-2xl font-black mb-1">{plan.price}</p>
