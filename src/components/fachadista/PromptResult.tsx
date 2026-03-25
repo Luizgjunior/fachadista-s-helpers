@@ -27,7 +27,7 @@ interface PromptResultProps {
 }
 
 const PromptResult = ({
-  result, copied, onCopy, previewLoading, onGeneratePreview, userCredits, isAdmin,
+  result, copied, onCopy, previewLoading, onGeneratePreview, userCredits, isAdmin, onCreditsConsumed,
 }: PromptResultProps) => {
   const [fakeProgress, setFakeProgress] = useState(0);
   const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
