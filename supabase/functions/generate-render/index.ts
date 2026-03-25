@@ -174,6 +174,7 @@ TECHNICAL STANDARDS:
 - Atmospheric effects: volumetric light through dust/moisture, accurate sky gradient, cloud shadow mapping on surfaces
 - Urban context: realistic sidewalk wear patterns, natural vegetation with leaf variation, appropriate street furniture aging
 ${projectSpecific}
+${cameraInstructions}
 
 ABSOLUTE PROHIBITIONS:
 - NO plastic-looking surfaces or uniform textures
