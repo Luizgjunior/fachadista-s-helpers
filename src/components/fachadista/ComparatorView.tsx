@@ -128,7 +128,7 @@ const ComparatorView = ({
             onPointerLeave={handlePointerUp}
           >
             {/* After image (full background) */}
-            <img src={afterImage} className="absolute inset-0 w-full h-full object-cover" alt="Render" draggable={false} />
+            <img src={afterImage} className="absolute inset-0 w-full h-full object-contain bg-secondary" alt="Render" draggable={false} />
             
             {/* Before image (clipped via clip-path for perfect alignment) */}
             <div
