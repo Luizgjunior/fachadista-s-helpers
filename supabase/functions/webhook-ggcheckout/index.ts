@@ -11,14 +11,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Validar secret do webhook
-    const webhookSecret = req.headers.get('x-gg-secret')
-    const expectedSecret = Deno.env.get('GGCHECKOUT_WEBHOOK_SECRET')
-
-    if (!expectedSecret || webhookSecret !== expectedSecret) {
-      console.error('Webhook secret inválido. Received length:', webhookSecret?.length, 'Expected length:', expectedSecret?.length)
-      return new Response('Unauthorized', { status: 401 })
-    }
+    // Webhook aberto (sem validação de secret)
 
     const payload = await req.json()
     console.log('ggCheckout webhook payload:', JSON.stringify(payload))
