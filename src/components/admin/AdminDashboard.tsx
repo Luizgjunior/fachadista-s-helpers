@@ -17,6 +17,7 @@ interface AdminDashboardProps {
     getFinancialMetrics: () => Promise<FinancialMetrics | null>;
     getDailyRevenue: () => Promise<DailyRevenue[]>;
     getRevenueByPlan: () => Promise<RevenueByPlan[]>;
+    getMonthlyMRR: () => Promise<MonthlyMRR[]>;
   };
 }
 
