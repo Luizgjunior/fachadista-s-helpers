@@ -273,8 +273,8 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
                         style={{ height: `${Math.max(revPct, 3)}%` }}
                       />
                     </div>
-                    <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground/60">
-                      {monthLabel}/{yearLabel}
+                    <span className="text-[7px] md:text-[9px] font-bold text-muted-foreground/60 truncate max-w-full">
+                      {monthLabel}
                     </span>
                     <div className="absolute -top-14 left-1/2 -translate-x-1/2 hidden group-hover:block bg-foreground text-background text-[10px] font-bold px-3 py-2 rounded-lg whitespace-nowrap shadow-lg z-10">
                       <div>MRR: {formatBRL(mrr)}</div>
