@@ -25,7 +25,6 @@ export default function AdminCredits({ admin }: AdminCreditsProps) {
   const [summary, setSummary] = useState({ totalConsumed: 0, totalDistributed: 0, avgBalance: 0 });
   const [transactions, setTransactions] = useState<CreditTransaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loading, setLoading] = useState(true);
   const [showRechargeConfirm, setShowRechargeConfirm] = useState(false);
   const [recharging, setRecharging] = useState(false);
 

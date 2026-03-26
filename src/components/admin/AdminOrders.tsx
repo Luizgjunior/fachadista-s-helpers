@@ -55,7 +55,7 @@ export default function AdminOrders({ admin }: AdminOrdersProps) {
     return matchSearch && matchStatus;
   });
 
-  const handleReprocess = async (order: CaktoOrder) => {
+  const handleReprocess = async (order: Order) => {
     if (!order.customer_email || order.status === "approved" || order.status === "renewed") {
       toast.error("Pedido já processado ou sem email.");
       return;
