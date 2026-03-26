@@ -140,9 +140,9 @@ Deno.serve(async (req) => {
     }
 
     // Se for assinatura, atualizar status e subscription_id
-    if (isSubscription || packageType === 'subscription') {
+    if (isSubscription || finalPackageType === 'subscription') {
       profileUpdate.subscription_status = 'active'
-      profileUpdate.plan_id = creditPackage?.id ?? profile.plan_id
+      profileUpdate.plan_id = finalPackage?.id ?? profile.plan_id
       if (subscriptionId) {
         profileUpdate.subscription_id = subscriptionId
       }
