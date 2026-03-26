@@ -105,7 +105,7 @@ const ComparatorView = ({
           </div>
         </div>
       ) : (
-        <div className="w-full max-w-6xl mx-auto space-y-5 md:space-y-8 animate-in fade-in duration-500">">
+        <div className="w-full max-w-6xl mx-auto space-y-5 md:space-y-8 animate-in fade-in duration-500">
           {/* Labels */}
           <div className="flex justify-between items-center px-1 md:px-8">
             <div className="flex items-center gap-2 bg-surface px-3 py-1.5 md:px-6 md:py-3 rounded-lg md:rounded-2xl border border-border shadow-sm">
