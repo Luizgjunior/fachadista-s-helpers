@@ -1,62 +1,44 @@
 
 
-## Modelo Híbrido: Assinatura Mensal + Créditos Avulsos
+## Plano: Integrar API do ggCheckout ao Dashboard Admin
 
-### Como funciona
+### O que será feito
 
-Sim, é possível combinar os dois modelos. O cliente assina um plano mensal (recebe créditos todo mês) e, se acabar antes do próximo ciclo, compra créditos avulsos.
+Criar uma edge function que consulta a API do ggCheckout para buscar pagamentos e dados do negócio em tempo real, e uma nova seção no dashboard admin que exibe esses dados lado a lado com os dados locais.
 
-```text
-┌─────────────────────────────────┐
-│  ASSINATURA MENSAL (recorrente) │
-│  Ex: Pro R$49,90/mês → 200 cr  │
-│  Créditos recarregam todo mês   │
-└────────────┬────────────────────┘
-             │
-             │  Acabou os créditos?
-             ▼
-┌─────────────────────────────────┐
-│  CRÉDITOS AVULSOS (pagto único) │
-│  Ex: +50 cr por R$19,90        │
-│  Compra quantas vezes quiser    │
-└─────────────────────────────────┘
-```
+### Etapas
 
-### O que precisa no ggCheckout
+**1. Salvar a API Key do ggCheckout como secret**
+- Adicionar `GGCHECKOUT_API_KEY` com o valor `ggck_live_eefba2cf32e6a3f790dacdc855f02ac631096d8fdb7ca49011c4288c96dd3307`
 
-1. **Produtos recorrentes** — criar 2-3 planos de assinatura mensal no ggCheckout (Starter, Pro, Studio) com cobrança recorrente
-2. **Produtos avulsos** — criar pacotes de créditos extras como pagamento único (já temos isso hoje)
-3. **Webhooks** — o ggCheckout precisa enviar webhook tanto para pagamento único quanto para renovação mensal
+**2. Criar edge function `ggcheckout-api`**
 
-### Implementação no sistema
+A função fará proxy das chamadas à API `https://www.ggcheckout.com/` com autenticação Bearer. Endpoints disponíveis:
 
-**1. Separar a página de planos em 2 seções**
-- **Assinaturas** (tabs ou seção superior): planos mensais com recarga automática
-- **Créditos avulsos** (seção inferior): pacotes de compra única para quem quer recarregar
+- `GET /api/me` — obter businessId
+- `GET /api/get-clients/business/{businessId}/payments` — listar todos pagamentos
+- `GET /api/get-clients/business/{businessId}/payments/paginated?pageSize=50&status=paid` — pagamentos paginados com filtros
 
-**2. Adicionar campos na tabela `credit_packages`**
-- `type`: `'subscription'` ou `'one_time'` para diferenciar
-- `billing_interval`: `'monthly'` para assinaturas
+A edge function receberá um parâmetro `action` (ex: `list_payments`, `get_business`) e retornará os dados da API do ggCheckout. Apenas admins autenticados poderão chamar.
 
-**3. Atualizar webhook para tratar renovações**
-- Quando o ggCheckout enviar webhook de renovação mensal, o sistema identifica que é renovação (não compra nova) e adiciona os créditos do ciclo
-- Usar o campo `order_id` para diferenciar primeira compra de renovação
+**3. Criar componente `AdminGGCheckout.tsx`**
 
-**4. Gestão de assinatura no perfil do usuário**
-- Salvar `plan_id` e `subscription_status` no perfil
-- Mostrar status da assinatura no app (ativo, cancelado, etc.)
+Nova aba "ggCheckout" no painel admin com:
+- KPIs do ggCheckout: total de pagamentos, valor total, pagamentos pendentes vs pagos
+- Lista de pagamentos recentes com status, email, valor, produto e data
+- Busca por email
+- Botão de reconciliação: comparar pagamentos do ggCheckout com pedidos locais na tabela `cakto_orders` e destacar divergências (pagamentos pagos que não geraram créditos)
 
-### Pré-requisito importante
+**4. Atualizar `Admin.tsx` e `useAdmin.ts`**
 
-Antes de implementar, preciso saber:
+- Adicionar nova aba "ggCheckout" na navegação
+- Adicionar método `getGGCheckoutPayments()` no hook que invoca a edge function
 
-- **O ggCheckout suporta cobranças recorrentes (assinatura)?** Nem todos os gateways de pagamento suportam. Se não suportar, podemos usar outro gateway para assinaturas (como Stripe) ou manter apenas créditos avulsos
-- **Quantos planos de assinatura quer oferecer?** (ex: Básico R$29,90/mês com 100cr, Pro R$49,90/mês com 200cr, etc.)
+### Detalhes Técnicos
 
-### Alternativa simples (sem assinatura)
-
-Se o ggCheckout não suportar recorrência, podemos manter apenas **pacotes avulsos** mas com uma abordagem de "planos sugeridos":
-- Mostrar os pacotes como se fossem planos (Starter, Pro, Studio)
-- O cliente compra manualmente todo mês quando quiser
-- Sem cobrança automática, sem cancelamento — mais simples
+- API base: `https://www.ggcheckout.com/`
+- Auth: `Authorization: Bearer {GGCHECKOUT_API_KEY}`
+- Primeiro chama `/api/me` para obter `businessId`, depois usa o `businessId` para listar pagamentos
+- Edge function com `verify_jwt = false` (validação JWT em código)
+- Reconciliação: cruzar `payment.id` do ggCheckout com `id` na tabela `cakto_orders` (prefixo `gg_`)
 
