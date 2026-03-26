@@ -107,16 +107,31 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Identificar pacote pelo valor pago
+    // Identificar pacote pelo valor pago + tipo (assinatura vs avulso)
+    const packageType = isSubscription ? 'subscription' : 'one_time'
     const { data: creditPackage } = await supabase
       .from('credit_packages')
       .select('*')
       .eq('price_brl', amountPaid)
+      .eq('type', packageType)
       .eq('is_active', true)
-      .single()
+      .maybeSingle()
 
-    const creditsToAdd = creditPackage?.credits ?? Math.max(Math.floor(amountPaid * 2.5), 10)
-    const packageType = creditPackage?.type || 'one_time'
+    // Fallback: tentar qualquer tipo se não encontrou pelo tipo específico
+    let finalPackage = creditPackage
+    if (!finalPackage) {
+      const { data: fallbackPackage } = await supabase
+        .from('credit_packages')
+        .select('*')
+        .eq('price_brl', amountPaid)
+        .eq('is_active', true)
+        .limit(1)
+        .maybeSingle()
+      finalPackage = fallbackPackage
+    }
+
+    const creditsToAdd = finalPackage?.credits ?? Math.max(Math.floor(amountPaid * 2.5), 10)
+    const finalPackageType = finalPackage?.type || packageType
 
     // Atualizar perfil do usuário
     const profileUpdate: Record<string, unknown> = {
