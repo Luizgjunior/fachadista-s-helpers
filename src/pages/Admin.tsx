@@ -97,7 +97,6 @@ const Admin = () => {
         {tab === "users" && <AdminUsers admin={admin} currentProfile={profile} />}
         {tab === "credits" && <AdminCredits admin={admin} />}
         {tab === "orders" && <AdminOrders admin={admin} />}
-        {tab === "ggcheckout" && <AdminGGCheckout />}
       </main>
     </div>
   );
