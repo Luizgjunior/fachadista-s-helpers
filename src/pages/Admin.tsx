@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, ArrowLeft, LogOut, BarChart3, Users, CreditCard, ShoppingCart, Wallet } from "lucide-react";
+import { Sparkles, ArrowLeft, LogOut, BarChart3, Users, CreditCard, ShoppingCart } from "lucide-react";
 import { useAuth, type Profile } from "@/hooks/useAuth";
 import { useAdmin, type AdminMetrics } from "@/hooks/useAdmin";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import AdminUsers from "@/components/admin/AdminUsers";
 import AdminCredits from "@/components/admin/AdminCredits";
 import AdminOrders from "@/components/admin/AdminOrders";
-import AdminGGCheckout from "@/components/admin/AdminGGCheckout";
 
-type AdminTab = "dashboard" | "users" | "credits" | "orders" | "ggcheckout";
+type AdminTab = "dashboard" | "users" | "credits" | "orders";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -27,7 +26,6 @@ const Admin = () => {
     { id: "users" as const, label: "Usuários", icon: Users },
     { id: "credits" as const, label: "Créditos", icon: CreditCard },
     { id: "orders" as const, label: "Pedidos", icon: ShoppingCart },
-    { id: "ggcheckout" as const, label: "ggCheckout", icon: Wallet },
   ];
 
   return (
@@ -99,7 +97,6 @@ const Admin = () => {
         {tab === "users" && <AdminUsers admin={admin} currentProfile={profile} />}
         {tab === "credits" && <AdminCredits admin={admin} />}
         {tab === "orders" && <AdminOrders admin={admin} />}
-        {tab === "ggcheckout" && <AdminGGCheckout />}
       </main>
     </div>
   );
