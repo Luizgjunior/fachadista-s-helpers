@@ -11,7 +11,6 @@ interface AdminCreditsProps {
     getCreditSummary: () => Promise<{ totalConsumed: number; totalDistributed: number; avgBalance: number }>;
     getTransactions: (limit?: number) => Promise<CreditTransaction[]>;
     rechargeProUsers: () => Promise<number>;
-    getCaktoOrders: (limit?: number) => Promise<CaktoOrder[]>;
   };
 }
 
