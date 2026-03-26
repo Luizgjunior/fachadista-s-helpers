@@ -3,7 +3,7 @@ import {
   RefreshCw, Search, AlertTriangle, CheckCircle, Plus, Package,
   XCircle, Clock, ArrowUpRight,
 } from "lucide-react";
-import type { CaktoOrder } from "@/hooks/useAdmin";
+import type { Order } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
