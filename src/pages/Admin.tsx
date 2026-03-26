@@ -26,7 +26,6 @@ const Admin = () => {
     { id: "users" as const, label: "Usuários", icon: Users },
     { id: "credits" as const, label: "Créditos", icon: CreditCard },
     { id: "orders" as const, label: "Pedidos", icon: ShoppingCart },
-    { id: "ggcheckout" as const, label: "ggCheckout", icon: Wallet },
   ];
 
   return (
