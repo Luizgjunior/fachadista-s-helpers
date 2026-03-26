@@ -52,7 +52,7 @@ export interface CreditTransaction {
   email: string;
 }
 
-export interface CaktoOrder {
+export interface Order {
   id: string;
   user_id: string | null;
   package_id: string | null;
