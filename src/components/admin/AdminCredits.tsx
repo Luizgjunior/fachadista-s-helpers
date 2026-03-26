@@ -197,80 +197,8 @@ export default function AdminCredits({ admin }: AdminCreditsProps) {
         )}
       </div>
 
-      {/* Cakto Orders */}
-      <div className="bg-surface rounded-2xl md:rounded-3xl border border-border shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-border flex items-center gap-3">
-          <ShoppingBag className="w-4 h-4 text-muted-foreground" />
-          <h3 className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">
-            Pedidos via Cakto
-          </h3>
-          {caktoOrders.length > 0 && (
-            <span className="bg-primary/10 text-primary text-[9px] font-black px-2 py-0.5 rounded-full">
-              {caktoOrders.length}
-            </span>
-          )}
-        </div>
 
-        {caktoOrders.length === 0 ? (
-          <div className="p-12 text-center text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
-            Nenhum pedido Cakto registrado
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  {["Data", "E-mail", "Pacote", "Créditos", "Valor", "Status"].map((h) => (
-                    <th
-                      key={h}
-                      className="text-left px-4 md:px-6 py-3 text-[9px] font-black uppercase tracking-widest text-muted-foreground"
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {caktoOrders.map((order) => {
-                  const isApproved = order.status === "approved";
-                  return (
-                    <tr key={order.id} className="border-b border-border/50 hover:bg-field-bg/50 transition-colors">
-                      <td className="px-4 md:px-6 py-3 text-[10px] font-medium text-muted-foreground whitespace-nowrap">
-                        {formatDateTime(order.processed_at)}
-                      </td>
-                      <td className="px-4 md:px-6 py-3 text-xs font-bold text-foreground truncate max-w-[180px]">
-                        {order.customer_email ?? "—"}
-                      </td>
-                      <td className="px-4 md:px-6 py-3">
-                        <span className="text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg bg-muted text-muted-foreground">
-                          {order.package_id ?? "—"}
-                        </span>
-                      </td>
-                      <td className="px-4 md:px-6 py-3">
-                        <span className="text-sm font-black text-green-600">+{order.credits_added}</span>
-                      </td>
-                      <td className="px-4 md:px-6 py-3 text-xs font-bold text-foreground whitespace-nowrap">
-                        {order.amount_paid != null ? `R$ ${Number(order.amount_paid).toFixed(2).replace(".", ",")}` : "—"}
-                      </td>
-                      <td className="px-4 md:px-6 py-3">
-                        <span
-                          className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg ${
-                            isApproved
-                              ? "bg-green-100 text-green-700"
-                              : "bg-destructive/10 text-destructive"
-                          }`}
-                        >
-                          {isApproved ? "Aprovado" : order.status}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+
       {showRechargeConfirm && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" onClick={() => setShowRechargeConfirm(false)} />
