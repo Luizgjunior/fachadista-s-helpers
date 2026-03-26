@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
     const expectedSecret = Deno.env.get('GGCHECKOUT_WEBHOOK_SECRET')
 
     if (!expectedSecret || webhookSecret !== expectedSecret) {
-      console.error('Webhook secret inválido')
+      console.error('Webhook secret inválido. Received length:', webhookSecret?.length, 'Expected length:', expectedSecret?.length)
       return new Response('Unauthorized', { status: 401 })
     }
 
