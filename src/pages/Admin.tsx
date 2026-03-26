@@ -7,9 +7,8 @@ import AdminDashboard from "@/components/admin/AdminDashboard";
 import AdminUsers from "@/components/admin/AdminUsers";
 import AdminCredits from "@/components/admin/AdminCredits";
 import AdminOrders from "@/components/admin/AdminOrders";
-import AdminGGCheckout from "@/components/admin/AdminGGCheckout";
 
-type AdminTab = "dashboard" | "users" | "credits" | "orders" | "ggcheckout";
+type AdminTab = "dashboard" | "users" | "credits" | "orders";
 
 const Admin = () => {
   const navigate = useNavigate();
