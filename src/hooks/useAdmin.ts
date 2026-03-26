@@ -392,6 +392,19 @@ export function useAdmin(profile: Profile | null) {
     [isAdmin]
   );
 
+  const getMonthlyMRR = useCallback(async (): Promise<MonthlyMRR[]> => {
+    if (!isAdmin) return [];
+    const { data, error } = await supabase
+      .from("admin_monthly_mrr" as any)
+      .select("*")
+      .order("month", { ascending: true });
+    if (error) {
+      console.error("Error fetching monthly MRR:", error);
+      return [];
+    }
+    return (data ?? []) as unknown as MonthlyMRR[];
+  }, [isAdmin]);
+
   const getCaktoOrders = useCallback(async (limit = 50): Promise<CaktoOrder[]> => {
     if (!isAdmin) return [];
     const { data, error } = await supabase
