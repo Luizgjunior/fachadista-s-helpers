@@ -479,11 +479,11 @@ function MetricCard({
   icon: any; color: string; bg: string; isString?: boolean;
 }) {
   return (
-    <div className="bg-surface rounded-2xl md:rounded-3xl border border-border p-4 md:p-6 shadow-sm">
-      <div className={`w-10 h-10 ${bg} rounded-xl flex items-center justify-center mb-3`}>
-        <Icon className={`w-5 h-5 ${color}`} />
+    <div className="bg-surface rounded-2xl md:rounded-3xl border border-border p-3 md:p-6 shadow-sm overflow-hidden">
+      <div className={`w-8 h-8 md:w-10 md:h-10 ${bg} rounded-xl flex items-center justify-center mb-2 md:mb-3 shrink-0`}>
+        <Icon className={`w-4 h-4 md:w-5 md:h-5 ${color}`} />
       </div>
-      <div className="text-2xl md:text-3xl font-black text-foreground tracking-tight">
+      <div className="text-xl md:text-3xl font-black text-foreground tracking-tight truncate">
         {isString ? value : (typeof value === "number" ? value.toLocaleString("pt-BR") : value)}
       </div>
       <div className="text-[9px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-1">
