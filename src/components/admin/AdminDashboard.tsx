@@ -209,7 +209,7 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
             Nenhuma venda registrada
           </div>
         ) : (
-          <div className="flex items-end gap-1 md:gap-1.5 h-40 md:h-52">
+          <div className="flex items-end gap-[2px] md:gap-1.5 h-40 md:h-52 overflow-hidden">
             {dailyRevenue.map(({ day, revenue, orders }) => {
               const heightPct = (revenue / maxRevenue) * 100;
               const dayNum = day.slice(8, 10);
