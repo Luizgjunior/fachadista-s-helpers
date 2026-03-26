@@ -446,7 +446,7 @@ function FinancialCard({
   icon: any; color: string; bg: string; highlight?: boolean;
 }) {
   return (
-    <div className={`bg-surface rounded-2xl md:rounded-3xl border p-4 md:p-5 shadow-sm ${
+    <div className={`bg-surface rounded-2xl md:rounded-3xl border p-3 md:p-5 shadow-sm overflow-hidden ${
       highlight ? "border-green-500/30 ring-1 ring-green-500/10" : "border-border"
     }`}>
       <div className="flex items-center justify-between mb-3">
