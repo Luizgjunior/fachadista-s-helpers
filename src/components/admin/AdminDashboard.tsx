@@ -222,7 +222,7 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
                     className="w-full bg-green-500/80 hover:bg-green-500 rounded-t-lg transition-colors cursor-default min-h-[4px]"
                     style={{ height: `${Math.max(heightPct, 3)}%` }}
                   />
-                  <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground/60">
+                   <span className="text-[7px] md:text-[9px] font-bold text-muted-foreground/60 truncate">
                     {dayNum}
                   </span>
                   <div className="absolute -top-10 left-1/2 -translate-x-1/2 hidden group-hover:block bg-foreground text-background text-[10px] font-bold px-2 py-1 rounded-lg whitespace-nowrap shadow-lg z-10">
