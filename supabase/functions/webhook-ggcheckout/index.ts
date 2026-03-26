@@ -107,16 +107,31 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Identificar pacote pelo valor pago
+    // Identificar pacote pelo valor pago + tipo (assinatura vs avulso)
+    const packageType = isSubscription ? 'subscription' : 'one_time'
     const { data: creditPackage } = await supabase
       .from('credit_packages')
       .select('*')
       .eq('price_brl', amountPaid)
+      .eq('type', packageType)
       .eq('is_active', true)
-      .single()
+      .maybeSingle()
 
-    const creditsToAdd = creditPackage?.credits ?? Math.max(Math.floor(amountPaid * 2.5), 10)
-    const packageType = creditPackage?.type || 'one_time'
+    // Fallback: tentar qualquer tipo se não encontrou pelo tipo específico
+    let finalPackage = creditPackage
+    if (!finalPackage) {
+      const { data: fallbackPackage } = await supabase
+        .from('credit_packages')
+        .select('*')
+        .eq('price_brl', amountPaid)
+        .eq('is_active', true)
+        .limit(1)
+        .maybeSingle()
+      finalPackage = fallbackPackage
+    }
+
+    const creditsToAdd = finalPackage?.credits ?? Math.max(Math.floor(amountPaid * 2.5), 10)
+    const finalPackageType = finalPackage?.type || packageType
 
     // Atualizar perfil do usuário
     const profileUpdate: Record<string, unknown> = {
@@ -125,9 +140,9 @@ Deno.serve(async (req) => {
     }
 
     // Se for assinatura, atualizar status e subscription_id
-    if (isSubscription || packageType === 'subscription') {
+    if (isSubscription || finalPackageType === 'subscription') {
       profileUpdate.subscription_status = 'active'
-      profileUpdate.plan_id = creditPackage?.id ?? profile.plan_id
+      profileUpdate.plan_id = finalPackage?.id ?? profile.plan_id
       if (subscriptionId) {
         profileUpdate.subscription_id = subscriptionId
       }
@@ -140,8 +155,8 @@ Deno.serve(async (req) => {
 
     // Descrição da transação
     const txDescription = isRenewal
-      ? `Renovação mensal via ggCheckout - ${creditPackage?.name ?? 'Plano'} - Pedido ${orderId}`
-      : `Compra via ggCheckout - ${creditPackage?.name ?? 'Pacote'} - Pedido ${orderId}`
+      ? `Renovação mensal via ggCheckout - ${finalPackage?.name ?? 'Plano'} - Pedido ${orderId}`
+      : `Compra via ggCheckout - ${finalPackage?.name ?? 'Pacote'} - Pedido ${orderId}`
 
     // Registrar transação
     await supabase.from('credit_transactions').insert({
@@ -155,7 +170,7 @@ Deno.serve(async (req) => {
     await supabase.from('cakto_orders').insert({
       id: orderKey,
       user_id: profile.id,
-      package_id: creditPackage?.id ?? null,
+      package_id: finalPackage?.id ?? null,
       credits_added: creditsToAdd,
       amount_paid: amountPaid,
       customer_email: customerEmail,
