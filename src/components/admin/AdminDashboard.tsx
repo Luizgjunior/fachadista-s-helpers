@@ -259,7 +259,7 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
                 return (
                   <div
                     key={month}
-                    className="flex-1 flex flex-col items-center gap-1 group relative"
+                    className="flex-1 min-w-0 flex flex-col items-center gap-1 group relative">
                   >
                     <div className="flex items-end gap-0.5 w-full h-full">
                       {/* MRR bar */}
