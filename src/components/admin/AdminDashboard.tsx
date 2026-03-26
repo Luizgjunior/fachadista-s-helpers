@@ -3,7 +3,7 @@ import {
   Users, Zap, Sparkles, Battery, ImageIcon, TrendingUp,
   DollarSign, RefreshCw, UserMinus, ShoppingCart, Receipt, ArrowUpRight, ArrowDownRight,
 } from "lucide-react";
-import type { AdminMetrics, FinancialMetrics, DailyRevenue, RevenueByPlan } from "@/hooks/useAdmin";
+import type { AdminMetrics, FinancialMetrics, DailyRevenue, RevenueByPlan, MonthlyMRR } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
 
 function Skeleton({ className = "" }: { className?: string }) {
