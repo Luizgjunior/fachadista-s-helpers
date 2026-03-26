@@ -52,7 +52,7 @@ export interface CreditTransaction {
   email: string;
 }
 
-export interface CaktoOrder {
+export interface Order {
   id: string;
   user_id: string | null;
   package_id: string | null;
@@ -405,7 +405,7 @@ export function useAdmin(profile: Profile | null) {
     return (data ?? []) as unknown as MonthlyMRR[];
   }, [isAdmin]);
 
-  const getCaktoOrders = useCallback(async (limit = 50): Promise<CaktoOrder[]> => {
+  const getOrders = useCallback(async (limit = 50): Promise<Order[]> => {
     if (!isAdmin) return [];
     const { data, error } = await supabase
       .from("cakto_orders")
@@ -413,10 +413,10 @@ export function useAdmin(profile: Profile | null) {
       .order("processed_at", { ascending: false })
       .limit(limit);
     if (error) {
-      console.error("Error fetching cakto orders:", error);
+      console.error("Error fetching orders:", error);
       return [];
     }
-    return (data ?? []) as CaktoOrder[];
+    return (data ?? []) as Order[];
   }, [isAdmin]);
 
   return {
@@ -436,7 +436,7 @@ export function useAdmin(profile: Profile | null) {
     getDailyPrompts,
     rechargeProUsers,
     getCreditSummary,
-    getCaktoOrders,
+    getOrders,
     getMonthlyMRR,
   };
 }

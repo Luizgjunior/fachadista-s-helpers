@@ -58,7 +58,7 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
     loadAll();
   }, [loadAll]);
 
-  // Realtime: listen to cakto_orders changes to auto-refresh
+  // Realtime: listen to orders changes to auto-refresh
   useEffect(() => {
     const channel = supabase
       .channel("admin-dashboard-realtime")

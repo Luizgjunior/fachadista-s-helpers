@@ -3,13 +3,13 @@ import {
   RefreshCw, Search, AlertTriangle, CheckCircle, Plus, Package,
   XCircle, Clock, ArrowUpRight,
 } from "lucide-react";
-import type { CaktoOrder } from "@/hooks/useAdmin";
+import type { Order } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface AdminOrdersProps {
   admin: {
-    getCaktoOrders: (limit?: number) => Promise<CaktoOrder[]>;
+    getOrders: (limit?: number) => Promise<Order[]>;
     updateUserCredits: (userId: string, currentCredits: number, delta: number, reason: string) => Promise<boolean>;
   };
 }
@@ -22,7 +22,7 @@ const statusConfig: Record<string, { label: string; color: string; icon: typeof 
 };
 
 export default function AdminOrders({ admin }: AdminOrdersProps) {
-  const [orders, setOrders] = useState<CaktoOrder[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
@@ -37,7 +37,7 @@ export default function AdminOrders({ admin }: AdminOrdersProps) {
 
   const loadOrders = useCallback(async () => {
     setLoading(true);
-    const data = await admin.getCaktoOrders(200);
+    const data = await admin.getOrders(200);
     setOrders(data);
     setLoading(false);
   }, [admin]);
@@ -55,7 +55,7 @@ export default function AdminOrders({ admin }: AdminOrdersProps) {
     return matchSearch && matchStatus;
   });
 
-  const handleReprocess = async (order: CaktoOrder) => {
+  const handleReprocess = async (order: Order) => {
     if (!order.customer_email || order.status === "approved" || order.status === "renewed") {
       toast.error("Pedido já processado ou sem email.");
       return;
