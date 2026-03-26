@@ -290,7 +290,7 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
                 );
               })}
             </div>
-            <div className="flex items-center gap-4 mt-4 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-3 md:gap-4 mt-4 text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
               <span className="flex items-center gap-1.5">
                 <span className="w-3 h-2 bg-green-500 rounded-sm inline-block" /> MRR (Assinaturas)
               </span>
