@@ -128,17 +128,16 @@ const ComparatorView = ({
             onPointerLeave={handlePointerUp}
           >
             {/* After image (full background) */}
-            <img src={afterImage} className="absolute inset-0 w-full h-full object-cover" alt="Render" draggable={false} />
+            <img src={afterImage} className="absolute inset-0 w-full h-full object-contain bg-secondary" alt="Render" draggable={false} />
             
-            {/* Before image (clipped) */}
+            {/* Before image (clipped via clip-path for perfect alignment) */}
             <div
-              className="absolute inset-0 overflow-hidden"
-              style={{ width: `${sliderPos}%` }}
+              className="absolute inset-0 pointer-events-none"
+              style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
             >
               <img
                 src={beforeImage}
-                className="absolute inset-0 h-full object-cover"
-                style={{ width: `${containerRef.current?.offsetWidth || 9999}px`, maxWidth: 'none' }}
+                className="absolute inset-0 w-full h-full object-contain"
                 alt="Projeto"
                 draggable={false}
               />
