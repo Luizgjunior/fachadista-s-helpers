@@ -235,7 +235,73 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
         )}
       </div>
 
-      {/* ═══ REVENUE BY PLAN ═══ */}
+      {/* ═══ MRR EVOLUTION CHART ═══ */}
+      <div className="bg-surface rounded-2xl md:rounded-3xl border border-border p-4 md:p-8 shadow-sm">
+        <h3 className="text-[11px] font-black uppercase tracking-widest text-muted-foreground mb-6 flex items-center gap-2">
+          <TrendingUp className="w-3.5 h-3.5 text-green-600" /> Evolução do MRR — Mês a Mês
+        </h3>
+
+        {monthlyMRR.length === 0 ? (
+          <div className="h-40 flex items-center justify-center text-[11px] font-bold text-muted-foreground/50 uppercase tracking-widest">
+            Nenhum dado disponível
+          </div>
+        ) : (
+          <>
+            <div className="flex items-end gap-2 md:gap-3 h-48 md:h-60">
+              {monthlyMRR.map(({ month, mrr, total_revenue, subscribers }, idx) => {
+                const maxMRR = Math.max(...monthlyMRR.map((m) => Math.max(m.mrr, m.total_revenue)), 1);
+                const mrrPct = (mrr / maxMRR) * 100;
+                const revPct = (total_revenue / maxMRR) * 100;
+                const monthLabel = new Date(month + "T00:00:00").toLocaleDateString("pt-BR", { month: "short" }).replace(".", "");
+                const yearLabel = new Date(month + "T00:00:00").getFullYear().toString().slice(2);
+                const prevMRR = idx > 0 ? monthlyMRR[idx - 1].mrr : 0;
+                const growth = prevMRR > 0 ? (((mrr - prevMRR) / prevMRR) * 100).toFixed(0) : null;
+                return (
+                  <div
+                    key={month}
+                    className="flex-1 flex flex-col items-center gap-1 group relative"
+                  >
+                    <div className="flex items-end gap-0.5 w-full h-full">
+                      {/* MRR bar */}
+                      <div
+                        className="flex-1 bg-green-500/80 hover:bg-green-500 rounded-t-md transition-colors cursor-default min-h-[4px]"
+                        style={{ height: `${Math.max(mrrPct, 3)}%` }}
+                      />
+                      {/* Total revenue bar */}
+                      <div
+                        className="flex-1 bg-primary/40 hover:bg-primary/60 rounded-t-md transition-colors cursor-default min-h-[4px]"
+                        style={{ height: `${Math.max(revPct, 3)}%` }}
+                      />
+                    </div>
+                    <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground/60">
+                      {monthLabel}/{yearLabel}
+                    </span>
+                    <div className="absolute -top-14 left-1/2 -translate-x-1/2 hidden group-hover:block bg-foreground text-background text-[10px] font-bold px-3 py-2 rounded-lg whitespace-nowrap shadow-lg z-10">
+                      <div>MRR: {formatBRL(mrr)}</div>
+                      <div>Receita: {formatBRL(total_revenue)}</div>
+                      <div>{subscribers} assinante{subscribers !== 1 ? "s" : ""}</div>
+                      {growth !== null && (
+                        <div className={Number(growth) >= 0 ? "text-green-400" : "text-red-400"}>
+                          {Number(growth) >= 0 ? "+" : ""}{growth}% vs mês anterior
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex items-center gap-4 mt-4 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <span className="w-3 h-2 bg-green-500 rounded-sm inline-block" /> MRR (Assinaturas)
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-3 h-2 bg-primary/40 rounded-sm inline-block" /> Receita Total
+              </span>
+            </div>
+          </>
+        )}
+      </div>
+
       {revenueByPlan.length > 0 && (
         <div className="bg-surface rounded-2xl md:rounded-3xl border border-border p-4 md:p-8 shadow-sm">
           <h3 className="text-[11px] font-black uppercase tracking-widest text-muted-foreground mb-6 flex items-center gap-2">
