@@ -22,7 +22,7 @@ const statusConfig: Record<string, { label: string; color: string; icon: typeof 
 };
 
 export default function AdminOrders({ admin }: AdminOrdersProps) {
-  const [orders, setOrders] = useState<CaktoOrder[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
