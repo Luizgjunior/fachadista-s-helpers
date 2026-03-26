@@ -101,7 +101,7 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
     : "0.0";
 
   return (
-    <div className="space-y-8 md:space-y-10">
+    <div className="space-y-6 md:space-y-10 w-full max-w-full overflow-x-hidden">
       {/* Last updated + refresh */}
       <div className="flex items-center justify-between">
         <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
@@ -209,7 +209,7 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
             Nenhuma venda registrada
           </div>
         ) : (
-          <div className="flex items-end gap-1 md:gap-1.5 h-40 md:h-52">
+          <div className="flex items-end gap-[2px] md:gap-1.5 h-40 md:h-52 overflow-hidden">
             {dailyRevenue.map(({ day, revenue, orders }) => {
               const heightPct = (revenue / maxRevenue) * 100;
               const dayNum = day.slice(8, 10);
@@ -222,7 +222,7 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
                     className="w-full bg-green-500/80 hover:bg-green-500 rounded-t-lg transition-colors cursor-default min-h-[4px]"
                     style={{ height: `${Math.max(heightPct, 3)}%` }}
                   />
-                  <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground/60">
+                   <span className="text-[7px] md:text-[9px] font-bold text-muted-foreground/60 truncate">
                     {dayNum}
                   </span>
                   <div className="absolute -top-10 left-1/2 -translate-x-1/2 hidden group-hover:block bg-foreground text-background text-[10px] font-bold px-2 py-1 rounded-lg whitespace-nowrap shadow-lg z-10">
@@ -247,7 +247,7 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
           </div>
         ) : (
           <>
-            <div className="flex items-end gap-2 md:gap-3 h-48 md:h-60">
+            <div className="flex items-end gap-1 md:gap-3 h-44 md:h-60 overflow-hidden">
               {monthlyMRR.map(({ month, mrr, total_revenue, subscribers }, idx) => {
                 const maxMRR = Math.max(...monthlyMRR.map((m) => Math.max(m.mrr, m.total_revenue)), 1);
                 const mrrPct = (mrr / maxMRR) * 100;
@@ -259,7 +259,7 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
                 return (
                   <div
                     key={month}
-                    className="flex-1 flex flex-col items-center gap-1 group relative"
+                    className="flex-1 min-w-0 flex flex-col items-center gap-1 group relative"
                   >
                     <div className="flex items-end gap-0.5 w-full h-full">
                       {/* MRR bar */}
@@ -273,8 +273,8 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
                         style={{ height: `${Math.max(revPct, 3)}%` }}
                       />
                     </div>
-                    <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground/60">
-                      {monthLabel}/{yearLabel}
+                    <span className="text-[7px] md:text-[9px] font-bold text-muted-foreground/60 truncate max-w-full">
+                      {monthLabel}
                     </span>
                     <div className="absolute -top-14 left-1/2 -translate-x-1/2 hidden group-hover:block bg-foreground text-background text-[10px] font-bold px-3 py-2 rounded-lg whitespace-nowrap shadow-lg z-10">
                       <div>MRR: {formatBRL(mrr)}</div>
@@ -290,7 +290,7 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
                 );
               })}
             </div>
-            <div className="flex items-center gap-4 mt-4 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-3 md:gap-4 mt-4 text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
               <span className="flex items-center gap-1.5">
                 <span className="w-3 h-2 bg-green-500 rounded-sm inline-block" /> MRR (Assinaturas)
               </span>
@@ -408,7 +408,7 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
             Nenhum dado disponível
           </div>
         ) : (
-          <div className="flex items-end gap-1 md:gap-1.5 h-40 md:h-52">
+          <div className="flex items-end gap-[2px] md:gap-1.5 h-40 md:h-52 overflow-hidden">
             {dailyData.map(({ day, prompts_count }) => {
               const heightPct = (prompts_count / maxPromptCount) * 100;
               const dayNum = day.slice(8, 10);
@@ -446,12 +446,12 @@ function FinancialCard({
   icon: any; color: string; bg: string; highlight?: boolean;
 }) {
   return (
-    <div className={`bg-surface rounded-2xl md:rounded-3xl border p-4 md:p-5 shadow-sm ${
+    <div className={`bg-surface rounded-2xl md:rounded-3xl border p-3 md:p-5 shadow-sm overflow-hidden ${
       highlight ? "border-green-500/30 ring-1 ring-green-500/10" : "border-border"
     }`}>
-      <div className="flex items-center justify-between mb-3">
-        <div className={`w-9 h-9 ${bg} rounded-xl flex items-center justify-center`}>
-          <Icon className={`w-4 h-4 ${color}`} />
+      <div className="flex items-center justify-between mb-2">
+        <div className={`w-8 h-8 md:w-9 md:h-9 ${bg} rounded-xl flex items-center justify-center shrink-0`}>
+          <Icon className={`w-3.5 h-3.5 md:w-4 md:h-4 ${color}`} />
         </div>
         {highlight && (
           <span className="text-[8px] font-black uppercase tracking-widest text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
@@ -459,7 +459,7 @@ function FinancialCard({
           </span>
         )}
       </div>
-      <div className={`text-xl md:text-2xl font-black tracking-tight ${
+      <div className={`text-base md:text-2xl font-black tracking-tight truncate ${
         highlight ? "text-green-600" : "text-foreground"
       }`}>
         {value}
@@ -479,11 +479,11 @@ function MetricCard({
   icon: any; color: string; bg: string; isString?: boolean;
 }) {
   return (
-    <div className="bg-surface rounded-2xl md:rounded-3xl border border-border p-4 md:p-6 shadow-sm">
-      <div className={`w-10 h-10 ${bg} rounded-xl flex items-center justify-center mb-3`}>
-        <Icon className={`w-5 h-5 ${color}`} />
+    <div className="bg-surface rounded-2xl md:rounded-3xl border border-border p-3 md:p-6 shadow-sm overflow-hidden">
+      <div className={`w-8 h-8 md:w-10 md:h-10 ${bg} rounded-xl flex items-center justify-center mb-2 md:mb-3 shrink-0`}>
+        <Icon className={`w-4 h-4 md:w-5 md:h-5 ${color}`} />
       </div>
-      <div className="text-2xl md:text-3xl font-black text-foreground tracking-tight">
+      <div className="text-xl md:text-3xl font-black text-foreground tracking-tight truncate">
         {isString ? value : (typeof value === "number" ? value.toLocaleString("pt-BR") : value)}
       </div>
       <div className="text-[9px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-1">
