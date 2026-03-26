@@ -25,6 +25,7 @@ const Admin = () => {
     { id: "dashboard" as const, label: "Dashboard", icon: BarChart3 },
     { id: "users" as const, label: "Usuários", icon: Users },
     { id: "credits" as const, label: "Créditos", icon: CreditCard },
+    { id: "orders" as const, label: "Pedidos", icon: ShoppingCart },
   ];
 
   return (
