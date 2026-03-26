@@ -101,7 +101,7 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
     : "0.0";
 
   return (
-    <div className="space-y-8 md:space-y-10">
+    <div className="space-y-6 md:space-y-10 w-full max-w-full overflow-x-hidden">
       {/* Last updated + refresh */}
       <div className="flex items-center justify-between">
         <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
