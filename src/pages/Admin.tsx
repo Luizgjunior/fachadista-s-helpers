@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, ArrowLeft, LogOut, BarChart3, Users, CreditCard, ShoppingCart, Wallet } from "lucide-react";
+import { Sparkles, ArrowLeft, LogOut, BarChart3, Users, CreditCard, ShoppingCart } from "lucide-react";
 import { useAuth, type Profile } from "@/hooks/useAuth";
 import { useAdmin, type AdminMetrics } from "@/hooks/useAdmin";
 import AdminDashboard from "@/components/admin/AdminDashboard";
