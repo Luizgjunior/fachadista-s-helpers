@@ -354,15 +354,22 @@ export function useAdmin(profile: Profile | null) {
   const deleteUser = useCallback(
     async (userId: string) => {
       if (!isAdmin) return false;
-      const { error } = await supabase
-        .from("profiles")
-        .delete()
-        .eq("id", userId);
+
+      const { data, error } = await supabase.functions.invoke("admin-delete-user", {
+        body: { user_id: userId },
+      });
+
       if (error) {
         toast.error("Erro ao excluir usuário.");
         return false;
       }
-      toast.success("Usuário excluído.");
+
+      if (data?.error) {
+        toast.error(data.error);
+        return false;
+      }
+
+      toast.success("Usuário excluído permanentemente.");
       return true;
     },
     [isAdmin]
