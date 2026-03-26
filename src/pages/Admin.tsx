@@ -27,7 +27,7 @@ const Admin = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden w-full max-w-full">
       {/* Header */}
       <header className="sticky top-0 z-50 glass-panel border-b border-border px-4 py-3 md:px-10 md:py-5">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between">
