@@ -68,6 +68,13 @@ export interface DailyPromptCount {
   prompts_count: number;
 }
 
+export interface MonthlyMRR {
+  month: string;
+  mrr: number;
+  total_revenue: number;
+  subscribers: number;
+}
+
 export function useAdmin(profile: Profile | null) {
   const isAdmin = profile?.is_admin === true;
 
