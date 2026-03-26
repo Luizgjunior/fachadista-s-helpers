@@ -436,7 +436,7 @@ export function useAdmin(profile: Profile | null) {
     getDailyPrompts,
     rechargeProUsers,
     getCreditSummary,
-    getCaktoOrders,
+    getOrders,
     getMonthlyMRR,
   };
 }
