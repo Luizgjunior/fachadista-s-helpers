@@ -307,6 +307,15 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_monthly_mrr: {
+        Row: {
+          month: string | null
+          mrr: number | null
+          subscribers: number | null
+          total_revenue: number | null
+        }
+        Relationships: []
+      }
       admin_revenue_by_plan: {
         Row: {
           credits_sold: number | null
