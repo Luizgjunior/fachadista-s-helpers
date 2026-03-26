@@ -42,38 +42,47 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'GGCHECKOUT_API_KEY not configured' }), { status: 500, headers: corsHeaders })
     }
 
-    const ggHeaders = {
+    const ggHeaders: Record<string, string> = {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'User-Agent': 'NewR-Admin/1.0',
     }
 
     const { action, params } = await req.json()
 
+    const fetchGG = async (url: string) => {
+      const res = await fetch(url, { headers: ggHeaders })
+      const text = await res.text()
+      
+      // Check if response is HTML (Cloudflare/Vercel protection)
+      if (text.startsWith('<!DOCTYPE') || text.startsWith('<html')) {
+        throw new Error('API_BLOCKED: ggCheckout API is behind bot protection and cannot be accessed from server. Use the local data view instead.')
+      }
+      
+      if (!res.ok) {
+        throw new Error(`ggCheckout API error [${res.status}]: ${text}`)
+      }
+      
+      return JSON.parse(text)
+    }
+
     if (action === 'get_business') {
-      const res = await fetch(`${GG_API_BASE}/me`, { headers: ggHeaders })
-      const data = await res.json()
-      if (!res.ok) throw new Error(`ggCheckout /me failed [${res.status}]: ${JSON.stringify(data)}`)
+      const data = await fetchGG(`${GG_API_BASE}/me`)
       return new Response(JSON.stringify(data), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     if (action === 'list_payments') {
-      // First get businessId
-      const meRes = await fetch(`${GG_API_BASE}/me`, { headers: ggHeaders })
-      const meData = await meRes.json()
-      if (!meRes.ok) throw new Error(`ggCheckout /me failed [${meRes.status}]`)
-
+      const meData = await fetchGG(`${GG_API_BASE}/me`)
       const businessId = meData?.id || meData?.businessId || meData?.business?.id
-      if (!businessId) throw new Error('Could not determine businessId from /me response')
+      if (!businessId) throw new Error('Could not determine businessId')
 
       const pageSize = params?.pageSize || 100
       const status = params?.status || ''
       let url = `${GG_API_BASE}/get-clients/business/${businessId}/payments/paginated?pageSize=${pageSize}`
       if (status) url += `&status=${status}`
 
-      const res = await fetch(url, { headers: ggHeaders })
-      const data = await res.json()
-      if (!res.ok) throw new Error(`ggCheckout payments failed [${res.status}]: ${JSON.stringify(data)}`)
-
+      const data = await fetchGG(url)
       return new Response(JSON.stringify(data), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
@@ -82,6 +91,10 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('ggcheckout-api error:', error)
     const msg = error instanceof Error ? error.message : 'Unknown error'
-    return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    const isBlocked = msg.includes('API_BLOCKED')
+    return new Response(
+      JSON.stringify({ error: msg, blocked: isBlocked }),
+      { status: isBlocked ? 503 : 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
   }
 })
