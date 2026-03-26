@@ -32,14 +32,12 @@ export default function AdminCredits({ admin }: AdminCreditsProps) {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const [s, t, o] = await Promise.all([
+      const [s, t] = await Promise.all([
         admin.getCreditSummary(),
         admin.getTransactions(50),
-        admin.getCaktoOrders(50),
       ]);
       setSummary(s);
       setTransactions(t);
-      setCaktoOrders(o);
       setLoading(false);
     };
     load();
