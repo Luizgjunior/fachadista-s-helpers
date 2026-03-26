@@ -37,7 +37,7 @@ export default function AdminOrders({ admin }: AdminOrdersProps) {
 
   const loadOrders = useCallback(async () => {
     setLoading(true);
-    const data = await admin.getCaktoOrders(200);
+    const data = await admin.getOrders(200);
     setOrders(data);
     setLoading(false);
   }, [admin]);
