@@ -449,9 +449,9 @@ function FinancialCard({
     <div className={`bg-surface rounded-2xl md:rounded-3xl border p-3 md:p-5 shadow-sm overflow-hidden ${
       highlight ? "border-green-500/30 ring-1 ring-green-500/10" : "border-border"
     }`}>
-      <div className="flex items-center justify-between mb-3">
-        <div className={`w-9 h-9 ${bg} rounded-xl flex items-center justify-center`}>
-          <Icon className={`w-4 h-4 ${color}`} />
+      <div className="flex items-center justify-between mb-2">
+        <div className={`w-8 h-8 md:w-9 md:h-9 ${bg} rounded-xl flex items-center justify-center shrink-0`}>
+          <Icon className={`w-3.5 h-3.5 md:w-4 md:h-4 ${color}`} />
         </div>
         {highlight && (
           <span className="text-[8px] font-black uppercase tracking-widest text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
