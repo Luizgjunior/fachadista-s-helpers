@@ -30,6 +30,7 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
   const [dailyData, setDailyData] = useState<{ day: string; prompts_count: number }[]>([]);
   const [dailyRevenue, setDailyRevenue] = useState<DailyRevenue[]>([]);
   const [revenueByPlan, setRevenueByPlan] = useState<RevenueByPlan[]>([]);
+  const [monthlyMRR, setMonthlyMRR] = useState<MonthlyMRR[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
