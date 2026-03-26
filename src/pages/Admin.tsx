@@ -8,7 +8,7 @@ import AdminUsers from "@/components/admin/AdminUsers";
 import AdminCredits from "@/components/admin/AdminCredits";
 import AdminOrders from "@/components/admin/AdminOrders";
 
-type AdminTab = "dashboard" | "users" | "credits";
+type AdminTab = "dashboard" | "users" | "credits" | "orders";
 
 const Admin = () => {
   const navigate = useNavigate();
