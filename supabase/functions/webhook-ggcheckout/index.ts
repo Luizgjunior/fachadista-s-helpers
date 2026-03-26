@@ -155,8 +155,8 @@ Deno.serve(async (req) => {
 
     // Descrição da transação
     const txDescription = isRenewal
-      ? `Renovação mensal via ggCheckout - ${creditPackage?.name ?? 'Plano'} - Pedido ${orderId}`
-      : `Compra via ggCheckout - ${creditPackage?.name ?? 'Pacote'} - Pedido ${orderId}`
+      ? `Renovação mensal via ggCheckout - ${finalPackage?.name ?? 'Plano'} - Pedido ${orderId}`
+      : `Compra via ggCheckout - ${finalPackage?.name ?? 'Pacote'} - Pedido ${orderId}`
 
     // Registrar transação
     await supabase.from('credit_transactions').insert({
@@ -170,7 +170,7 @@ Deno.serve(async (req) => {
     await supabase.from('cakto_orders').insert({
       id: orderKey,
       user_id: profile.id,
-      package_id: creditPackage?.id ?? null,
+      package_id: finalPackage?.id ?? null,
       credits_added: creditsToAdd,
       amount_paid: amountPaid,
       customer_email: customerEmail,
