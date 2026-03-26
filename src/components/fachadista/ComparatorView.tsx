@@ -1,5 +1,5 @@
-import { useRef, useCallback } from "react";
-import { ArrowRightLeft, ImageIcon, Sparkles, Check } from "lucide-react";
+import { useRef, useCallback, useState, useEffect } from "react";
+import { ArrowRightLeft, ImageIcon, Sparkles, Check, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 
 interface ComparatorViewProps {
   beforeImage: string | null;
@@ -16,21 +16,29 @@ const ComparatorView = ({
   beforeInputRef, afterInputRef, onFileUpload
 }: ComparatorViewProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const sliderPosition = useRef(50);
+  const [sliderPos, setSliderPos] = useState(50);
+  const isDragging = useRef(false);
 
-  const handleSliderMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      const x = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
-      const position = ((x - rect.left) / rect.width) * 100;
-      const clamped = Math.min(100, Math.max(0, position));
-      sliderPosition.current = clamped;
+  const updatePosition = useCallback((clientX: number) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const position = ((clientX - rect.left) / rect.width) * 100;
+    setSliderPos(Math.min(100, Math.max(0, position)));
+  }, []);
 
-      const clipEl = containerRef.current.querySelector('[data-clip]') as HTMLElement;
-      const handleEl = containerRef.current.querySelector('[data-handle]') as HTMLElement;
-      if (clipEl) clipEl.style.width = `${clamped}%`;
-      if (handleEl) handleEl.style.left = `${clamped}%`;
-    }
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    isDragging.current = true;
+    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+    updatePosition(e.clientX);
+  }, [updatePosition]);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!isDragging.current) return;
+    updatePosition(e.clientX);
+  }, [updatePosition]);
+
+  const handlePointerUp = useCallback(() => {
+    isDragging.current = false;
   }, []);
 
   return (
@@ -98,53 +106,81 @@ const ComparatorView = ({
         </div>
       ) : (
         <div className="w-full max-w-6xl mx-auto space-y-5 md:space-y-8 animate-in zoom-in-95 duration-500">
+          {/* Labels */}
           <div className="flex justify-between items-center px-1 md:px-8">
-            <div className="bg-surface px-3 py-1.5 md:px-6 md:py-3 rounded-lg md:rounded-2xl border border-border shadow-sm">
+            <div className="flex items-center gap-2 bg-surface px-3 py-1.5 md:px-6 md:py-3 rounded-lg md:rounded-2xl border border-border shadow-sm">
+              <ChevronLeft className="w-3 h-3 md:w-4 md:h-4 text-muted-foreground" />
               <span className="text-[9px] md:text-sm font-black uppercase tracking-[0.15em] text-foreground">PROJETO BASE</span>
             </div>
-            <div className="bg-primary px-3 py-1.5 md:px-6 md:py-3 rounded-lg md:rounded-2xl border border-primary shadow-sm">
-              <span className="text-[9px] md:text-sm font-black uppercase tracking-[0.15em] text-primary-foreground">RESULTADO FINAL</span>
+            <div className="flex items-center gap-2 bg-primary px-3 py-1.5 md:px-6 md:py-3 rounded-lg md:rounded-2xl border border-primary shadow-sm shadow-primary/20">
+              <span className="text-[9px] md:text-sm font-black uppercase tracking-[0.15em] text-primary-foreground">RENDER FINAL</span>
+              <ChevronRight className="w-3 h-3 md:w-4 md:h-4 text-primary-foreground" />
             </div>
           </div>
 
+          {/* Comparator */}
           <div
             ref={containerRef}
-            className="relative w-full aspect-[3/2] md:aspect-video rounded-2xl md:rounded-[55px] overflow-hidden cursor-ew-resize border border-border shadow-xl md:shadow-2xl select-none bg-secondary"
-            onMouseMove={handleSliderMove}
-            onTouchMove={handleSliderMove}
-            onClick={handleSliderMove}
+            className="relative w-full aspect-[3/2] md:aspect-video rounded-2xl md:rounded-[40px] overflow-hidden cursor-ew-resize border-2 border-border shadow-xl md:shadow-2xl select-none bg-secondary touch-none"
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerLeave={handlePointerUp}
           >
-            <img src={afterImage} className="absolute inset-0 w-full h-full object-cover" alt="Depois" draggable={false} />
+            {/* After image (full background) */}
+            <img src={afterImage} className="absolute inset-0 w-full h-full object-cover" alt="Render" draggable={false} />
+            
+            {/* Before image (clipped) */}
             <div
-              data-clip
-              className="absolute inset-0 overflow-hidden border-r-4 border-primary shadow-[15px_0_40px_rgba(217,70,239,0.2)]"
-              style={{ width: '50%' }}
+              className="absolute inset-0 overflow-hidden"
+              style={{ width: `${sliderPos}%` }}
             >
               <img
                 src={beforeImage}
-                className="absolute inset-0 w-full h-full object-cover max-w-none"
-                style={{ width: containerRef.current?.offsetWidth || '100%' }}
-                alt="Antes"
+                className="absolute inset-0 h-full object-cover"
+                style={{ width: `${containerRef.current?.offsetWidth || 9999}px`, maxWidth: 'none' }}
+                alt="Projeto"
                 draggable={false}
               />
             </div>
+
+            {/* Divider line */}
             <div
-              data-handle
-              className="absolute top-0 bottom-0 w-10 md:w-12 -ml-5 md:-ml-6 flex items-center justify-center pointer-events-none"
-              style={{ left: '50%' }}
+              className="absolute top-0 bottom-0 w-[3px] md:w-[4px] -translate-x-1/2 pointer-events-none z-10"
+              style={{ left: `${sliderPos}%` }}
             >
-              <div className="w-10 h-10 md:w-14 md:h-14 bg-surface rounded-full shadow-2xl flex items-center justify-center border-[3px] md:border-[4px] border-primary scale-110">
-                <ArrowRightLeft className="w-4 h-4 md:w-6 md:h-6 text-primary" />
+              <div className="w-full h-full bg-primary/90 shadow-[0_0_20px_rgba(217,70,239,0.4)]" />
+            </div>
+
+            {/* Handle */}
+            <div
+              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 pointer-events-none z-20"
+              style={{ left: `${sliderPos}%` }}
+            >
+              <div className="w-11 h-11 md:w-14 md:h-14 bg-surface rounded-full shadow-2xl flex items-center justify-center border-[3px] md:border-[4px] border-primary transition-transform hover:scale-110">
+                <ArrowRightLeft className="w-4 h-4 md:w-5 md:h-5 text-primary" />
               </div>
+            </div>
+
+            {/* Corner labels */}
+            <div className="absolute top-3 left-3 md:top-5 md:left-5 bg-background/80 backdrop-blur-sm px-2.5 py-1 md:px-4 md:py-1.5 rounded-lg md:rounded-xl pointer-events-none z-10">
+              <span className="text-[8px] md:text-[11px] font-black uppercase tracking-widest text-foreground/80">Antes</span>
+            </div>
+            <div className="absolute top-3 right-3 md:top-5 md:right-5 bg-primary/80 backdrop-blur-sm px-2.5 py-1 md:px-4 md:py-1.5 rounded-lg md:rounded-xl pointer-events-none z-10">
+              <span className="text-[8px] md:text-[11px] font-black uppercase tracking-widest text-primary-foreground/90">Depois</span>
             </div>
           </div>
 
+          {/* Controls */}
           <div className="flex justify-center flex-col items-center gap-3">
-            <p className="text-[9px] md:text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] animate-pulse">Deslize para comparar</p>
+            <p className="text-[9px] md:text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] animate-pulse">
+              Arraste o controle para comparar
+            </p>
             <button
-              onClick={() => { setBeforeImage(null); setAfterImage(null); }}
-              className="bg-surface hover:bg-surface-hover border border-border px-5 py-2.5 md:px-8 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-all shadow-sm"
+              onClick={() => { setBeforeImage(null); setAfterImage(null); setSliderPos(50); }}
+              className="flex items-center gap-2 bg-surface hover:bg-surface-hover border border-border px-5 py-2.5 md:px-8 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-all shadow-sm hover:shadow-md"
             >
+              <RotateCcw className="w-3 h-3 md:w-4 md:h-4" />
               Novo Comparativo
             </button>
           </div>
