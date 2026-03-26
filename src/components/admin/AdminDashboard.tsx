@@ -247,7 +247,7 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
           </div>
         ) : (
           <>
-            <div className="flex items-end gap-2 md:gap-3 h-48 md:h-60">
+            <div className="flex items-end gap-1 md:gap-3 h-44 md:h-60 overflow-hidden">
               {monthlyMRR.map(({ month, mrr, total_revenue, subscribers }, idx) => {
                 const maxMRR = Math.max(...monthlyMRR.map((m) => Math.max(m.mrr, m.total_revenue)), 1);
                 const mrrPct = (mrr / maxMRR) * 100;
