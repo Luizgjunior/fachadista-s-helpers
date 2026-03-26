@@ -36,18 +36,20 @@ export default function AdminDashboard({ admin }: AdminDashboardProps) {
 
   const loadAll = useCallback(async () => {
     setLoading(true);
-    const [m, d, f, dr, rp] = await Promise.all([
+    const [m, d, f, dr, rp, mm] = await Promise.all([
       admin.getMetrics(),
       admin.getDailyPrompts(),
       admin.getFinancialMetrics(),
       admin.getDailyRevenue(),
       admin.getRevenueByPlan(),
+      admin.getMonthlyMRR(),
     ]);
     setMetrics(m);
     setDailyData(d);
     setFinancial(f);
     setDailyRevenue(dr);
     setRevenueByPlan(rp);
+    setMonthlyMRR(mm);
     setLastUpdated(new Date());
     setLoading(false);
   }, [admin]);
