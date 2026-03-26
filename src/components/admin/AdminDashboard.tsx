@@ -459,7 +459,7 @@ function FinancialCard({
           </span>
         )}
       </div>
-      <div className={`text-xl md:text-2xl font-black tracking-tight ${
+      <div className={`text-base md:text-2xl font-black tracking-tight truncate ${
         highlight ? "text-green-600" : "text-foreground"
       }`}>
         {value}
