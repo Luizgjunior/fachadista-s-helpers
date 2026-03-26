@@ -9,7 +9,7 @@ import { toast } from "sonner";
 
 interface AdminOrdersProps {
   admin: {
-    getCaktoOrders: (limit?: number) => Promise<CaktoOrder[]>;
+    getOrders: (limit?: number) => Promise<Order[]>;
     updateUserCredits: (userId: string, currentCredits: number, delta: number, reason: string) => Promise<boolean>;
   };
 }
