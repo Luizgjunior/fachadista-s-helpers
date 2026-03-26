@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, ArrowLeft, LogOut, BarChart3, Users, CreditCard, ShoppingCart } from "lucide-react";
+import { Sparkles, ArrowLeft, LogOut, BarChart3, Users, CreditCard, ShoppingCart, Wallet } from "lucide-react";
 import { useAuth, type Profile } from "@/hooks/useAuth";
 import { useAdmin, type AdminMetrics } from "@/hooks/useAdmin";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import AdminUsers from "@/components/admin/AdminUsers";
 import AdminCredits from "@/components/admin/AdminCredits";
 import AdminOrders from "@/components/admin/AdminOrders";
+import AdminGGCheckout from "@/components/admin/AdminGGCheckout";
 
-type AdminTab = "dashboard" | "users" | "credits" | "orders";
+type AdminTab = "dashboard" | "users" | "credits" | "orders" | "ggcheckout";
 
 const Admin = () => {
   const navigate = useNavigate();
