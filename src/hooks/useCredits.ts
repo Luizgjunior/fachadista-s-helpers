@@ -76,6 +76,11 @@ export function useCredits({ profile, refreshProfile }: UseCreditsOptions) {
     [consumeCredits]
   );
 
+  const consumeMontageCredits = useCallback(
+    () => consumeCredits(CREDIT_COSTS.MONTAGE, "Montagem de fachada"),
+    [consumeCredits]
+  );
+
   return {
     credits,
     hasCredits,
