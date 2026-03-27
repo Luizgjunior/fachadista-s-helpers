@@ -87,9 +87,11 @@ export function useCredits({ profile, refreshProfile }: UseCreditsOptions) {
     hasCreditsForPrompt,
     hasCreditsForImage,
     hasCreditsForVideo,
+    hasCreditsForMontage,
     consumeCredits,
     consumePromptCredits,
     consumeImageCredits,
     consumeVideoCredits,
+    consumeMontageCredits,
   };
 }
