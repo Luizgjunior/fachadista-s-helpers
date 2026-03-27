@@ -24,64 +24,33 @@ serve(async (req) => {
       );
     }
 
-    // Extract base64 data from data URLs
-    const extractBase64 = (dataUrl: string) => {
-      const match = dataUrl.match(/^data:image\/(\w+);base64,(.+)$/);
-      if (!match) return null;
-      return { mimeType: `image/${match[1]}`, data: match[2] };
-    };
+    const prompt = `You are an expert architectural photomontage artist. 
 
-    const locationData = extractBase64(locationImage);
-    const facadeData = extractBase64(facadeImage);
-    const maskData = maskImage ? extractBase64(maskImage) : null;
+I'm giving you three images:
+1. A LOCATION PHOTO - the real-world site
+2. A FACADE DESIGN - the architectural render/design to insert
+3. A MASK (red markings on the location photo showing exactly where the facade goes)
 
-    if (!locationData || !facadeData) {
-      return new Response(
-        JSON.stringify({ error: "Invalid image format. Must be base64 data URLs." }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+TASK: Insert the facade design into the marked red area of the location photo. Create a photorealistic composite that:
+- Matches perspective, lighting, shadows and scale of the location
+- Blends edges naturally
+- Preserves surrounding environment (sky, vegetation, buildings, sidewalk)
+- Adjusts color temperature to match ambient lighting
+- Adds appropriate shadows and reflections
 
-    const systemPrompt = `You are an expert architectural photomontage artist. Your task is to seamlessly composite a facade design onto a location photograph.
+Generate ONLY the final composited image.`;
 
-INSTRUCTIONS:
-1. The first image is the LOCATION PHOTO - the real-world site where the facade should be placed.
-2. The second image is the FACADE DESIGN - the architectural render/design to be inserted.
-3. The third image (if provided) is a MASK showing the exact area (white regions on black background) where the facade should be placed on the location photo.
-
-REQUIREMENTS:
-- Insert the facade design into the marked area of the location photo with photorealistic quality.
-- Match the perspective, lighting, shadows, and scale of the location photo.
-- Blend edges naturally so the composition looks like a real photograph.
-- Preserve the surrounding environment (sky, vegetation, neighboring buildings, sidewalk).
-- Adjust the facade's color temperature and brightness to match the ambient lighting.
-- Add appropriate shadows and reflections.
-- The result should look like a professional architectural photomontage.
-
-Generate ONLY the final composited image. No text, no explanations.`;
-
-    // Build messages with images
     const userContent: any[] = [
-      {
-        type: "text",
-        text: "Please composite the facade design onto the location photo in the area indicated by the mask. Create a photorealistic result.",
-      },
-      {
-        type: "image_url",
-        image_url: { url: `data:${locationData.mimeType};base64,${locationData.data}` },
-      },
-      {
-        type: "image_url",
-        image_url: { url: `data:${facadeData.mimeType};base64,${facadeData.data}` },
-      },
+      { type: "text", text: prompt },
+      { type: "image_url", image_url: { url: locationImage } },
+      { type: "image_url", image_url: { url: facadeImage } },
     ];
 
-    if (maskData) {
-      userContent.push({
-        type: "image_url",
-        image_url: { url: `data:${maskData.mimeType};base64,${maskData.data}` },
-      });
+    if (maskImage) {
+      userContent.push({ type: "image_url", image_url: { url: maskImage } });
     }
+
+    console.log("Calling AI gateway with gemini-3-pro-image-preview...");
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -92,9 +61,9 @@ Generate ONLY the final composited image. No text, no explanations.`;
       body: JSON.stringify({
         model: "google/gemini-3-pro-image-preview",
         messages: [
-          { role: "system", content: systemPrompt },
           { role: "user", content: userContent },
         ],
+        modalities: ["image", "text"],
       }),
     });
 
@@ -122,33 +91,42 @@ Generate ONLY the final composited image. No text, no explanations.`;
     }
 
     const data = await response.json();
+    console.log("Response keys:", JSON.stringify(Object.keys(data)));
+    
     const choice = data.choices?.[0]?.message;
-
-    // Extract image from response
     let imageUrl: string | null = null;
 
-    if (choice?.content) {
-      // Check if content is an array (multimodal response)
-      if (Array.isArray(choice.content)) {
-        for (const part of choice.content) {
-          if (part.type === "image_url" && part.image_url?.url) {
-            imageUrl = part.image_url.url;
-            break;
-          }
-        }
-      } else if (typeof choice.content === "string") {
-        // Check if it's a base64 image embedded in text
-        const b64Match = choice.content.match(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/);
-        if (b64Match) {
-          imageUrl = b64Match[0];
+    // Image generation models return images in message.images array
+    if (choice?.images && Array.isArray(choice.images) && choice.images.length > 0) {
+      imageUrl = choice.images[0]?.image_url?.url || null;
+      console.log("Found image in images array");
+    }
+
+    // Fallback: check content array
+    if (!imageUrl && Array.isArray(choice?.content)) {
+      for (const part of choice.content) {
+        if (part.type === "image_url" && part.image_url?.url) {
+          imageUrl = part.image_url.url;
+          console.log("Found image in content array");
+          break;
         }
       }
     }
 
+    // Fallback: check string content for base64
+    if (!imageUrl && typeof choice?.content === "string") {
+      const b64Match = choice.content.match(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/);
+      if (b64Match) {
+        imageUrl = b64Match[0];
+        console.log("Found image in string content");
+      }
+    }
+
     if (!imageUrl) {
-      console.error("No image in response:", JSON.stringify(data).slice(0, 500));
+      console.error("No image in response. Choice keys:", choice ? JSON.stringify(Object.keys(choice)) : "null");
+      console.error("Response snippet:", JSON.stringify(data).slice(0, 1000));
       return new Response(
-        JSON.stringify({ error: "O modelo não retornou uma imagem. Tente novamente com uma marcação mais clara." }),
+        JSON.stringify({ error: "O modelo não retornou uma imagem. Tente novamente." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
