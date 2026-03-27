@@ -1,5 +1,5 @@
 import {
-  Sparkles, RotateCcw, RefreshCw, Zap, ArrowRightLeft, LogOut, Shield, ShoppingCart, Menu
+  Sparkles, RotateCcw, RefreshCw, Zap, ArrowRightLeft, LogOut, Shield, ShoppingCart, Menu, Layers
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { type AppMode } from "@/types/fachadista";
