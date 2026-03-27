@@ -715,7 +715,7 @@ const Landing = () => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-5"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
           >
             {TESTIMONIALS.map((t, i) => (
               <motion.div key={i} variants={fadeUp} whileHover={{ y: -4 }} className="bg-surface border border-border rounded-3xl p-6 hover:border-primary/20 transition-all">
