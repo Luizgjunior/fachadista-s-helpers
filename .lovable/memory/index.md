@@ -13,20 +13,27 @@ Fachadista - Architectural prompt generator adapted from GitHub repo
 - Types: src/types/fachadista.ts
 - Service: src/services/geminiService.ts (uses fetch, not @google/genai SDK)
 - Constants: src/constants/defaults.ts
-- Components: src/components/fachadista/ (AppHeader, ControlPanel, ComparatorView, ImageUploadZone, PromptResult, SelectField, SliderField, ToggleSwitch, AIVideoGenerator, UpgradeModal)
+- Components: src/components/fachadista/ (AppHeader, ControlPanel, ComparatorView, ImageUploadZone, PromptResult, SelectField, SliderField, ToggleSwitch, AIVideoGenerator, UpgradeModal, MontageView, FreeUserPromo)
 - Requires VITE_GEMINI_API_KEY env var for Gemini API
 
 ## Credit Costs
 - PROMPT: 3 credits
 - IMAGE: 5 credits  
+- MONTAGE: 10 credits (Facade placement via Lovable AI)
 - VIDEO: 30 credits (Fal AI Kling 2.1 Standard, ~$0.28/video, margin ~5x)
 
 ## Edge Functions
 - generate-prompt: Lovable AI prompt generation
 - generate-render: Lovable AI image generation
+- generate-montage: Lovable AI facade composition (gemini-3-pro-image-preview)
 - generate-video: Fal AI Kling 2.1 Standard image-to-video (FAL_KEY secret)
 - admin-create-user: Admin user creation
-- webhook-cakto: Payment webhook
+- webhook-ggcheckout: Payment webhook
+
+## App Modes
+- generator: Main prompt/render generation
+- comparator: Before/after image comparison
+- montagem: Facade placement (upload location + facade + draw mask → AI composition)
 
 ## Removed
 - src/repo-source/ (raw downloaded files, replaced by adapted versions)
