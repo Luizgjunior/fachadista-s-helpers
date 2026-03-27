@@ -205,10 +205,49 @@ const TypewriterText = ({ texts, className }: { texts: string[]; className?: str
 const FEATURES = [
   { icon: Sparkles, title: "Prompts com IA", desc: "Análise inteligente da sua imagem para gerar prompts otimizados para Midjourney e DALL·E." },
   { icon: Image, title: "Render com IA", desc: "Gere renders fotorrealistas direto na plataforma, sem sair do sistema." },
+  { icon: Paintbrush, title: "Montagem de Fachada", desc: "Envie a foto do local, a fachada desejada, marque onde quer posicionar e a IA faz a montagem perfeita." },
+  { icon: Video, title: "Vídeo Animação IA", desc: "Transforme seus renders em vídeos animados cinematográficos para impressionar clientes." },
   { icon: Layers, title: "Comparador", desc: "Compare lado a lado o projeto original e o render para apresentações impactantes." },
   { icon: Eye, title: "Referência Borrada", desc: "Oculte a referência para que a IA crie sem viés, gerando resultados mais criativos." },
   { icon: Zap, title: "Parâmetros Avançados", desc: "Controle iluminação, estilo, vegetação, entorno urbano e muito mais." },
   { icon: MessageSquare, title: "Prompt Bilíngue", desc: "Prompt em inglês (para IA) e português (para você entender), com tags profissionais." },
+];
+
+const HOW_IT_WORKS = [
+  { step: "01", title: "Faça upload", desc: "Envie qualquer imagem: SketchUp, Revit, croqui à mão, foto de maquete.", icon: Image },
+  { step: "02", title: "Configure", desc: "Ajuste estilo, iluminação, vegetação e parâmetros com controles intuitivos.", icon: Zap },
+  { step: "03", title: "Gere com IA", desc: "Nossa IA cria o prompt perfeito e gera o render fotorrealista em segundos.", icon: Sparkles },
+  { step: "04", title: "Apresente", desc: "Compare antes/depois, monte fachadas e crie vídeos para surpreender seu cliente.", icon: TrendingUp },
+];
+
+const PAIN_POINTS = [
+  { problem: "3-5 dias esperando o render", solution: "Pronto em 30 segundos", icon: Clock },
+  { problem: "R$ 500-2.000 por render externo", solution: "A partir de R$ 1,00 por render", icon: TrendingUp },
+  { problem: "Software pesado + máquina cara", solution: "100% online, sem instalação", icon: Shield },
+  { problem: "Horas montando fachada no Photoshop", solution: "Montagem IA em 1 clique", icon: Paintbrush },
+];
+
+const PLANS = [
+  { name: "Starter", credits: 50, price: "R$ 19,90", perCredit: "R$ 0,40", popular: false, features: ["50 créditos/mês", "~16 prompts, ~10 renders ou ~1 vídeo IA", "Montagem de fachada com IA", "Recarga automática mensal", "Comparador de renders"] },
+  { name: "Pro", credits: 200, price: "R$ 49,90", perCredit: "R$ 0,25", popular: true, features: ["200 créditos/mês", "~66 prompts, ~40 renders ou ~6 vídeos IA", "Montagem de fachada com IA", "Recarga automática mensal", "Economia de 37%", "Preview visual IA", "Suporte prioritário"] },
+  { name: "Studio", credits: 500, price: "R$ 99,90", perCredit: "R$ 0,20", popular: false, features: ["500 créditos/mês", "~166 prompts, ~100 renders ou ~16 vídeos IA", "Montagem de fachada ilimitada", "Recarga automática mensal", "Economia de 50%", "Acesso antecipado a novidades", "Suporte VIP"] },
+];
+
+const FAQ = [
+  { q: "Como funciona o NewRender?", a: "Você faz upload de uma imagem do seu projeto (SketchUp, planta, croqui), configura parâmetros como iluminação e estilo, e nossa IA gera um prompt profissional otimizado. Com esse prompt, você pode gerar um render fotorrealista diretamente na plataforma." },
+  { q: "O que é a Montagem de Fachada?", a: "É a funcionalidade mais poderosa do NewRender. Você envia a foto real do local (terreno, prédio), envia o projeto da fachada, marca na foto onde quer posicionar e a IA faz a composição fotorrealista — como se a fachada já estivesse construída. Perfeito para apresentar ao cliente." },
+  { q: "Preciso saber usar Midjourney?", a: "Não! O NewRender gera o prompt pronto para copiar e colar. Além disso, você pode gerar o render direto na nossa plataforma sem precisar de nenhuma outra ferramenta." },
+  { q: "Quanto custa cada operação?", a: "Prompt: 3 créditos. Render com IA: 5 créditos. Montagem de Fachada: 10 créditos. Vídeo animação IA: 30 créditos. Você pode comprar pacotes de créditos sem mensalidade." },
+  { q: "Os créditos expiram?", a: "Não! Seus créditos ficam na conta até serem usados. Sem prazo de validade, sem surpresas." },
+  { q: "Posso usar qualquer tipo de imagem?", a: "Sim! SketchUp, Revit, AutoCAD, fotos de maquete, croquis à mão livre, plantas humanizadas, fotos de terrenos reais — qualquer referência visual funciona." },
+  { q: "A qualidade do render é profissional?", a: "Sim. Nosso sistema usa modelos de IA de última geração com prompts otimizados especificamente para arquitetura, gerando resultados com qualidade de estúdio de renderização." },
+];
+
+const TESTIMONIALS = [
+  { name: "Arq. Marina S.", role: "Escritório de Fachadas", text: "Reduzi de 3 dias para 15 minutos o tempo de apresentação de fachadas para o cliente. Impressionante.", stars: 5 },
+  { name: "Arq. Ricardo L.", role: "Projetos Residenciais", text: "A montagem de fachada é absurda. Mostro pro cliente como vai ficar o prédio no terreno real. Nunca mais perco venda.", stars: 5 },
+  { name: "Designer Juliana M.", role: "Interiores & Comercial", text: "Uso para interiores e fachadas. A função de comparação antes/depois é perfeita para reuniões com o cliente.", stars: 5 },
+  { name: "Eng. Carlos P.", role: "Construtora", text: "Os vídeos animados e montagens de fachada mudaram o nível das nossas apresentações. O cliente assina na hora.", stars: 5 },
 ];
 
 const HOW_IT_WORKS = [
