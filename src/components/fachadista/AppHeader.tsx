@@ -139,6 +139,16 @@ const AppHeader = ({
             >
               <ArrowRightLeft className="w-3 h-3" /> Compare
             </button>
+            <button
+              onClick={() => setAppMode('montagem')}
+              className={`flex-1 py-2 rounded-[10px] text-[10px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 ${
+                appMode === 'montagem'
+                  ? 'bg-brand-glow text-primary-foreground shadow-md shadow-brand-glow/20'
+                  : 'text-muted-foreground'
+              }`}
+            >
+              <Layers className="w-3 h-3" /> Montagem
+            </button>
           </div>
         </div>
       </div>
