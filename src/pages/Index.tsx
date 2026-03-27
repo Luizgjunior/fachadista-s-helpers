@@ -220,6 +220,10 @@ const Index = () => {
       setResult(data);
       setHistory(prev => [data, ...prev].slice(0, 10));
       await savePromptToDb(data);
+      // Show promo for free users who never purchased
+      if (hasPurchased === false) {
+        setTimeout(() => setPromoOpen(true), 1500);
+      }
     } catch (err: any) {
       console.error('Erro completo:', err);
       toast.error(err?.message || 'Erro desconhecido. Veja o console.');
