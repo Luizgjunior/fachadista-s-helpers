@@ -8,6 +8,7 @@ import PromptResult from "@/components/fachadista/PromptResult";
 import ControlPanel, { ControlPanelContent } from "@/components/fachadista/ControlPanel";
 import ComparatorView from "@/components/fachadista/ComparatorView";
 import UpgradeModal from "@/components/fachadista/UpgradeModal";
+import FreeUserPromo from "@/components/fachadista/FreeUserPromo";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { DEFAULT_PARAMS } from "@/constants/defaults";
 import { generateArchitecturalPrompt, generateSamplePreview } from "@/services/geminiService";
