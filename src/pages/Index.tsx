@@ -7,6 +7,7 @@ import ImageUploadZone from "@/components/fachadista/ImageUploadZone";
 import PromptResult from "@/components/fachadista/PromptResult";
 import ControlPanel, { ControlPanelContent } from "@/components/fachadista/ControlPanel";
 import ComparatorView from "@/components/fachadista/ComparatorView";
+import MontageView from "@/components/fachadista/MontageView";
 import UpgradeModal from "@/components/fachadista/UpgradeModal";
 import FreeUserPromo from "@/components/fachadista/FreeUserPromo";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
@@ -31,7 +32,7 @@ const mobileLoadingMessages = [
 const Index = () => {
   const navigate = useNavigate();
   const { user, profile, signOut, refreshProfile } = useAuth();
-  const { credits, hasCreditsForPrompt, hasCreditsForImage, consumePromptCredits, consumeImageCredits } = useCredits({ profile, refreshProfile });
+  const { credits, hasCreditsForPrompt, hasCreditsForImage, consumePromptCredits, consumeImageCredits, consumeMontageCredits } = useCredits({ profile, refreshProfile });
 
   const [appMode, setAppMode] = useState<AppMode>('generator');
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -410,6 +411,14 @@ const Index = () => {
           beforeInputRef={beforeInputRef}
           afterInputRef={afterInputRef}
           onFileUpload={(e, target) => handleFileUpload(e, target)}
+        />
+      )}
+
+      {appMode === 'montagem' && (
+        <MontageView
+          onConsumeCredits={consumeMontageCredits}
+          onUpgradeClick={() => setUpgradeOpen(true)}
+          profile={profile}
         />
       )}
 

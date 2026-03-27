@@ -1,5 +1,5 @@
 import {
-  Sparkles, RotateCcw, RefreshCw, Zap, ArrowRightLeft, LogOut, Shield, ShoppingCart, Menu
+  Sparkles, RotateCcw, RefreshCw, Zap, ArrowRightLeft, LogOut, Shield, ShoppingCart, Menu, Layers
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { type AppMode } from "@/types/fachadista";
@@ -139,6 +139,16 @@ const AppHeader = ({
             >
               <ArrowRightLeft className="w-3 h-3" /> Compare
             </button>
+            <button
+              onClick={() => setAppMode('montagem')}
+              className={`flex-1 py-2 rounded-[10px] text-[10px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 ${
+                appMode === 'montagem'
+                  ? 'bg-brand-glow text-primary-foreground shadow-md shadow-brand-glow/20'
+                  : 'text-muted-foreground'
+              }`}
+            >
+              <Layers className="w-3 h-3" /> Montagem
+            </button>
           </div>
         </div>
       </div>
@@ -162,7 +172,7 @@ const AppHeader = ({
         <div className="flex bg-secondary p-1.5 rounded-2xl border border-border shadow-sm">
           <button
             onClick={() => setAppMode('generator')}
-            className={`px-6 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
+            className={`px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
               appMode === 'generator'
                 ? 'bg-surface text-primary shadow-md border border-border'
                 : 'text-muted-foreground hover:text-foreground'
@@ -172,13 +182,23 @@ const AppHeader = ({
           </button>
           <button
             onClick={() => setAppMode('comparator')}
-            className={`px-6 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
+            className={`px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
               appMode === 'comparator'
                 ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <ArrowRightLeft className="w-3.5 h-3.5" /> Compare
+          </button>
+          <button
+            onClick={() => setAppMode('montagem')}
+            className={`px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
+              appMode === 'montagem'
+                ? 'bg-brand-glow text-primary-foreground shadow-lg shadow-brand-glow/20'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" /> Montagem
           </button>
         </div>
 
