@@ -8,6 +8,7 @@ import PromptResult from "@/components/fachadista/PromptResult";
 import ControlPanel, { ControlPanelContent } from "@/components/fachadista/ControlPanel";
 import ComparatorView from "@/components/fachadista/ComparatorView";
 import UpgradeModal from "@/components/fachadista/UpgradeModal";
+import FreeUserPromo from "@/components/fachadista/FreeUserPromo";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { DEFAULT_PARAMS } from "@/constants/defaults";
 import { generateArchitecturalPrompt, generateSamplePreview } from "@/services/geminiService";
@@ -35,6 +36,21 @@ const Index = () => {
   const [appMode, setAppMode] = useState<AppMode>('generator');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [promoOpen, setPromoOpen] = useState(false);
+  const [hasPurchased, setHasPurchased] = useState<boolean | null>(null);
+
+  // Check if free user has ever purchased
+  useEffect(() => {
+    if (!user || profile?.is_admin || (profile?.plan_id && profile.plan_id !== 'free')) {
+      setHasPurchased(true); // skip promo for admin/paid users
+      return;
+    }
+    supabase
+      .from("cakto_orders")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .then(({ count }) => setHasPurchased((count ?? 0) > 0));
+  }, [user, profile]);
 
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -204,6 +220,10 @@ const Index = () => {
       setResult(data);
       setHistory(prev => [data, ...prev].slice(0, 10));
       await savePromptToDb(data);
+      // Show promo for free users who never purchased
+      if (hasPurchased === false) {
+        setTimeout(() => setPromoOpen(true), 1500);
+      }
     } catch (err: any) {
       console.error('Erro completo:', err);
       toast.error(err?.message || 'Erro desconhecido. Veja o console.');
@@ -276,6 +296,7 @@ const Index = () => {
       />
 
       <UpgradeModal open={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
+      <FreeUserPromo open={promoOpen} onClose={() => setPromoOpen(false)} creditsRemaining={credits} />
 
       {appMode === 'generator' && (
         <>
