@@ -24,21 +24,28 @@ serve(async (req) => {
       );
     }
 
-    const prompt = `You are an expert architectural photomontage artist. 
+    const prompt = `You are a precision architectural photomontage tool. Your ONLY job is to place a facade design onto a location photo.
 
-I'm giving you three images:
-1. A LOCATION PHOTO - the real-world site
-2. A FACADE DESIGN - the architectural render/design to insert
-3. A MASK (red markings on the location photo showing exactly where the facade goes)
+CRITICAL RULES — FOLLOW EXACTLY:
+1. The LOCATION PHOTO (image 1) is the BASE. You must preserve it PIXEL-PERFECTLY. Do NOT alter, modify, recolor, reshape, or reimagine ANY part of the location photo except the exact area marked in red.
+2. The FACADE DESIGN (image 2) is what must be placed INTO the red-marked area ONLY.
+3. The MASK (image 3) shows the red-marked zone — this is the ONLY area you may change.
 
-TASK: Insert the facade design into the marked red area of the location photo. Create a photorealistic composite that:
-- Matches perspective, lighting, shadows and scale of the location
-- Blends edges naturally
-- Preserves surrounding environment (sky, vegetation, buildings, sidewalk)
-- Adjusts color temperature to match ambient lighting
-- Adds appropriate shadows and reflections
+STRICT PRESERVATION REQUIREMENTS:
+- The sky, clouds, trees, cars, people, sidewalk, road, neighboring buildings, poles, wires, signs — ALL must remain 100% identical to the original location photo.
+- Do NOT change lighting, color grading, saturation, contrast, or any visual property of the original photo.
+- Do NOT add, remove, or modify any object outside the marked area.
+- Do NOT crop, resize, or change the aspect ratio of the original photo.
+- The output image must have the EXACT same composition, framing, and dimensions as the location photo.
 
-Generate ONLY the final composited image.`;
+FACADE INSERTION RULES:
+- Place the facade design ONLY within the red-marked boundaries.
+- Adjust the facade's perspective to match the building's perspective in the location photo.
+- Match the facade's lighting direction and intensity to the existing photo lighting.
+- Blend the facade edges naturally at the boundary so it looks physically attached to the building.
+- The facade should look like it was physically built there and photographed — not digitally composited.
+
+OUTPUT: Generate the final image — identical to the location photo but with the facade inserted in the marked area. Nothing else changes.`;
 
     const userContent: any[] = [
       { type: "text", text: prompt },
