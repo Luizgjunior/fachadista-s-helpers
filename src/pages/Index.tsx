@@ -36,6 +36,21 @@ const Index = () => {
   const [appMode, setAppMode] = useState<AppMode>('generator');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [promoOpen, setPromoOpen] = useState(false);
+  const [hasPurchased, setHasPurchased] = useState<boolean | null>(null);
+
+  // Check if free user has ever purchased
+  useEffect(() => {
+    if (!user || profile?.is_admin || (profile?.plan_id && profile.plan_id !== 'free')) {
+      setHasPurchased(true); // skip promo for admin/paid users
+      return;
+    }
+    supabase
+      .from("cakto_orders")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .then(({ count }) => setHasPurchased((count ?? 0) > 0));
+  }, [user, profile]);
 
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
