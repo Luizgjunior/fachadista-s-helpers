@@ -24,26 +24,36 @@ serve(async (req) => {
       );
     }
 
-    const prompt = `TASK: Architectural facade photomontage.
+    const prompt = `YOU ARE AN ARCHITECTURAL PHOTOMONTAGE ENGINE. YOUR ONLY JOB: PASTE IMAGE 2 INTO THE RED-MARKED AREA OF IMAGE 1.
 
-You receive exactly 3 images:
+INPUT:
+- IMAGE 1: Original clean photo of a real location (building, terrain, street).
+- IMAGE 2: A facade/storefront design. THIS IS THE EXACT VISUAL that must appear in the final image.
+- IMAGE 3: Same photo as Image 1, but the user drew RED MARKS on it. The red area = EXACT placement zone.
 
-IMAGE 1 — ORIGINAL LOCATION PHOTO (clean, unmodified). This is the base photo. The final result MUST be identical to this photo in every pixel EXCEPT the area where the facade is inserted.
+CRITICAL INSTRUCTIONS — FOLLOW WITH ZERO DEVIATION:
 
-IMAGE 2 — FACADE DESIGN to insert. This is the new facade/storefront design.
+1. USE IMAGE 1 AS THE BASE. The final output must be visually IDENTICAL to Image 1 in every area OUTSIDE the red zone.
 
-IMAGE 3 — MARKED LOCATION PHOTO. This is the same location photo but with RED MARKINGS drawn by the user. The red-highlighted area shows EXACTLY where the facade design (image 2) should be placed.
+2. TAKE THE FACADE FROM IMAGE 2 AND PLACE IT EXACTLY WHERE THE RED MARKS ARE IN IMAGE 3.
+   - The facade design (Image 2) must be reproduced FAITHFULLY — same colors, same text, same logo, same proportions, same materials.
+   - Do NOT redesign, reinterpret, or reimagine the facade. Copy it as-is.
+   - Do NOT change the facade's colors, fonts, brand name, layout, or any detail.
 
-ABSOLUTE RULES:
-- Start from IMAGE 1 (the clean original). Keep EVERYTHING unchanged: sky, road, sidewalk, trees, cars, people, poles, signs, neighboring buildings, colors, lighting, shadows — ALL preserved exactly.
-- ONLY replace the area that corresponds to the RED MARKINGS in image 3 with the facade from image 2.
-- Match the facade's perspective to the building geometry in the photo.
-- Match lighting direction and color temperature so the facade looks physically real.
-- Blend edges where the facade meets the existing building seamlessly.
-- Do NOT change the image dimensions, crop, zoom, or aspect ratio.
-- Do NOT alter anything outside the red-marked zone. Zero changes.
+3. PERSPECTIVE: Warp/transform Image 2 so it matches the building's perspective and geometry visible in Image 1. The facade must look like it was physically built there.
 
-Generate the final composited photograph.`;
+4. LIGHTING: Match the lighting direction, shadows, and color temperature from Image 1 so the facade blends naturally.
+
+5. EDGES: Seamlessly blend where the facade meets the existing structure. No harsh cuts.
+
+6. PRESERVE EVERYTHING ELSE: Sky, street, sidewalk, cars, trees, neighboring buildings, signs, poles, people — ALL must remain EXACTLY as in Image 1. ZERO modifications outside the marked area.
+
+7. DO NOT crop, zoom, resize, or change the aspect ratio of the image.
+
+8. THE FACADE IN IMAGE 2 IS SACRED. Reproduce it with maximum fidelity. If it has text, reproduce the text. If it has a logo, reproduce the logo. If it has specific colors, use those exact colors.
+
+OUTPUT: A single photorealistic image showing Image 1 with Image 2's facade inserted in the red-marked zone.`;
+
 
     const userContent: any[] = [
       { type: "text", text: prompt },
