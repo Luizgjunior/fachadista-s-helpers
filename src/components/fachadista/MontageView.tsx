@@ -220,9 +220,9 @@ const MontageView = ({ onConsumeCredits, onUpgradeClick, profile }: MontageViewP
     setStep('generating');
 
     try {
-      const maskImage = exportMask();
+      const markedLocation = await exportMarkedLocation();
       const { data, error } = await supabase.functions.invoke('generate-montage', {
-        body: { locationImage, facadeImage, maskImage },
+        body: { locationImage, facadeImage, markedLocationImage: markedLocation },
       });
 
       if (error) throw error;
