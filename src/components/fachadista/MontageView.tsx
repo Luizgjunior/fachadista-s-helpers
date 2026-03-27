@@ -142,33 +142,55 @@ const MontageView = ({ onConsumeCredits, onUpgradeClick, profile }: MontageViewP
   const handleUndo = () => setStrokes(prev => prev.slice(0, -1));
   const handleClear = () => setStrokes([]);
 
-  const exportMask = (): string | null => {
-    const canvas = canvasRef.current;
-    if (!canvas) return null;
-    // Create a clean mask canvas
-    const maskCanvas = document.createElement('canvas');
-    maskCanvas.width = 1024;
-    maskCanvas.height = Math.round(1024 * (canvas.height / canvas.width));
-    const ctx = maskCanvas.getContext('2d')!;
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
+  const exportMarkedLocation = (): Promise<string | null> => {
+    return new Promise((resolve) => {
+      const img = bgImageRef.current;
+      if (!img) { resolve(null); return; }
 
-    // Draw strokes in white on black background for mask
-    for (const stroke of strokes) {
-      if (stroke.tool !== 'pencil') continue;
-      if (stroke.points.length < 2) continue;
-      ctx.beginPath();
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.lineWidth = stroke.size * (maskCanvas.width / canvas.width);
-      ctx.strokeStyle = 'white';
-      ctx.moveTo(stroke.points[0].x * maskCanvas.width, stroke.points[0].y * maskCanvas.height);
-      for (let i = 1; i < stroke.points.length; i++) {
-        ctx.lineTo(stroke.points[i].x * maskCanvas.width, stroke.points[i].y * maskCanvas.height);
+      // Create a canvas at the original image resolution with markings drawn on top
+      const outCanvas = document.createElement('canvas');
+      outCanvas.width = img.naturalWidth;
+      outCanvas.height = img.naturalHeight;
+      const ctx = outCanvas.getContext('2d')!;
+
+      // Draw the original location photo
+      ctx.drawImage(img, 0, 0, outCanvas.width, outCanvas.height);
+
+      // Draw the red strokes on top (thick, bright red, semi-transparent fill)
+      for (const stroke of strokes) {
+        if (stroke.tool !== 'pencil') continue;
+        if (stroke.points.length < 2) continue;
+        ctx.beginPath();
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        // Scale brush size relative to output resolution
+        const canvas = canvasRef.current;
+        const scaleX = outCanvas.width / (canvas?.width || 1);
+        ctx.lineWidth = stroke.size * scaleX;
+        ctx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
+        ctx.moveTo(stroke.points[0].x * outCanvas.width, stroke.points[0].y * outCanvas.height);
+        for (let i = 1; i < stroke.points.length; i++) {
+          ctx.lineTo(stroke.points[i].x * outCanvas.width, stroke.points[i].y * outCanvas.height);
+        }
+        ctx.stroke();
       }
-      ctx.stroke();
-    }
-    return maskCanvas.toDataURL('image/png');
+
+      // Also fill the marked area for clarity
+      for (const stroke of strokes) {
+        if (stroke.tool !== 'pencil') continue;
+        if (stroke.points.length < 3) continue;
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.25)';
+        ctx.moveTo(stroke.points[0].x * outCanvas.width, stroke.points[0].y * outCanvas.height);
+        for (let i = 1; i < stroke.points.length; i++) {
+          ctx.lineTo(stroke.points[i].x * outCanvas.width, stroke.points[i].y * outCanvas.height);
+        }
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      resolve(outCanvas.toDataURL('image/jpeg', 0.85));
+    });
   };
 
   const processFile = (file: File, target: 'location' | 'facade') => {
