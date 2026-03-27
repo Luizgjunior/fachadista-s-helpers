@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Sparkles, Zap, Image, Layers, Eye, MessageSquare, Star, Check, Clock, Shield, TrendingUp, Play, ChevronDown } from "lucide-react";
+import { ArrowRight, Sparkles, Zap, Image, Layers, Eye, MessageSquare, Star, Check, Clock, Shield, TrendingUp, Play, ChevronDown, Paintbrush, Video, Target, Award, Rocket, Heart } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, useScroll, useTransform, AnimatePresence, type Variants } from "framer-motion";
 import LegalFooter from "@/components/shared/LegalFooter";
