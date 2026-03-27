@@ -296,6 +296,7 @@ const Index = () => {
       />
 
       <UpgradeModal open={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
+      <FreeUserPromo open={promoOpen} onClose={() => setPromoOpen(false)} creditsRemaining={credits} />
 
       {appMode === 'generator' && (
         <>
