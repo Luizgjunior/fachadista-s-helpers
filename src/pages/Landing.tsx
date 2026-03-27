@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Sparkles, Zap, Image, Layers, Eye, MessageSquare, Star, Check, Clock, Shield, TrendingUp, Play, ChevronDown } from "lucide-react";
+import { ArrowRight, Sparkles, Zap, Image, Layers, Eye, MessageSquare, Star, Check, Clock, Shield, TrendingUp, Play, ChevronDown, Paintbrush, Video, Target, Award, Rocket, Heart } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, useScroll, useTransform, AnimatePresence, type Variants } from "framer-motion";
 import LegalFooter from "@/components/shared/LegalFooter";
@@ -205,6 +205,8 @@ const TypewriterText = ({ texts, className }: { texts: string[]; className?: str
 const FEATURES = [
   { icon: Sparkles, title: "Prompts com IA", desc: "Análise inteligente da sua imagem para gerar prompts otimizados para Midjourney e DALL·E." },
   { icon: Image, title: "Render com IA", desc: "Gere renders fotorrealistas direto na plataforma, sem sair do sistema." },
+  { icon: Paintbrush, title: "Montagem de Fachada", desc: "Envie a foto do local, a fachada desejada, marque onde quer posicionar e a IA faz a montagem perfeita." },
+  { icon: Video, title: "Vídeo Animação IA", desc: "Transforme seus renders em vídeos animados cinematográficos para impressionar clientes." },
   { icon: Layers, title: "Comparador", desc: "Compare lado a lado o projeto original e o render para apresentações impactantes." },
   { icon: Eye, title: "Referência Borrada", desc: "Oculte a referência para que a IA crie sem viés, gerando resultados mais criativos." },
   { icon: Zap, title: "Parâmetros Avançados", desc: "Controle iluminação, estilo, vegetação, entorno urbano e muito mais." },
@@ -215,35 +217,41 @@ const HOW_IT_WORKS = [
   { step: "01", title: "Faça upload", desc: "Envie qualquer imagem: SketchUp, Revit, croqui à mão, foto de maquete.", icon: Image },
   { step: "02", title: "Configure", desc: "Ajuste estilo, iluminação, vegetação e parâmetros com controles intuitivos.", icon: Zap },
   { step: "03", title: "Gere com IA", desc: "Nossa IA cria o prompt perfeito e gera o render fotorrealista em segundos.", icon: Sparkles },
-  { step: "04", title: "Apresente", desc: "Compare antes/depois e surpreenda seu cliente com resultados de estúdio.", icon: TrendingUp },
+  { step: "04", title: "Apresente", desc: "Compare antes/depois, monte fachadas e crie vídeos para surpreender seu cliente.", icon: TrendingUp },
 ];
 
 const PAIN_POINTS = [
   { problem: "3-5 dias esperando o render", solution: "Pronto em 30 segundos", icon: Clock },
   { problem: "R$ 500-2.000 por render externo", solution: "A partir de R$ 1,00 por render", icon: TrendingUp },
   { problem: "Software pesado + máquina cara", solution: "100% online, sem instalação", icon: Shield },
+  { problem: "Horas montando fachada no Photoshop", solution: "Montagem IA em 1 clique", icon: Paintbrush },
 ];
 
 const PLANS = [
-  { name: "Starter", credits: 50, price: "R$ 19,90", perCredit: "R$ 0,40", popular: false, features: ["50 créditos/mês", "~16 prompts, ~10 renders ou ~1 vídeo IA", "Recarga automática mensal", "Comparador de renders"] },
-  { name: "Pro", credits: 200, price: "R$ 49,90", perCredit: "R$ 0,25", popular: true, features: ["200 créditos/mês", "~66 prompts, ~40 renders ou ~6 vídeos IA", "Recarga automática mensal", "Economia de 37%", "Preview visual IA", "Suporte prioritário"] },
-  { name: "Studio", credits: 500, price: "R$ 99,90", perCredit: "R$ 0,20", popular: false, features: ["500 créditos/mês", "~166 prompts, ~100 renders ou ~16 vídeos IA", "Recarga automática mensal", "Economia de 50%", "Acesso antecipado a novidades", "Suporte VIP"] },
+  { name: "Starter", credits: 50, price: "R$ 19,90", perCredit: "R$ 0,40", popular: false, features: ["50 créditos/mês", "~16 prompts, ~10 renders ou ~1 vídeo IA", "Montagem de fachada com IA", "Recarga automática mensal", "Comparador de renders"] },
+  { name: "Pro", credits: 200, price: "R$ 49,90", perCredit: "R$ 0,25", popular: true, features: ["200 créditos/mês", "~66 prompts, ~40 renders ou ~6 vídeos IA", "Montagem de fachada com IA", "Recarga automática mensal", "Economia de 37%", "Preview visual IA", "Suporte prioritário"] },
+  { name: "Studio", credits: 500, price: "R$ 99,90", perCredit: "R$ 0,20", popular: false, features: ["500 créditos/mês", "~166 prompts, ~100 renders ou ~16 vídeos IA", "Montagem de fachada ilimitada", "Recarga automática mensal", "Economia de 50%", "Acesso antecipado a novidades", "Suporte VIP"] },
 ];
 
 const FAQ = [
   { q: "Como funciona o NewRender?", a: "Você faz upload de uma imagem do seu projeto (SketchUp, planta, croqui), configura parâmetros como iluminação e estilo, e nossa IA gera um prompt profissional otimizado. Com esse prompt, você pode gerar um render fotorrealista diretamente na plataforma." },
+  { q: "O que é a Montagem de Fachada?", a: "É a funcionalidade mais poderosa do NewRender. Você envia a foto real do local (terreno, prédio), envia o projeto da fachada, marca na foto onde quer posicionar e a IA faz a composição fotorrealista — como se a fachada já estivesse construída. Perfeito para apresentar ao cliente." },
   { q: "Preciso saber usar Midjourney?", a: "Não! O NewRender gera o prompt pronto para copiar e colar. Além disso, você pode gerar o render direto na nossa plataforma sem precisar de nenhuma outra ferramenta." },
-  { q: "Quanto custa cada operação?", a: "Prompt: 3 créditos. Render com IA: 5 créditos. Vídeo animação IA: 30 créditos. Você pode comprar pacotes de créditos sem mensalidade." },
+  { q: "Quanto custa cada operação?", a: "Prompt: 3 créditos. Render com IA: 5 créditos. Montagem de Fachada: 10 créditos. Vídeo animação IA: 30 créditos. Você pode comprar pacotes de créditos sem mensalidade." },
   { q: "Os créditos expiram?", a: "Não! Seus créditos ficam na conta até serem usados. Sem prazo de validade, sem surpresas." },
-  { q: "Posso usar qualquer tipo de imagem?", a: "Sim! SketchUp, Revit, AutoCAD, fotos de maquete, croquis à mão livre, plantas humanizadas — qualquer referência visual funciona." },
+  { q: "Posso usar qualquer tipo de imagem?", a: "Sim! SketchUp, Revit, AutoCAD, fotos de maquete, croquis à mão livre, plantas humanizadas, fotos de terrenos reais — qualquer referência visual funciona." },
   { q: "A qualidade do render é profissional?", a: "Sim. Nosso sistema usa modelos de IA de última geração com prompts otimizados especificamente para arquitetura, gerando resultados com qualidade de estúdio de renderização." },
 ];
 
 const TESTIMONIALS = [
   { name: "Arq. Marina S.", role: "Escritório de Fachadas", text: "Reduzi de 3 dias para 15 minutos o tempo de apresentação de fachadas para o cliente. Impressionante.", stars: 5 },
-  { name: "Arq. Ricardo L.", role: "Projetos Residenciais", text: "Os renders gerados são tão bons que meus clientes não acreditam que foram feitos com IA. Excelente custo-benefício.", stars: 5 },
+  { name: "Arq. Ricardo L.", role: "Projetos Residenciais", text: "A montagem de fachada é absurda. Mostro pro cliente como vai ficar o prédio no terreno real. Nunca mais perco venda.", stars: 5 },
   { name: "Designer Juliana M.", role: "Interiores & Comercial", text: "Uso para interiores e fachadas. A função de comparação antes/depois é perfeita para reuniões com o cliente.", stars: 5 },
+  { name: "Eng. Carlos P.", role: "Construtora", text: "Os vídeos animados e montagens de fachada mudaram o nível das nossas apresentações. O cliente assina na hora.", stars: 5 },
 ];
+
+
+
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -503,7 +511,151 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* ═══ FEATURES ═══ */}
+      {/* ═══ MONTAGEM DE FACHADA — SHOWCASE ═══ */}
+      <section className="px-4 pb-16 md:pb-24">
+        <div className="max-w-5xl mx-auto pt-16">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            className="text-center mb-12"
+          >
+            <span className="inline-block bg-gradient-to-r from-primary/20 to-brand-glow/20 text-primary rounded-full px-5 py-1.5 text-[9px] font-black uppercase tracking-widest mb-4 border border-primary/20">
+              ✨ NOVO — EXCLUSIVO
+            </span>
+            <h2 className="text-2xl md:text-5xl font-black uppercase tracking-tight leading-tight">
+              Montagem de Fachada<br />
+              <span className="text-primary">com Inteligência Artificial</span>
+            </h2>
+            <p className="text-sm md:text-base text-muted-foreground mt-4 max-w-2xl mx-auto">
+              Mostre ao seu cliente <strong className="text-foreground">exatamente como vai ficar</strong> a fachada no terreno real.
+              Sem Photoshop. Sem renderista. Em segundos.
+            </p>
+          </motion.div>
+
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+          >
+            {[
+              { step: "1", icon: Image, title: "Foto do Local", desc: "Tire uma foto do terreno ou prédio existente com seu celular." },
+              { step: "2", icon: Paintbrush, title: "Marque a Área", desc: "Desenhe com o dedo ou mouse onde a fachada deve aparecer." },
+              { step: "3", icon: Sparkles, title: "IA Gera a Montagem", desc: "A IA posiciona a fachada com perspectiva e iluminação realistas." },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                variants={fadeUp}
+                className="relative bg-surface border border-border rounded-3xl p-6 text-center group hover:border-primary/30 transition-all overflow-hidden"
+              >
+                <div className="absolute top-3 right-4 text-5xl font-black text-primary/10">{item.step}</div>
+                <div className="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                  <item.icon className="w-6 h-6" />
+                </div>
+                <h3 className="text-sm font-black uppercase tracking-wider mb-2">{item.title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Persuasive highlight box */}
+          <motion.div
+            variants={scaleUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-surface to-brand-glow/5 border-2 border-primary/20 rounded-[32px] p-8 md:p-12"
+          >
+            <div className="absolute top-0 right-0 w-60 h-60 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-40 h-40 bg-brand-glow/10 rounded-full blur-[80px] pointer-events-none" />
+            <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
+              <div className="flex-1 space-y-4">
+                <h3 className="text-xl md:text-2xl font-black uppercase tracking-tight">
+                  O cliente vê. <span className="text-primary">O cliente compra.</span>
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Arquitetos que mostram montagens de fachada no local real <strong className="text-foreground">fecham 3x mais projetos</strong>. 
+                  Seu cliente não precisa mais imaginar — ele <em>vê</em>.
+                </p>
+                <ul className="space-y-2">
+                  {[
+                    "Foto do terreno + render = apresentação matadora",
+                    "Funciona com celular — tire a foto e monte na hora",
+                    "Perspectiva e iluminação ajustadas pela IA automaticamente",
+                    "Apenas 10 créditos por montagem",
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-center gap-2 text-xs font-bold text-foreground">
+                      <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="flex-shrink-0">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => navigate("/login")}
+                  className="bg-primary text-primary-foreground px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-[0.15em] shadow-xl shadow-primary/25 flex items-center gap-2"
+                >
+                  <Paintbrush className="w-4 h-4" /> Experimentar agora
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══ WHY SUBSCRIBE — PERSUASIVE ═══ */}
+      <section className="px-4 pb-16 md:pb-24 bg-surface-muted/50">
+        <div className="max-w-5xl mx-auto py-16">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            className="text-center mb-12"
+          >
+            <span className="inline-block bg-primary/10 text-primary rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest mb-4">POR QUE ASSINAR</span>
+            <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tight">
+              Tudo que você ganha<br />
+              <span className="text-primary">com o NewRender</span>
+            </h2>
+          </motion.div>
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
+          >
+            {[
+              { icon: Rocket, value: "30s", label: "Tempo médio de render", desc: "Enquanto seu concorrente espera 3 dias, você já apresentou." },
+              { icon: Target, value: "3x", label: "Mais fechamentos", desc: "Clientes compram quando veem. Montagens reais vendem mais." },
+              { icon: Award, value: "R$1", label: "Por render", desc: "Menos que um café. Resultados de estúdio profissional." },
+              { icon: Heart, value: "∞", label: "Possibilidades", desc: "Prompts, renders, montagens, vídeos — tudo numa plataforma." },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                variants={fadeUp}
+                whileHover={{ y: -6 }}
+                className="bg-surface border border-border rounded-3xl p-6 text-center group hover:border-primary/30 transition-all"
+              >
+                <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                  <item.icon className="w-5 h-5" />
+                </div>
+                <p className="text-3xl font-black text-primary tabular-nums mb-1">{item.value}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">{item.label}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
       <section className="px-4 pb-16 md:pb-24">
         <div className="max-w-5xl mx-auto pt-16">
           <motion.div
@@ -523,7 +675,7 @@ const Landing = () => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
           >
             {FEATURES.map((f, i) => (
               <motion.div
@@ -563,7 +715,7 @@ const Landing = () => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-5"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
           >
             {TESTIMONIALS.map((t, i) => (
               <motion.div key={i} variants={fadeUp} whileHover={{ y: -4 }} className="bg-surface border border-border rounded-3xl p-6 hover:border-primary/20 transition-all">
