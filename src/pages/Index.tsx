@@ -32,7 +32,7 @@ const mobileLoadingMessages = [
 const Index = () => {
   const navigate = useNavigate();
   const { user, profile, signOut, refreshProfile } = useAuth();
-  const { credits, hasCreditsForPrompt, hasCreditsForImage, consumePromptCredits, consumeImageCredits } = useCredits({ profile, refreshProfile });
+  const { credits, hasCreditsForPrompt, hasCreditsForImage, consumePromptCredits, consumeImageCredits, consumeMontageCredits } = useCredits({ profile, refreshProfile });
 
   const [appMode, setAppMode] = useState<AppMode>('generator');
   const [drawerOpen, setDrawerOpen] = useState(false);
