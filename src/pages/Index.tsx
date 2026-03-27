@@ -414,6 +414,14 @@ const Index = () => {
         />
       )}
 
+      {appMode === 'montagem' && (
+        <MontageView
+          onConsumeCredits={consumeMontageCredits}
+          onUpgradeClick={() => setUpgradeOpen(true)}
+          profile={profile}
+        />
+      )}
+
       <LegalFooter />
 
       <input type="file" ref={fileInputRef} className="hidden" accept="image/png, image/jpeg, image/webp" multiple onChange={(e) => handleFileUpload(e, 'main')} />
