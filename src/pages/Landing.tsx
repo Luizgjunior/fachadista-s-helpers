@@ -511,7 +511,151 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* ═══ FEATURES ═══ */}
+      {/* ═══ MONTAGEM DE FACHADA — SHOWCASE ═══ */}
+      <section className="px-4 pb-16 md:pb-24">
+        <div className="max-w-5xl mx-auto pt-16">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            className="text-center mb-12"
+          >
+            <span className="inline-block bg-gradient-to-r from-primary/20 to-brand-glow/20 text-primary rounded-full px-5 py-1.5 text-[9px] font-black uppercase tracking-widest mb-4 border border-primary/20">
+              ✨ NOVO — EXCLUSIVO
+            </span>
+            <h2 className="text-2xl md:text-5xl font-black uppercase tracking-tight leading-tight">
+              Montagem de Fachada<br />
+              <span className="text-primary">com Inteligência Artificial</span>
+            </h2>
+            <p className="text-sm md:text-base text-muted-foreground mt-4 max-w-2xl mx-auto">
+              Mostre ao seu cliente <strong className="text-foreground">exatamente como vai ficar</strong> a fachada no terreno real.
+              Sem Photoshop. Sem renderista. Em segundos.
+            </p>
+          </motion.div>
+
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+          >
+            {[
+              { step: "1", icon: Image, title: "Foto do Local", desc: "Tire uma foto do terreno ou prédio existente com seu celular." },
+              { step: "2", icon: Paintbrush, title: "Marque a Área", desc: "Desenhe com o dedo ou mouse onde a fachada deve aparecer." },
+              { step: "3", icon: Sparkles, title: "IA Gera a Montagem", desc: "A IA posiciona a fachada com perspectiva e iluminação realistas." },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                variants={fadeUp}
+                className="relative bg-surface border border-border rounded-3xl p-6 text-center group hover:border-primary/30 transition-all overflow-hidden"
+              >
+                <div className="absolute top-3 right-4 text-5xl font-black text-primary/10">{item.step}</div>
+                <div className="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                  <item.icon className="w-6 h-6" />
+                </div>
+                <h3 className="text-sm font-black uppercase tracking-wider mb-2">{item.title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Persuasive highlight box */}
+          <motion.div
+            variants={scaleUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-surface to-brand-glow/5 border-2 border-primary/20 rounded-[32px] p-8 md:p-12"
+          >
+            <div className="absolute top-0 right-0 w-60 h-60 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-40 h-40 bg-brand-glow/10 rounded-full blur-[80px] pointer-events-none" />
+            <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
+              <div className="flex-1 space-y-4">
+                <h3 className="text-xl md:text-2xl font-black uppercase tracking-tight">
+                  O cliente vê. <span className="text-primary">O cliente compra.</span>
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Arquitetos que mostram montagens de fachada no local real <strong className="text-foreground">fecham 3x mais projetos</strong>. 
+                  Seu cliente não precisa mais imaginar — ele <em>vê</em>.
+                </p>
+                <ul className="space-y-2">
+                  {[
+                    "Foto do terreno + render = apresentação matadora",
+                    "Funciona com celular — tire a foto e monte na hora",
+                    "Perspectiva e iluminação ajustadas pela IA automaticamente",
+                    "Apenas 10 créditos por montagem",
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-center gap-2 text-xs font-bold text-foreground">
+                      <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="flex-shrink-0">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => navigate("/login")}
+                  className="bg-primary text-primary-foreground px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-[0.15em] shadow-xl shadow-primary/25 flex items-center gap-2"
+                >
+                  <Paintbrush className="w-4 h-4" /> Experimentar agora
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══ WHY SUBSCRIBE — PERSUASIVE ═══ */}
+      <section className="px-4 pb-16 md:pb-24 bg-surface-muted/50">
+        <div className="max-w-5xl mx-auto py-16">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            className="text-center mb-12"
+          >
+            <span className="inline-block bg-primary/10 text-primary rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest mb-4">POR QUE ASSINAR</span>
+            <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tight">
+              Tudo que você ganha<br />
+              <span className="text-primary">com o NewRender</span>
+            </h2>
+          </motion.div>
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
+          >
+            {[
+              { icon: Rocket, value: "30s", label: "Tempo médio de render", desc: "Enquanto seu concorrente espera 3 dias, você já apresentou." },
+              { icon: Target, value: "3x", label: "Mais fechamentos", desc: "Clientes compram quando veem. Montagens reais vendem mais." },
+              { icon: Award, value: "R$1", label: "Por render", desc: "Menos que um café. Resultados de estúdio profissional." },
+              { icon: Heart, value: "∞", label: "Possibilidades", desc: "Prompts, renders, montagens, vídeos — tudo numa plataforma." },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                variants={fadeUp}
+                whileHover={{ y: -6 }}
+                className="bg-surface border border-border rounded-3xl p-6 text-center group hover:border-primary/30 transition-all"
+              >
+                <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                  <item.icon className="w-5 h-5" />
+                </div>
+                <p className="text-3xl font-black text-primary tabular-nums mb-1">{item.value}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">{item.label}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
       <section className="px-4 pb-16 md:pb-24">
         <div className="max-w-5xl mx-auto pt-16">
           <motion.div
